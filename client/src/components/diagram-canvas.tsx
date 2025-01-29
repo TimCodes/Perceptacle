@@ -13,6 +13,21 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'active':
+      return '#48BB78'; // green.500
+    case 'warning':
+      return '#ECC94B'; // yellow.500
+    case 'error':
+      return '#E53E3E'; // red.500
+    case 'inactive':
+      return '#A0AEC0'; // gray.500
+    default:
+      return '#CBD5E0'; // gray.300
+  }
+};
+
 export default function DiagramCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -41,6 +56,7 @@ export default function DiagramCanvas() {
         y: event.clientY,
       });
 
+      const initialStatus = 'active';
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
         type: 'default',
@@ -48,13 +64,13 @@ export default function DiagramCanvas() {
         data: { 
           label: type, 
           icon: type,
-          status: 'active', // Default status
+          status: initialStatus,
           description: '',
           instanceType: ''
         },
         style: {
           background: '#ffffff',
-          border: '1px solid #ccc',
+          border: `2px solid ${getStatusColor(initialStatus)}`,
           borderRadius: '4px',
           padding: '10px'
         }

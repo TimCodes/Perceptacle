@@ -36,6 +36,10 @@ export default function ConfigPanel() {
         ...selectedNode.style,
         border: `2px solid ${getStatusColor(value)}`,
       };
+    } else {
+      updatedNode.style = {
+        ...selectedNode.style,
+      };
     }
 
     updateSelectedNode(updatedNode);
