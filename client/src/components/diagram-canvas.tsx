@@ -1,23 +1,50 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import ReactFlow, {
   Controls,
   Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
   Connection,
   Edge,
   ReactFlowInstance,
-  Node
+  Node,
+  addEdge
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
 
 export default function DiagramCanvas() {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
-  const { setSelectedNode } = useDiagramStore();
+  const {
+    nodes,
+    edges,
+    setNodes,
+    setEdges,
+    setRfInstance,
+    setSelectedNode
+  } = useDiagramStore();
+
+  const onNodesChange = useCallback((changes: any) => {
+    setNodes(
+      changes.reduce((acc: Node[], change: any) => {
+        if (change.type === 'position' || change.type === 'dimensions') {
+          const node = nodes.find((n) => n.id === change.id);
+          if (node) {
+            return [...acc, { ...node, position: change.position || node.position }];
+          }
+        }
+        return acc;
+      }, []) || nodes
+    );
+  }, [nodes, setNodes]);
+
+  const onEdgesChange = useCallback((changes: any) => {
+    setEdges(
+      changes.reduce((acc: Edge[], change: any) => {
+        if (change.type === 'remove') {
+          return acc.filter((e) => e.id !== change.id);
+        }
+        return acc;
+      }, edges)
+    );
+  }, [edges, setEdges]);
 
   const onConnect = useCallback(
     (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
@@ -34,12 +61,12 @@ export default function DiagramCanvas() {
       event.preventDefault();
 
       const type = event.dataTransfer.getData('application/reactflow');
-      if (!type || !rfInstance) return;
+      if (!type) return;
 
-      const position = rfInstance.screenToFlowPosition({
+      const position = {
         x: event.clientX,
-        y: event.clientY,
-      });
+        y: event.clientY
+      };
 
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
@@ -48,9 +75,9 @@ export default function DiagramCanvas() {
         data: { label: type, icon: type },
       };
 
-      setNodes((nds) => nds.concat(newNode));
+      setNodes([...nodes, newNode]);
     },
-    [rfInstance, setNodes]
+    [nodes, setNodes]
   );
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
