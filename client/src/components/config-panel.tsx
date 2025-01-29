@@ -5,6 +5,7 @@ import {
   Text,
   FormControl,
   FormLabel,
+  FormHelperText,
 } from '@chakra-ui/react';
 import { useDiagramStore } from '@/lib/diagram-store';
 
@@ -31,7 +32,7 @@ export default function ConfigPanel() {
 
   return (
     <Box p={4} borderLeft="1px" borderColor="gray.200">
-      <Text fontSize="lg" fontWeight="bold" mb={4}>Node Configuration</Text>
+      <Text mb={4} fontWeight="bold" fontSize="lg">Node Configuration</Text>
 
       <VStack spacing={4} align="stretch">
         <FormControl>

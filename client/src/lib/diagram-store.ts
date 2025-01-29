@@ -17,8 +17,8 @@ interface DiagramState {
 }
 
 export const useDiagramStore = create<DiagramState>((set, get) => ({
-  nodes: [] as Node[],
-  edges: [] as Edge[],
+  nodes: [],
+  edges: [],
   selectedNode: null,
   rfInstance: null,
 
@@ -42,16 +42,23 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
   },
 
   saveDiagram: () => {
-    const { nodes, edges } = get();
-    const flow = { nodes, edges };
+    const { rfInstance } = get();
+    if (!rfInstance) return;
+
+    const flow = rfInstance.toObject();
     localStorage.setItem('gcp-diagram', JSON.stringify(flow));
   },
 
   loadDiagram: () => {
+    const { rfInstance } = get();
+    if (!rfInstance) return;
+
     const flow = localStorage.getItem('gcp-diagram');
     if (flow) {
       const { nodes, edges } = JSON.parse(flow);
-      set({ nodes: nodes || [], edges: edges || [] });
+      rfInstance.setNodes(nodes);
+      rfInstance.setEdges(edges);
+      set({ nodes, edges });
     }
   },
 

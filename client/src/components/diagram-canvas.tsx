@@ -1,71 +1,73 @@
+import { useCallback, useState } from 'react';
 import ReactFlow, {
   Controls,
   Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
   Connection,
   Edge,
-  Node,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
+  ReactFlowInstance,
+  Node
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { useCallback } from 'react';
 import { useDiagramStore } from '@/lib/diagram-store';
 
 export default function DiagramCanvas() {
-  const {
-    nodes,
-    edges,
-    setNodes,
-    setEdges,
-    setRfInstance,
-    setSelectedNode,
-  } = useDiagramStore();
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
+  const { setSelectedNode } = useDiagramStore();
 
-  const onNodesChange = useCallback((changes: any) => {
-    setNodes(applyNodeChanges(changes, nodes));
-  }, [nodes, setNodes]);
-
-  const onEdgesChange = useCallback((changes: any) => {
-    setEdges(applyEdgeChanges(changes, edges || []));
-  }, [edges, setEdges]);
-
-  const onConnect = useCallback((params: Connection) => {
-    setEdges((eds) => addEdge(params, eds || []));
-  }, [setEdges]);
+  const onConnect = useCallback(
+    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    [setEdges]
+  );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
-  const onDrop = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
+  const onDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault();
 
-    const type = event.dataTransfer.getData('application/reactflow');
-    if (!type) return;
+      const type = event.dataTransfer.getData('application/reactflow');
+      if (!type || !rfInstance) return;
 
-    const newNode: Node = {
-      id: `${type}-${Date.now()}`,
-      type: 'default',
-      position: { x: event.clientX - 250, y: event.clientY - 100 },
-      data: { label: type },
-    };
+      const position = rfInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
+      });
 
-    setNodes((nds) => [...(nds || []), newNode]);
-  }, [setNodes]);
+      const newNode: Node = {
+        id: `${type}-${Date.now()}`,
+        type: 'default',
+        position,
+        data: { label: type, icon: type },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [rfInstance, setNodes]
+  );
+
+  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+    setSelectedNode(node);
+  }, [setSelectedNode]);
 
   return (
     <ReactFlow
-      nodes={nodes || []}
-      edges={edges || []}
+      nodes={nodes}
+      edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       onInit={setRfInstance}
       onDrop={onDrop}
       onDragOver={onDragOver}
-      onNodeClick={(_, node) => setSelectedNode(node)}
+      onNodeClick={onNodeClick}
       fitView
     >
       <Background />
