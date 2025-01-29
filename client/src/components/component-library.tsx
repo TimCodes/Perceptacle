@@ -1,10 +1,11 @@
-import { Stack, Input, Box, Text, SimpleGrid } from '@chakra-ui/react';
+import { Stack, Input, Box, Text, SimpleGrid, useTheme } from '@chakra-ui/react';
 import { Search } from 'lucide-react';
 import { GCPComponents } from '@/lib/gcp-components';
 import { useState } from 'react';
 
 export default function ComponentLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
+  const theme = useTheme();
 
   const filteredComponents = GCPComponents.filter(component =>
     component.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -16,7 +17,7 @@ export default function ComponentLibrary() {
   };
 
   return (
-    <Stack direction="column" p={4} spacing={4}>
+    <Stack direction="column" p={4} spacing={4} bg={theme.colors.white}>
       <Box position="relative">
         <Input
           placeholder="Search components..."
@@ -31,7 +32,7 @@ export default function ComponentLibrary() {
             left: '12px',
             top: '50%',
             transform: 'translateY(-50%)',
-            color: 'gray'
+            color: theme.colors.gray[500]
           }}
         />
       </Box>
@@ -42,12 +43,12 @@ export default function ComponentLibrary() {
             key={component.type}
             p={2}
             border="1px"
-            borderColor="gray.200"
+            borderColor={theme.colors.gray[200]}
             borderRadius="md"
             cursor="grab"
             draggable
             onDragStart={(e) => onDragStart(e, component.type)}
-            _hover={{ bg: 'gray.50' }}
+            _hover={{ bg: theme.colors.gray[50] }}
             textAlign="center"
           >
             <component.icon size={32} style={{ margin: '0 auto' }} />

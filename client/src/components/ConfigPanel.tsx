@@ -1,12 +1,20 @@
 import {
   Box,
   VStack,
-  FormControl,
-  FormLabel,
   Input,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
+
+import {
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
+  FormErrorIcon,
+} from "@chakra-ui/form-control"
+
+
 import { Node } from 'reactflow';
 
 interface ConfigPanelProps {

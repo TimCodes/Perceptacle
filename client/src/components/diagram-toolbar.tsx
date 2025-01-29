@@ -1,10 +1,12 @@
-import { Flex, Button, useToast as useChakraToast } from '@chakra-ui/react';
+import { Flex, Button, useTheme } from '@chakra-ui/react';
 import { Save, Trash2, Plus, Download } from 'lucide-react';
 import { useCallback } from 'react';
 import { useDiagramStore } from '@/lib/diagram-store';
+import { useToast } from '@/hooks/use-toast';
 
 export default function DiagramToolbar() {
-  const toast = useChakraToast();
+  const toast = useToast();
+  const theme = useTheme();
   const { saveDiagram, loadDiagram, clearDiagram } = useDiagramStore();
 
   const handleSave = useCallback(() => {
@@ -24,7 +26,7 @@ export default function DiagramToolbar() {
   }, [clearDiagram]);
 
   return (
-    <Flex p={4} justify="space-between">
+    <Flex p={4} justify="space-between" bg={theme.colors.white} borderBottom="1px" borderColor={theme.colors.gray[200]}>
       <Flex gap={2}>
         <Button
           onClick={handleNew}

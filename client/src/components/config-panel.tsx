@@ -1,20 +1,24 @@
 import {
   Box,
-  Flex,
+  VStack,
   Input,
   Text,
   FormControl,
-  FormLabel
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
+  useTheme,
 } from '@chakra-ui/react';
 import { useDiagramStore } from '@/lib/diagram-store';
 
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
+  const theme = useTheme();
 
   if (!selectedNode) {
     return (
-      <Box p={4}>
-        <Text color="gray.500">Select a node to configure its properties</Text>
+      <Box p={4} bg={theme.colors.white}>
+        <Text color={theme.colors.gray[500]}>Select a node to configure its properties</Text>
       </Box>
     );
   }
@@ -27,7 +31,7 @@ export default function ConfigPanel() {
   };
 
   return (
-    <Flex direction="column" p={4} gap={4}>
+    <VStack spacing={4} p={4} align="stretch" bg={theme.colors.white}>
       <Text fontWeight="bold" fontSize="lg">Node Configuration</Text>
 
       <FormControl>
@@ -36,6 +40,7 @@ export default function ConfigPanel() {
           value={selectedNode.data.label || ''}
           onChange={(e) => handleChange('label', e.target.value)}
         />
+        <FormHelperText>Enter a name for this component</FormHelperText>
       </FormControl>
 
       <FormControl>
@@ -44,6 +49,7 @@ export default function ConfigPanel() {
           value={selectedNode.data.description || ''}
           onChange={(e) => handleChange('description', e.target.value)}
         />
+        <FormHelperText>Brief description of the component's purpose</FormHelperText>
       </FormControl>
 
       <FormControl>
@@ -52,7 +58,8 @@ export default function ConfigPanel() {
           value={selectedNode.data.instanceType || ''}
           onChange={(e) => handleChange('instanceType', e.target.value)}
         />
+        <FormHelperText>The type of GCP instance (e.g., n1-standard-1)</FormHelperText>
       </FormControl>
-    </Flex>
+    </VStack>
   );
 }

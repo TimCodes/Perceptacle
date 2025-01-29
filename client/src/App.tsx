@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ChakraProvider } from "@chakra-ui/react";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
+import { theme } from "./lib/theme";
 
 function Router() {
   return (
@@ -17,7 +18,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ChakraProvider>
+      <ChakraProvider theme={theme}>
         <Router />
       </ChakraProvider>
     </QueryClientProvider>
