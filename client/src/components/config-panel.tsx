@@ -6,6 +6,7 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
+  Select,
 } from '@chakra-ui/react';
 import { useDiagramStore } from '@/lib/diagram-store';
 
@@ -27,7 +28,26 @@ export default function ConfigPanel() {
         ...selectedNode.data,
         [field]: value,
       },
+      style: {
+        ...selectedNode.style,
+        border: `2px solid ${getStatusColor(value)}`,
+      }
     });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return '#48BB78'; // green.500
+      case 'warning':
+        return '#ECC94B'; // yellow.500
+      case 'error':
+        return '#E53E3E'; // red.500
+      case 'inactive':
+        return '#A0AEC0'; // gray.500
+      default:
+        return '#CBD5E0'; // gray.300
+    }
   };
 
   return (
@@ -42,6 +62,20 @@ export default function ConfigPanel() {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('label', e.target.value)}
           />
           <FormHelperText>Enter a name for this component</FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Status</FormLabel>
+          <Select
+            value={selectedNode.data.status || 'active'}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChange('status', e.target.value)}
+          >
+            <option value="active">Active</option>
+            <option value="warning">Warning</option>
+            <option value="error">Error</option>
+            <option value="inactive">Inactive</option>
+          </Select>
+          <FormHelperText>Current status of the component</FormHelperText>
         </FormControl>
 
         <FormControl>

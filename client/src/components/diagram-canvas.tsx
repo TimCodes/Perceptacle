@@ -45,7 +45,19 @@ export default function DiagramCanvas() {
         id: `${type}-${Date.now()}`,
         type: 'default',
         position,
-        data: { label: type, icon: type },
+        data: { 
+          label: type, 
+          icon: type,
+          status: 'active', // Default status
+          description: '',
+          instanceType: ''
+        },
+        style: {
+          background: '#ffffff',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          padding: '10px'
+        }
       };
 
       setNodes((nds) => nds.concat(newNode));
