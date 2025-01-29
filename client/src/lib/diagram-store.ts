@@ -51,7 +51,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     const flow = localStorage.getItem('gcp-diagram');
     if (flow) {
       const { nodes, edges } = JSON.parse(flow);
-      set({ nodes, edges });
+      set({ nodes: nodes || [], edges: edges || [] });
     }
   },
 

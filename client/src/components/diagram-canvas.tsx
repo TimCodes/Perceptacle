@@ -27,42 +27,38 @@ export default function DiagramCanvas() {
   }, [nodes, setNodes]);
 
   const onEdgesChange = useCallback((changes: any) => {
-    setEdges(applyEdgeChanges(changes, edges));
+    setEdges(applyEdgeChanges(changes, edges || []));
   }, [edges, setEdges]);
 
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  const onConnect = useCallback((params: Connection) => {
+    setEdges((eds) => addEdge(params, eds || []));
+  }, [setEdges]);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
+  const onDrop = useCallback((event: React.DragEvent) => {
+    event.preventDefault();
 
-      const type = event.dataTransfer.getData('application/reactflow');
-      if (!type) return;
+    const type = event.dataTransfer.getData('application/reactflow');
+    if (!type) return;
 
-      const newNode: Node = {
-        id: `${type}-${Date.now()}`,
-        type: 'default',
-        position: { x: event.clientX - 250, y: event.clientY - 100 },
-        data: { label: type },
-      };
+    const newNode: Node = {
+      id: `${type}-${Date.now()}`,
+      type: 'default',
+      position: { x: event.clientX - 250, y: event.clientY - 100 },
+      data: { label: type },
+    };
 
-      setNodes([...(nodes || []), newNode]);
-    },
-    [nodes, setNodes]
-  );
+    setNodes((nds) => [...(nds || []), newNode]);
+  }, [setNodes]);
 
   return (
     <ReactFlow
-      nodes={nodes}
-      edges={edges}
+      nodes={nodes || []}
+      edges={edges || []}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
