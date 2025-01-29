@@ -11,8 +11,6 @@ interface DiagramState {
   setSelectedNode: (node: Node | null) => void;
   setRfInstance: (instance: ReactFlowInstance) => void;
   updateSelectedNode: (node: Node) => void;
-  deleteNode: (nodeId: string) => void;
-  addNode: (node: Node) => void;
   saveDiagram: () => void;
   loadDiagram: () => void;
   clearDiagram: () => void;
@@ -41,25 +39,6 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
       nodes: updatedNodes,
       selectedNode: node
     });
-  },
-
-  deleteNode: (nodeId) => {
-    const { nodes, edges } = get();
-    const updatedNodes = nodes.filter((node) => node.id !== nodeId);
-    const updatedEdges = edges.filter(
-      (edge) => edge.source !== nodeId && edge.target !== nodeId
-    );
-
-    set({
-      nodes: updatedNodes,
-      edges: updatedEdges,
-      selectedNode: null
-    });
-  },
-
-  addNode: (node) => {
-    const { nodes } = get();
-    set({ nodes: [...nodes, node] });
   },
 
   saveDiagram: () => {

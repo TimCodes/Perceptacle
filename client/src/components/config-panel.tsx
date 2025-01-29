@@ -5,14 +5,11 @@ import {
   Text,
   FormControl,
   FormLabel,
-  FormHelperText,
-  Button,
 } from '@chakra-ui/react';
-import { Trash2 } from 'lucide-react';
 import { useDiagramStore } from '@/lib/diagram-store';
 
 export default function ConfigPanel() {
-  const { selectedNode, updateSelectedNode, deleteNode } = useDiagramStore();
+  const { selectedNode, updateSelectedNode } = useDiagramStore();
 
   if (!selectedNode) {
     return (
@@ -32,15 +29,9 @@ export default function ConfigPanel() {
     });
   };
 
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this node?')) {
-      deleteNode(selectedNode.id);
-    }
-  };
-
   return (
     <Box p={4} borderLeft="1px" borderColor="gray.200">
-      <Text mb={4} fontWeight="bold" fontSize="lg">Node Configuration</Text>
+      <Text fontSize="lg" fontWeight="bold" mb={4}>Node Configuration</Text>
 
       <VStack spacing={4} align="stretch">
         <FormControl>
@@ -69,16 +60,6 @@ export default function ConfigPanel() {
           />
           <FormHelperText>The type of GCP instance (e.g., n1-standard-1)</FormHelperText>
         </FormControl>
-
-        <Button
-          leftIcon={<Trash2 size={16} />}
-          colorScheme="red"
-          variant="ghost"
-          onClick={handleDelete}
-          mt={4}
-        >
-          Delete Node
-        </Button>
       </VStack>
     </Box>
   );
