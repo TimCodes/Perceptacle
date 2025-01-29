@@ -1,7 +1,15 @@
-import { Stack, Input, Box, Text, SimpleGrid } from '@chakra-ui/react';
+import {
+  Box,
+  VStack,
+  Input,
+  Text,
+  SimpleGrid,
+  InputGroup,
+  InputLeftElement,
+} from '@chakra-ui/react';
 import { Search } from 'lucide-react';
-import { GCPComponents } from '@/lib/gcp-components';
 import { useState } from 'react';
+import { GCPComponents } from '@/lib/gcp-components';
 
 export default function ComponentLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,31 +18,25 @@ export default function ComponentLibrary() {
     component.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const onDragStart = (event: React.DragEvent, nodeType: string) => {
+  const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
 
   return (
     <Box p={4} borderRight="1px" borderColor="gray.200" bg="white">
-      <Stack gap={4}>
+      <VStack spacing={4} align="stretch">
         <Box position="relative">
-          <Input
-            placeholder="Search components..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            pl={10}
-          />
-          <Search
-            size={20}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--chakra-colors-gray-500)'
-            }}
-          />
+          <InputGroup>
+            <InputLeftElement>
+              <Search size={20} />
+            </InputLeftElement>
+            <Input
+              placeholder="Search components..."
+              value={searchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            />
+          </InputGroup>
         </Box>
 
         <SimpleGrid columns={2} spacing={4}>
@@ -56,7 +58,7 @@ export default function ComponentLibrary() {
             </Box>
           ))}
         </SimpleGrid>
-      </Stack>
+      </VStack>
     </Box>
   );
 }

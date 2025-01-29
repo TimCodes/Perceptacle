@@ -3,12 +3,10 @@ import {
   VStack,
   Input,
   Text,
-} from '@chakra-ui/react';
-import {
   FormControl,
   FormLabel,
   FormHelperText,
-} from '@chakra-ui/form-control';
+} from '@chakra-ui/react';
 import { useDiagramStore } from '@/lib/diagram-store';
 
 export default function ConfigPanel() {
@@ -36,12 +34,12 @@ export default function ConfigPanel() {
     <Box p={4} borderLeft="1px" borderColor="gray.200">
       <Text mb={4} fontWeight="bold" fontSize="lg">Node Configuration</Text>
 
-      <VStack align="stretch" spacing={4}>
+      <VStack spacing={4} align="stretch">
         <FormControl>
           <FormLabel>Label</FormLabel>
           <Input
             value={selectedNode.data.label || ''}
-            onChange={(e) => handleChange('label', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('label', e.target.value)}
           />
           <FormHelperText>Enter a name for this component</FormHelperText>
         </FormControl>
@@ -50,7 +48,7 @@ export default function ConfigPanel() {
           <FormLabel>Description</FormLabel>
           <Input
             value={selectedNode.data.description || ''}
-            onChange={(e) => handleChange('description', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('description', e.target.value)}
           />
           <FormHelperText>Brief description of the component's purpose</FormHelperText>
         </FormControl>
@@ -59,7 +57,7 @@ export default function ConfigPanel() {
           <FormLabel>Instance Type</FormLabel>
           <Input
             value={selectedNode.data.instanceType || ''}
-            onChange={(e) => handleChange('instanceType', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange('instanceType', e.target.value)}
           />
           <FormHelperText>The type of GCP instance (e.g., n1-standard-1)</FormHelperText>
         </FormControl>
