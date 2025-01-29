@@ -11,8 +11,6 @@ interface DiagramState {
   setSelectedNode: (node: Node | null) => void;
   setRfInstance: (instance: ReactFlowInstance) => void;
   updateSelectedNode: (node: Node) => void;
-  deleteNode: (nodeId: string) => void;
-  duplicateNode: (nodeId: string) => void;
   saveDiagram: () => void;
   loadDiagram: () => void;
   clearDiagram: () => void;
@@ -40,39 +38,6 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     set({
       nodes: updatedNodes,
       selectedNode: node
-    });
-  },
-
-  deleteNode: (nodeId) => {
-    const { nodes, edges } = get();
-    const updatedNodes = nodes.filter((node) => node.id !== nodeId);
-    const updatedEdges = edges.filter(
-      (edge) => edge.source !== nodeId && edge.target !== nodeId
-    );
-
-    set({
-      nodes: updatedNodes,
-      edges: updatedEdges,
-      selectedNode: null
-    });
-  },
-
-  duplicateNode: (nodeId) => {
-    const { nodes } = get();
-    const nodeToDuplicate = nodes.find((node) => node.id === nodeId);
-    if (!nodeToDuplicate) return;
-
-    const newNode = {
-      ...nodeToDuplicate,
-      id: `${nodeToDuplicate.type}-${Date.now()}`,
-      position: {
-        x: nodeToDuplicate.position.x + 50,
-        y: nodeToDuplicate.position.y + 50
-      }
-    };
-
-    set({
-      nodes: [...nodes, newNode]
     });
   },
 

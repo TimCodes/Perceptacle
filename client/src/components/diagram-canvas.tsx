@@ -12,11 +12,6 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
-import CustomNode from './custom-node';
-
-const nodeTypes = {
-  default: CustomNode
-};
 
 export default function DiagramCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -73,7 +68,6 @@ export default function DiagramCanvas() {
       onDrop={onDrop}
       onDragOver={onDragOver}
       onNodeClick={onNodeClick}
-      nodeTypes={nodeTypes}
       fitView
     >
       <Background />
