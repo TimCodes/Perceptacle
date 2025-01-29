@@ -4,6 +4,8 @@ import ReactFlow, {
   Connection,
   Edge,
   Node,
+  applyNodeChanges,
+  applyEdgeChanges,
   addEdge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -21,29 +23,12 @@ export default function DiagramCanvas() {
   } = useDiagramStore();
 
   const onNodesChange = useCallback((changes: any) => {
-    setNodes((nds: Node[]) => {
-      return changes.reduce((acc: Node[], change: any) => {
-        if (change.type === 'position') {
-          const node = nds.find((n) => n.id === change.id);
-          if (node) {
-            return [...acc, { ...node, position: change.position }];
-          }
-        }
-        return acc;
-      }, nds);
-    });
-  }, [setNodes]);
+    setNodes(applyNodeChanges(changes, nodes));
+  }, [nodes, setNodes]);
 
   const onEdgesChange = useCallback((changes: any) => {
-    setEdges((eds: Edge[]) => {
-      return changes.reduce((acc: Edge[], change: any) => {
-        if (change.type === 'remove') {
-          return acc.filter((e) => e.id !== change.id);
-        }
-        return acc;
-      }, eds);
-    });
-  }, [setEdges]);
+    setEdges(applyEdgeChanges(changes, edges));
+  }, [edges, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -69,9 +54,9 @@ export default function DiagramCanvas() {
         data: { label: type },
       };
 
-      setNodes((nds) => [...nds, newNode]);
+      setNodes([...(nodes || []), newNode]);
     },
-    [setNodes]
+    [nodes, setNodes]
   );
 
   return (
