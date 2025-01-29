@@ -66,17 +66,24 @@ export default function DiagramEditor() {
     setSelectedNode(null);
   }, []);
 
+  const onNodeUpdate = useCallback((updatedNode: Node) => {
+    setNodes(nodes.map(node => 
+      node.id === updatedNode.id ? updatedNode : node
+    ));
+    setSelectedNode(updatedNode);
+  }, [nodes]);
+
   return (
     <Flex h="100vh" bg="gray.50">
       <ComponentLibrary setNodes={setNodes} />
-      
+
       <Flex direction="column" flex={1}>
         <DiagramToolbar 
           onSave={onSave} 
           onLoad={onLoad}
           onClear={onClear}
         />
-        
+
         <Box flex={1}>
           <Canvas
             nodes={nodes}
@@ -91,11 +98,7 @@ export default function DiagramEditor() {
 
       <ConfigPanel 
         selectedNode={selectedNode}
-        onNodeUpdate={(updatedNode) => {
-          setNodes(nodes.map(n => 
-            n.id === updatedNode.id ? updatedNode : n
-          ));
-        }}
+        onNodeUpdate={onNodeUpdate}
       />
     </Flex>
   );
