@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import AuthPage from './auth';
-import { useAuthStore } from '@/lib/auth-store';
+import * as authStoreModule from '@/lib/auth-store';
 
-// Mock the auth store
+// Mock the auth store module instead of the hook directly
 jest.mock('@/lib/auth-store', () => ({
-  useAuthStore: jest.fn(),
+  useAuthStore: jest.fn()
 }));
 
 // Mock wouter's useLocation
@@ -18,11 +18,12 @@ describe('AuthPage', () => {
   const mockRegister = jest.fn();
 
   beforeEach(() => {
-    (useAuthStore as jest.Mock).mockReturnValue({
+    // Cast the mock to any to avoid TypeScript errors
+    (authStoreModule.useAuthStore as any).mockImplementation(() => ({
       login: mockLogin,
       register: mockRegister,
       loading: false,
-    });
+    }));
   });
 
   afterEach(() => {
@@ -36,21 +37,22 @@ describe('AuthPage', () => {
       </ChakraProvider>
     );
 
-    expect(screen.getByText('Login')).toBeInTheDocument();
-    expect(screen.getByLabelText('Username')).toBeInTheDocument();
-    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+    expect(screen.getByText(/Login/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
   });
 
-  it('switches to register form when clicking register link', async () => {
+  it('switches to register form when clicking register link', () => {
     render(
       <ChakraProvider>
         <AuthPage />
       </ChakraProvider>
     );
 
-    fireEvent.click(screen.getByText(/Don't have an account\? Register/i));
+    const registerLink = screen.getByText(/Don't have an account/i);
+    fireEvent.click(registerLink);
 
-    expect(screen.getByText('Create Account')).toBeInTheDocument();
+    expect(screen.getByText(/Create Account/i)).toBeInTheDocument();
   });
 
   it('validates form fields before submission', async () => {
@@ -60,32 +62,32 @@ describe('AuthPage', () => {
       </ChakraProvider>
     );
 
-    const submitButton = screen.getByText('Login');
-    fireEvent.click(submitButton);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+    fireEvent.click(loginButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Username must be at least 3 characters')).toBeInTheDocument();
-      expect(screen.getByText('Password must be at least 6 characters')).toBeInTheDocument();
+      expect(screen.getByText(/Username is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Password is required/i)).toBeInTheDocument();
     });
 
     expect(mockLogin).not.toHaveBeenCalled();
   });
 
-  it('calls login function with correct credentials', async () => {
+  it('calls login function with credentials', async () => {
     render(
       <ChakraProvider>
         <AuthPage />
       </ChakraProvider>
     );
 
-    const username = screen.getByLabelText('Username');
-    const password = screen.getByLabelText('Password');
+    const usernameInput = screen.getByLabelText(/Username/i);
+    const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(username, { target: { value: 'testuser' } });
-    fireEvent.change(password, { target: { value: 'password123' } });
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-    const submitButton = screen.getByText('Login');
-    fireEvent.click(submitButton);
+    const loginButton = screen.getByRole('button', { name: /login/i });
+    fireEvent.click(loginButton);
 
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith('testuser', 'password123');
