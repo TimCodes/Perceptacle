@@ -4,6 +4,11 @@ import {
   Input,
   Text,
   useColorModeValue,
+  Link,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+  IconButton,
 } from '@chakra-ui/react';
 
 import {
@@ -14,7 +19,7 @@ import {
   FormErrorIcon,
 } from "@chakra-ui/form-control"
 
-
+import { ExternalLink, Github } from 'lucide-react';
 import { Node } from 'reactflow';
 
 interface ConfigPanelProps {
@@ -52,6 +57,21 @@ export default function ConfigPanel({ selectedNode, onNodeUpdate }: ConfigPanelP
     });
   };
 
+  const renderExternalLinkButton = (url: string) => {
+    if (!url) return null;
+    return (
+      <InputRightElement>
+        <IconButton
+          aria-label="Open link"
+          icon={<ExternalLink size={16} />}
+          size="sm"
+          variant="ghost"
+          onClick={() => window.open(url, '_blank')}
+        />
+      </InputRightElement>
+    );
+  };
+
   return (
     <Box
       w="300px"
@@ -81,7 +101,34 @@ export default function ConfigPanel({ selectedNode, onNodeUpdate }: ConfigPanelP
           />
         </FormControl>
 
-        {/* Add more configuration fields based on node type */}
+        <FormControl>
+          <FormLabel>GitHub Repository</FormLabel>
+          <InputGroup>
+            <InputLeftElement>
+              <Github size={16} />
+            </InputLeftElement>
+            <Input
+              value={selectedNode.data.githubUrl || ''}
+              onChange={(e) => handleChange('githubUrl', e.target.value)}
+              placeholder="https://github.com/user/repo"
+            />
+            {renderExternalLinkButton(selectedNode.data.githubUrl)}
+          </InputGroup>
+          <FormHelperText>Link to the component's repository</FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Google Console Link</FormLabel>
+          <InputGroup>
+            <Input
+              value={selectedNode.data.consoleUrl || ''}
+              onChange={(e) => handleChange('consoleUrl', e.target.value)}
+              placeholder="https://console.cloud.google.com/..."
+            />
+            {renderExternalLinkButton(selectedNode.data.consoleUrl)}
+          </InputGroup>
+          <FormHelperText>Link to the Google Cloud Console</FormHelperText>
+        </FormControl>
       </VStack>
     </Box>
   );
