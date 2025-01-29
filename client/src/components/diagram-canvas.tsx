@@ -4,9 +4,10 @@ import ReactFlow, {
   Background,
   Connection,
   Edge,
-  ReactFlowInstance,
   Node,
-  addEdge
+  NodeChange,
+  EdgeChange,
+  addEdge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
@@ -21,9 +22,9 @@ export default function DiagramCanvas() {
     setSelectedNode
   } = useDiagramStore();
 
-  const onNodesChange = useCallback((changes: any) => {
+  const onNodesChange = useCallback((changes: NodeChange[]) => {
     setNodes(
-      changes.reduce((acc: Node[], change: any) => {
+      changes.reduce((acc: Node[], change: NodeChange) => {
         if (change.type === 'position' || change.type === 'dimensions') {
           const node = nodes.find((n) => n.id === change.id);
           if (node) {
@@ -35,19 +36,24 @@ export default function DiagramCanvas() {
     );
   }, [nodes, setNodes]);
 
-  const onEdgesChange = useCallback((changes: any) => {
-    setEdges(
-      changes.reduce((acc: Edge[], change: any) => {
+  const onEdgesChange = useCallback((changes: EdgeChange[]) => {
+    setEdges((eds) => {
+      return changes.reduce((acc: Edge[], change: EdgeChange) => {
         if (change.type === 'remove') {
           return acc.filter((e) => e.id !== change.id);
         }
         return acc;
-      }, edges)
-    );
-  }, [edges, setEdges]);
+      }, eds);
+    });
+  }, [setEdges]);
 
   const onConnect = useCallback(
-    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    (connection: Connection) => {
+      setEdges((eds) => {
+        const newEdge = { ...connection, id: `e${connection.source}-${connection.target}` };
+        return addEdge(newEdge, eds);
+      });
+    },
     [setEdges]
   );
 
@@ -64,8 +70,8 @@ export default function DiagramCanvas() {
       if (!type) return;
 
       const position = {
-        x: event.clientX,
-        y: event.clientY
+        x: event.clientX - 200,  // Offset for the component library width
+        y: event.clientY - 60    // Offset for the toolbar height
       };
 
       const newNode: Node = {
