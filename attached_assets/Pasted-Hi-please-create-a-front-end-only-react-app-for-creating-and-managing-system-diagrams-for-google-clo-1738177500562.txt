@@ -1,0 +1,117 @@
+Hi please create a front end only react app for creating and managing system diagrams for google cloud componets. You can you FloWise ( https://github.com/FlowiseAI/Flowise)  and N8N ( https://github.com/n8n-io/n8n ) as example applications. You should usethe React Flow and Chara UI libraries. 
+
+**I. Front-End Requirements Breakdown**
+
+**A. Core Functionality:**
+
+1.  **Diagram Canvas:**
+
+-   **Interactive Canvas:** A space where users can visually build their diagrams using Nodes
+-   **Drop Down menu** A drop down menu with the list of node components that is searchable and dragable.
+-   **Drag and Drop:** Ability to drag component nodes from a library onto the canvas.
+-   **Panning and Zooming:** Smooth panning across large diagrams and zooming in/out.
+-   **Connection Drawing:** Ability to draw lines/arrows between components to represent connections/flows.
+-   **Selection:** Ability to select individual or multiple components/connections.
+-   **Context Menus:** Display relevant context menu options based on selected component (e.g. delete, duplicate).
+-   **Grid System:** A visual grid for easier alignment of the components (optional)
+
+3.  **Component Library:**
+
+-   **Categorized Components:** A library of Google Cloud icons, organized by category (e.g., Compute, Storage, Database).
+-   **Search/Filter:** Ability to search for specific components by name.
+-   **Drag Handles:** Clear drag handles on components to initiate drag and drop.
+-   **Visual Previews:** Display appropriate icons or previews of components in the library.
+
+5.  **Component Configuration Panel:**
+
+-   **Basic Property Inputs:** Input fields for setting names, labels, and basic configuration settings for components.
+-   **Real-Time Updates:** Changes in properties reflected immediately on the canvas.
+-   **Validation:** Basic validation on the property inputs.
+-   **Dynamic Inputs:** Dynamically show/hide specific config fields based on the selected components
+
+7.  **Diagram Management:**
+
+-   **New Diagram Button:** Ability to clear the current canvas
+-   **Save Button:** Save the current diagram to either browser local storage or an API endpoint.
+-   **Load Button:** Load a previously saved diagram from local storage or API.
+-   **List of Diagrams:** Displays all the previously saved diagram and allows loading and deleting.
+
+11.  **Search and Filtering:**
+
+-   **Search bar:** Allow to search for existing diagram and components
+-   **Filtering options:** Allow to filter based on attributes
+
+**B. Non-Functional Requirements:**
+
+1.  **Performance:**
+
+-   **Smooth Interactions:** The diagram canvas interactions (drag, pan, zoom) should be smooth and responsive.
+-   **Efficient Rendering:** Optimize rendering of components on the canvas.
+
+3.  **Usability:**
+
+-   **Intuitive Interface:** Simple and intuitive for users to quickly understand how to create diagrams.
+-   **Clear Visuals:** Components, connections, and UI elements should be visually clear.
+-   **Accessibility:** Should be somewhat accessible for screen readers, with clear labeling for each control.
+
+5.  **Browser Compatibility:** Should be compatible with modern browsers (Chrome, Firefox, Safari, Edge).
+6.  **Responsiveness**: The application should be responsive for different screen sizes.
+
+**II. Front-End Development Steps:**
+
+1.  **Technology Stack Setup:**
+
+-   **Framework:**  React
+-   **State Management:** React Hooks
+-   **UI Component Library:** Chakra UI.
+-   **Diagramming Library:** React Flow
+
+3.  **Component Design:**
+
+-   **Canvas Component:** Build the core canvas component, where we would implement the panning, zooming, selecting components, adding components etc.
+-   **Component Library:** Create the component that renders the component library, and can fetch the google cloud service icons.
+-   **Component Config Panel:** Build the config panel, which displays dynamically based on the selected component.
+-   **Diagram Management Panel:** Create the component to display the list of the diagram and handle saving, loading, and deleting diagrams.
+-   **Authentication Components:** Create basic login and signup forms.
+
+5.  **State Management Implementation:**
+
+-   Set up actions and reducers to manage the application state, such as:
+
+-   Diagram canvas state (components, connections, zoom level, selected element).
+-   Available components.
+-   Component configuration data.
+-   User authentication state.
+-   Diagram Data
+
+7.  **API handling**
+
+-   Create a utility for making API calls, and decide on the data structure for incoming and outgoing data.
+
+9.  **Develop Components and features:**
+
+-   Develop components individually, starting with the core functionality.
+
+-   Implement the ability to add the components to the canvas.
+-   Implement drawing connections between components.
+-   Implement setting and modifying the configuration for components.
+
+-   Implement diagram saving and loading functionalities.
+-   Implement user login and signup.
+-   Add search and filtering capabilities.
+
+11.  **Layout Implementation:**
+
+-   Create the desired UI layout for the application, with clear divisions for canvas, component library, component config panel etc.
+-   Make the application responsive for mobile and tablet screens.
+
+13.  **Testing:**
+
+-   Unit test components
+-   End to end test major functionalities.
+-   Perform manual testing for all the UI functionalities.
+
+15.  **Optimization:**
+
+-   Optimize for smooth performance and responsiveness.
+-   Optimize the rendering of the application for components and connectio
