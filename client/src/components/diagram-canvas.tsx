@@ -19,7 +19,8 @@ export default function DiagramCanvas() {
     setNodes,
     setEdges,
     setRfInstance,
-    setSelectedNode
+    setSelectedNode,
+    addNode
   } = useDiagramStore();
 
   const onNodesChange = useCallback((changes: NodeChange[]) => {
@@ -28,7 +29,7 @@ export default function DiagramCanvas() {
         if (change.type === 'position' || change.type === 'dimensions') {
           const node = nodes.find((n) => n.id === change.id);
           if (node) {
-            return [...acc, { ...node, position: change.position || node.position }];
+            return [...acc, { ...node, position: { ...node.position, ...change.position } }];
           }
         }
         return acc;
@@ -69,10 +70,14 @@ export default function DiagramCanvas() {
       const type = event.dataTransfer.getData('application/reactflow');
       if (!type) return;
 
-      const position = {
-        x: event.clientX - 200,  // Offset for the component library width
-        y: event.clientY - 60    // Offset for the toolbar height
-      };
+      // Calculate position relative to the canvas
+      const reactFlowBounds = document.querySelector('.react-flow')?.getBoundingClientRect();
+      const position = reactFlowBounds 
+        ? {
+            x: event.clientX - reactFlowBounds.left - 200,
+            y: event.clientY - reactFlowBounds.top - 60
+          }
+        : { x: 0, y: 0 };
 
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
@@ -81,9 +86,9 @@ export default function DiagramCanvas() {
         data: { label: type, icon: type },
       };
 
-      setNodes([...nodes, newNode]);
+      addNode(newNode);
     },
-    [nodes, setNodes]
+    [addNode]
   );
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {

@@ -12,6 +12,7 @@ interface DiagramState {
   setRfInstance: (instance: ReactFlowInstance) => void;
   updateSelectedNode: (node: Node) => void;
   deleteNode: (nodeId: string) => void;
+  addNode: (node: Node) => void;
   saveDiagram: () => void;
   loadDiagram: () => void;
   clearDiagram: () => void;
@@ -56,12 +57,16 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     });
   },
 
-  saveDiagram: () => {
-    const { rfInstance } = get();
-    if (!rfInstance) return;
+  addNode: (node) => {
+    const { nodes } = get();
+    set({ nodes: [...nodes, node] });
+  },
 
-    const flow = rfInstance.toObject();
-    localStorage.setItem('gcp-diagram', JSON.stringify(flow));
+  saveDiagram: () => {
+    const flow = get().rfInstance?.toObject();
+    if (flow) {
+      localStorage.setItem('gcp-diagram', JSON.stringify(flow));
+    }
   },
 
   loadDiagram: () => {
