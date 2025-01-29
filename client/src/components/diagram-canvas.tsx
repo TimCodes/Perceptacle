@@ -65,8 +65,11 @@ export default function DiagramCanvas() {
           label: type, 
           icon: type,
           status: initialStatus,
-          description: '',
-          instanceType: ''
+          description: 'Example component description',
+          instanceType: '',
+          // Add dummy URLs for testing
+          githubUrl: 'https://github.com/example/gcp-component',
+          consoleUrl: 'https://console.cloud.google.com/home/dashboard'
         },
         style: {
           background: '#ffffff',
