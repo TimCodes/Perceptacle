@@ -22,17 +22,23 @@ export default function ConfigPanel() {
   }
 
   const handleChange = (field: string, value: string) => {
-    updateSelectedNode({
+    const updatedNode = {
       ...selectedNode,
       data: {
         ...selectedNode.data,
         [field]: value,
       },
-      style: {
+    };
+
+    // Only update the border color when the status changes
+    if (field === 'status') {
+      updatedNode.style = {
         ...selectedNode.style,
         border: `2px solid ${getStatusColor(value)}`,
-      }
-    });
+      };
+    }
+
+    updateSelectedNode(updatedNode);
   };
 
   const getStatusColor = (status: string) => {
