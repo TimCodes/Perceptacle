@@ -12,6 +12,7 @@ import {
   InputLeftElement,
   InputRightElement,
   IconButton,
+  HStack,
 } from "@chakra-ui/react";
 import { ExternalLink, Github } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
@@ -77,6 +78,25 @@ export default function ConfigPanel() {
     );
   };
 
+  const renderLink = (url: string, icon: React.ReactNode) => {
+    if (!url) return null;
+    return (
+      <Link
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        color="blue.500"
+        fontSize="sm"
+        display="inline-flex"
+        alignItems="center"
+        _hover={{ textDecoration: 'underline', color: 'blue.600' }}
+      >
+        {icon}
+        <Text ml={2}>{url}</Text>
+      </Link>
+    );
+  };
+
   return (
     <Box p={4} borderLeft="1px" borderColor="gray.200">
       <Text mb={4} fontWeight="bold" fontSize="lg">
@@ -129,6 +149,11 @@ export default function ConfigPanel() {
             />
             {renderExternalLinkButton(selectedNode.data.githubUrl)}
           </InputGroup>
+          {selectedNode.data.githubUrl && (
+            <Box mt={1}>
+              {renderLink(selectedNode.data.githubUrl, <Github size={14} />)}
+            </Box>
+          )}
           <FormHelperText>Link to the component's repository</FormHelperText>
         </FormControl>
 
@@ -142,6 +167,11 @@ export default function ConfigPanel() {
             />
             {renderExternalLinkButton(selectedNode.data.consoleUrl)}
           </InputGroup>
+          {selectedNode.data.consoleUrl && (
+            <Box mt={1}>
+              {renderLink(selectedNode.data.consoleUrl, <ExternalLink size={14} />)}
+            </Box>
+          )}
           <FormHelperText>Link to the Google Cloud Console</FormHelperText>
         </FormControl>
 
