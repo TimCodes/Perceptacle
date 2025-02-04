@@ -19,8 +19,12 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  StatHelpText,
-  SimpleGrid,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { ExternalLink, Github, Activity, AlertCircle } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
@@ -28,10 +32,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   if (!selectedNode) {
     return (
-      <Box p={4} borderLeft="1px" borderColor="gray.200">
+      <Box p={4} borderLeft="1px" borderColor={borderColor}>
         <Text color="gray.500">Select a node to configure its properties</Text>
       </Box>
     );
@@ -59,15 +65,15 @@ export default function ConfigPanel() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "#48BB78"; // green.500
+        return "#48BB78";
       case "warning":
-        return "#ECC94B"; // yellow.500
+        return "#ECC94B";
       case "error":
-        return "#E53E3E"; // red.500
+        return "#E53E3E";
       case "inactive":
-        return "#A0AEC0"; // gray.500
+        return "#A0AEC0";
       default:
-        return "#CBD5E0"; // gray.300
+        return "#CBD5E0";
     }
   };
 
@@ -81,7 +87,6 @@ export default function ConfigPanel() {
         return <Activity size={14} className="text-blue-500" />;
     }
   };
-
 
   const renderExternalLinkButton = (url: string) => {
     if (!url) return null;
@@ -128,15 +133,7 @@ export default function ConfigPanel() {
     };
 
     return (
-      <Box mt={4}>
-        <Divider my={4} />
-        <Text mb={4} fontWeight="bold" fontSize="lg">
-          Observability
-          <Badge ml={2} colorScheme={selectedNode.data.status === 'active' ? 'green' : 'red'}>
-            {selectedNode.data.status}
-          </Badge>
-        </Text>
-
+      <Box>
         <SimpleGrid columns={2} spacing={4} mb={4}>
           <Stat>
             <StatLabel>CPU Usage</StatLabel>
@@ -181,7 +178,6 @@ export default function ConfigPanel() {
 
     return (
       <Box mt={4}>
-        <Divider my={4} />
         <HStack mb={4} justify="space-between">
           <Text fontWeight="bold" fontSize="lg">
             Component Logs
@@ -191,7 +187,7 @@ export default function ConfigPanel() {
 
         <ScrollArea className="h-[200px] w-full rounded-md border p-4">
           <VStack spacing={2} align="stretch">
-            {logs.slice().reverse().map((log, index) => (
+            {logs.slice().reverse().map((log: any, index: number) => (
               <HStack
                 key={index}
                 p={2}
@@ -217,95 +213,128 @@ export default function ConfigPanel() {
   };
 
   return (
-    <Box p={4} borderLeft="1px" borderColor="gray.200">
+    <Box p={4} borderLeft="1px" borderColor={borderColor} width="400px">
       <Text mb={4} fontWeight="bold" fontSize="lg">
         Node Configuration
       </Text>
 
-      <VStack spacing={4} align="stretch">
-        <FormControl>
-          <FormLabel>Label</FormLabel>
-          <Input
-            value={selectedNode.data.label || ""}
-            onChange={(e) => handleChange("label", e.target.value)}
-          />
-          <FormHelperText>Enter a name for this component</FormHelperText>
-        </FormControl>
+      <Tabs>
+        <TabList>
+          <Tab>Configuration</Tab>
+          <Tab>CI/CD</Tab>
+          <Tab>Observability</Tab>
+        </TabList>
 
-        <FormControl>
-          <FormLabel>Status</FormLabel>
-          <Select
-            value={selectedNode.data.status || "active"}
-            onChange={(e) => handleChange("status", e.target.value)}
-          >
-            <option value="active">Active</option>
-            <option value="warning">Warning</option>
-            <option value="error">Error</option>
-            <option value="inactive">Inactive</option>
-          </Select>
-          <FormHelperText>Current status of the component</FormHelperText>
-        </FormControl>
+        <TabPanels>
+          {/* Configuration Tab */}
+          <TabPanel>
+            <VStack spacing={4} align="stretch">
+              <FormControl>
+                <FormLabel>Label</FormLabel>
+                <Input
+                  value={selectedNode.data.label || ""}
+                  onChange={(e) => handleChange("label", e.target.value)}
+                />
+                <FormHelperText>Enter a name for this component</FormHelperText>
+              </FormControl>
 
-        <FormControl>
-          <FormLabel>Description</FormLabel>
-          <Input
-            value={selectedNode.data.description || ""}
-            onChange={(e) => handleChange("description", e.target.value)}
-          />
-          <FormHelperText>Brief description of the component's purpose</FormHelperText>
-        </FormControl>
+              <FormControl>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  value={selectedNode.data.status || "active"}
+                  onChange={(e) => handleChange("status", e.target.value)}
+                >
+                  <option value="active">Active</option>
+                  <option value="warning">Warning</option>
+                  <option value="error">Error</option>
+                  <option value="inactive">Inactive</option>
+                </Select>
+                <FormHelperText>Current status of the component</FormHelperText>
+              </FormControl>
 
-        <FormControl>
-          <FormLabel>GitHub Repository</FormLabel>
-          <InputGroup>
-            <InputLeftElement>
-              <Github size={16} />
-            </InputLeftElement>
-            <Input
-              value={selectedNode.data.githubUrl || ""}
-              onChange={(e) => handleChange("githubUrl", e.target.value)}
-              placeholder="https://github.com/user/repo"
-            />
-            {renderExternalLinkButton(selectedNode.data.githubUrl)}
-          </InputGroup>
-          {selectedNode.data.githubUrl && (
-            <Box mt={1}>
-              {renderLink(selectedNode.data.githubUrl, <Github size={14} />)}
-            </Box>
-          )}
-          <FormHelperText>Link to the component's repository</FormHelperText>
-        </FormControl>
+              <FormControl>
+                <FormLabel>Description</FormLabel>
+                <Input
+                  value={selectedNode.data.description || ""}
+                  onChange={(e) => handleChange("description", e.target.value)}
+                />
+                <FormHelperText>Brief description of the component's purpose</FormHelperText>
+              </FormControl>
 
-        <FormControl>
-          <FormLabel>Google Console Link</FormLabel>
-          <InputGroup>
-            <Input
-              value={selectedNode.data.consoleUrl || ""}
-              onChange={(e) => handleChange("consoleUrl", e.target.value)}
-              placeholder="https://console.cloud.google.com/..."
-            />
-            {renderExternalLinkButton(selectedNode.data.consoleUrl)}
-          </InputGroup>
-          {selectedNode.data.consoleUrl && (
-            <Box mt={1}>
-              {renderLink(selectedNode.data.consoleUrl, <ExternalLink size={14} />)}
-            </Box>
-          )}
-          <FormHelperText>Link to the Google Cloud Console</FormHelperText>
-        </FormControl>
+              <FormControl>
+                <FormLabel>Instance Type</FormLabel>
+                <Input
+                  value={selectedNode.data.instanceType || ""}
+                  onChange={(e) => handleChange("instanceType", e.target.value)}
+                />
+                <FormHelperText>The type of GCP instance (e.g., n1-standard-1)</FormHelperText>
+              </FormControl>
+            </VStack>
+          </TabPanel>
 
-        <FormControl>
-          <FormLabel>Instance Type</FormLabel>
-          <Input
-            value={selectedNode.data.instanceType || ""}
-            onChange={(e) => handleChange("instanceType", e.target.value)}
-          />
-          <FormHelperText>The type of GCP instance (e.g., n1-standard-1)</FormHelperText>
-        </FormControl>
+          {/* CI/CD Tab */}
+          <TabPanel>
+            <VStack spacing={4} align="stretch">
+              <FormControl>
+                <FormLabel>GitHub Repository</FormLabel>
+                <InputGroup>
+                  <InputLeftElement>
+                    <Github size={16} />
+                  </InputLeftElement>
+                  <Input
+                    value={selectedNode.data.githubUrl || ""}
+                    onChange={(e) => handleChange("githubUrl", e.target.value)}
+                    placeholder="https://github.com/user/repo"
+                  />
+                  {renderExternalLinkButton(selectedNode.data.githubUrl)}
+                </InputGroup>
+                {selectedNode.data.githubUrl && (
+                  <Box mt={1}>
+                    {renderLink(selectedNode.data.githubUrl, <Github size={14} />)}
+                  </Box>
+                )}
+                <FormHelperText>Link to the component's repository</FormHelperText>
+              </FormControl>
 
-        {renderObservabilityMetrics()}
-        {renderComponentLogs()}
-      </VStack>
+              <FormControl>
+                <FormLabel>Google Console Link</FormLabel>
+                <InputGroup>
+                  <Input
+                    value={selectedNode.data.consoleUrl || ""}
+                    onChange={(e) => handleChange("consoleUrl", e.target.value)}
+                    placeholder="https://console.cloud.google.com/..."
+                  />
+                  {renderExternalLinkButton(selectedNode.data.consoleUrl)}
+                </InputGroup>
+                {selectedNode.data.consoleUrl && (
+                  <Box mt={1}>
+                    {renderLink(selectedNode.data.consoleUrl, <ExternalLink size={14} />)}
+                  </Box>
+                )}
+                <FormHelperText>Link to the Google Cloud Console</FormHelperText>
+              </FormControl>
+            </VStack>
+          </TabPanel>
+
+          {/* Observability Tab */}
+          <TabPanel>
+            <VStack spacing={4} align="stretch">
+              <Box>
+                <HStack mb={4} justify="space-between">
+                  <Text fontWeight="bold" fontSize="lg">
+                    Metrics
+                  </Text>
+                  <Badge colorScheme={selectedNode.data.status === 'active' ? 'green' : 'red'}>
+                    {selectedNode.data.status}
+                  </Badge>
+                </HStack>
+                {renderObservabilityMetrics()}
+              </Box>
+              {renderComponentLogs()}
+            </VStack>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </Box>
   );
 }
