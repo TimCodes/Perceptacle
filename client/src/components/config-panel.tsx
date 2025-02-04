@@ -25,6 +25,7 @@ import {
   TabPanels,
   Tabs,
   useColorModeValue,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { ExternalLink, Github, Activity, AlertCircle } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
