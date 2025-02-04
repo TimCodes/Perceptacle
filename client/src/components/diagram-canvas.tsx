@@ -69,7 +69,16 @@ export default function DiagramCanvas() {
           instanceType: '',
           // Add dummy URLs for testing
           githubUrl: 'https://github.com/example/gcp-component',
-          consoleUrl: 'https://console.cloud.google.com/home/dashboard'
+          consoleUrl: 'https://console.cloud.google.com/home/dashboard',
+          // Add metrics data
+          metrics: {
+            cpu: Math.floor(Math.random() * 100),
+            memory: Math.floor(Math.random() * 100),
+            disk: Math.floor(Math.random() * 100),
+            network: Math.floor(Math.random() * 100),
+            lastUpdated: new Date().toISOString(),
+            activeAlerts: Math.floor(Math.random() * 5),
+          }
         },
         style: {
           background: '#ffffff',

@@ -13,8 +13,16 @@ import {
   InputRightElement,
   IconButton,
   HStack,
+  Divider,
+  Badge,
+  Progress,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  SimpleGrid,
 } from "@chakra-ui/react";
-import { ExternalLink, Github } from "lucide-react";
+import { ExternalLink, Github, Activity, AlertCircle } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 
 export default function ConfigPanel() {
@@ -37,7 +45,6 @@ export default function ConfigPanel() {
       },
     };
 
-    // Only update the border color when the status changes
     if (field === "status") {
       updatedNode.style = {
         ...selectedNode.style,
@@ -94,6 +101,65 @@ export default function ConfigPanel() {
         {icon}
         <Text ml={2}>{url}</Text>
       </Link>
+    );
+  };
+
+  const renderObservabilityMetrics = () => {
+    const metrics = selectedNode.data.metrics || {
+      cpu: 45,
+      memory: 60,
+      disk: 30,
+      network: 25,
+      lastUpdated: new Date().toISOString(),
+      activeAlerts: 2,
+    };
+
+    return (
+      <Box mt={4}>
+        <Divider my={4} />
+        <Text mb={4} fontWeight="bold" fontSize="lg">
+          Observability
+          <Badge ml={2} colorScheme={selectedNode.data.status === 'active' ? 'green' : 'red'}>
+            {selectedNode.data.status}
+          </Badge>
+        </Text>
+
+        <SimpleGrid columns={2} spacing={4} mb={4}>
+          <Stat>
+            <StatLabel>CPU Usage</StatLabel>
+            <StatNumber>{metrics.cpu}%</StatNumber>
+            <Progress value={metrics.cpu} size="sm" colorScheme={metrics.cpu > 80 ? 'red' : 'blue'} />
+          </Stat>
+
+          <Stat>
+            <StatLabel>Memory Usage</StatLabel>
+            <StatNumber>{metrics.memory}%</StatNumber>
+            <Progress value={metrics.memory} size="sm" colorScheme={metrics.memory > 80 ? 'red' : 'blue'} />
+          </Stat>
+
+          <Stat>
+            <StatLabel>Disk Usage</StatLabel>
+            <StatNumber>{metrics.disk}%</StatNumber>
+            <Progress value={metrics.disk} size="sm" colorScheme={metrics.disk > 80 ? 'red' : 'blue'} />
+          </Stat>
+
+          <Stat>
+            <StatLabel>Network Usage</StatLabel>
+            <StatNumber>{metrics.network}%</StatNumber>
+            <Progress value={metrics.network} size="sm" colorScheme={metrics.network > 80 ? 'red' : 'blue'} />
+          </Stat>
+        </SimpleGrid>
+
+        <HStack spacing={4} mb={2}>
+          <Activity size={16} />
+          <Text fontSize="sm">Last Updated: {new Date(metrics.lastUpdated).toLocaleString()}</Text>
+        </HStack>
+
+        <HStack spacing={4}>
+          <AlertCircle size={16} color={metrics.activeAlerts > 0 ? '#E53E3E' : '#48BB78'} />
+          <Text fontSize="sm">Active Alerts: {metrics.activeAlerts}</Text>
+        </HStack>
+      </Box>
     );
   };
 
@@ -183,6 +249,8 @@ export default function ConfigPanel() {
           />
           <FormHelperText>The type of GCP instance (e.g., n1-standard-1)</FormHelperText>
         </FormControl>
+
+        {renderObservabilityMetrics()}
       </VStack>
     </Box>
   );
