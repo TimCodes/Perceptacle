@@ -11,21 +11,40 @@ import ReactFlow, {
   Node
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { Box, HStack, Text } from '@chakra-ui/react';
 import { useDiagramStore } from '@/lib/diagram-store';
+import { GCPComponents } from '@/lib/gcp-components';
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'active':
-      return '#48BB78'; // green.500
+      return '#48BB78';
     case 'warning':
-      return '#ECC94B'; // yellow.500
+      return '#ECC94B';
     case 'error':
-      return '#E53E3E'; // red.500
+      return '#E53E3E';
     case 'inactive':
-      return '#A0AEC0'; // gray.500
+      return '#A0AEC0';
     default:
-      return '#CBD5E0'; // gray.300
+      return '#CBD5E0';
   }
+};
+
+const CustomNode = ({ data }: { data: any }) => {
+  const Icon = GCPComponents.find(comp => comp.type === data.icon)?.icon;
+
+  return (
+    <Box p={2}>
+      <HStack spacing={2} alignItems="center">
+        {Icon && <Icon size={20} />}
+        <Text fontSize="sm">{data.label}</Text>
+      </HStack>
+    </Box>
+  );
+};
+
+const nodeTypes = {
+  default: CustomNode,
 };
 
 export default function DiagramCanvas() {
@@ -62,15 +81,13 @@ export default function DiagramCanvas() {
         type: 'default',
         position,
         data: { 
-          label: type, 
+          label: type,
           icon: type,
           status: initialStatus,
           description: 'Example component description',
           instanceType: '',
-          // Add dummy URLs for testing
           githubUrl: 'https://github.com/example/gcp-component',
           consoleUrl: 'https://console.cloud.google.com/home/dashboard',
-          // Add metrics data
           metrics: {
             cpu: Math.floor(Math.random() * 100),
             memory: Math.floor(Math.random() * 100),
@@ -79,7 +96,6 @@ export default function DiagramCanvas() {
             lastUpdated: new Date().toISOString(),
             activeAlerts: Math.floor(Math.random() * 5),
           },
-          // Initialize empty logs array
           logs: [
             {
               timestamp: new Date().toISOString(),
@@ -92,7 +108,7 @@ export default function DiagramCanvas() {
           background: '#ffffff',
           border: `2px solid ${getStatusColor(initialStatus)}`,
           borderRadius: '4px',
-          padding: '10px'
+          width: 180
         }
       };
 
@@ -116,6 +132,7 @@ export default function DiagramCanvas() {
       onDrop={onDrop}
       onDragOver={onDragOver}
       onNodeClick={onNodeClick}
+      nodeTypes={nodeTypes}
       fitView
     >
       <Background />
