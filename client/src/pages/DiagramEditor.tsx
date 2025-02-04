@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import ComponentLibrary from '@/components/ComponentLibrary';
 import Canvas from '@/components/Canvas';
-import ConfigPanel from '@/components/ConfigPanel';
+import ConfigPanel from '@/components/config-panel';
 import DiagramToolbar from '@/components/DiagramToolbar';
 import { loadDiagram } from '@/lib/diagramStorage';
 import { Node, Edge } from 'reactflow';
