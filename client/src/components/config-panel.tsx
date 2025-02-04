@@ -38,7 +38,7 @@ export default function ConfigPanel() {
 
   if (!selectedNode) {
     return (
-      <Box p={4} borderLeft="1px" borderColor={borderColor}>
+      <Box p={4} borderLeft="1px" borderColor={borderColor} width="450px">
         <Text color="gray.500">Select a node to configure its properties</Text>
       </Box>
     );
@@ -186,7 +186,7 @@ export default function ConfigPanel() {
           <Badge>{logs.length} entries</Badge>
         </HStack>
 
-        <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+        <ScrollArea className="h-[300px] w-full rounded-md border p-4">
           <VStack spacing={2} align="stretch">
             {logs.slice().reverse().map((log: any, index: number) => (
               <HStack
@@ -214,7 +214,7 @@ export default function ConfigPanel() {
   };
 
   return (
-    <Box p={4} borderLeft="1px" borderColor={borderColor} width="400px">
+    <Box p={4} borderLeft="1px" borderColor={borderColor} width="450px">
       <Text mb={4} fontWeight="bold" fontSize="lg">
         Node Configuration
       </Text>
