@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Box, Flex, IconButton, Collapse } from '@chakra-ui/react';
+import { Box, Flex, IconButton } from '@chakra-ui/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import ComponentLibrary from '@/components/ComponentLibrary';
 import Canvas from '@/components/Canvas';
 import ConfigPanel from '@/components/config-panel';
@@ -8,6 +9,8 @@ import DiagramToolbar from '@/components/DiagramToolbar';
 import { loadDiagram } from '@/lib/diagramStorage';
 import { startMockLogGenerator } from '@/lib/mock-log-generator';
 import { Node, Edge } from 'reactflow';
+
+const MotionBox = motion(Box);
 
 export default function DiagramEditor() {
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -88,28 +91,45 @@ export default function DiagramEditor() {
 
   return (
     <Flex h="100vh" bg="gray.50">
-      <Box position="relative" minW={isComponentMenuOpen ? "250px" : "0"} bg="white" borderRight="1px" borderColor="gray.200">
-        <Collapse in={isComponentMenuOpen} style={{ display: 'flex' }}>
-          <ComponentLibrary setNodes={setNodes} />
-        </Collapse>
-        <IconButton
-          aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
-          icon={isComponentMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-          onClick={toggleComponentMenu}
-          position="absolute"
-          right="-10"
-          top="4"
-          zIndex="10"
-          size="sm"
-          variant="solid"
+      <AnimatePresence initial={false}>
+        <MotionBox
+          position="relative"
           bg="white"
-          borderWidth={1}
+          borderRight="1px"
           borderColor="gray.200"
-          borderLeftRadius="0"
-          shadow="md"
-          _hover={{ bg: 'gray.50' }}
-        />
-      </Box>
+          initial={false}
+          animate={{
+            width: isComponentMenuOpen ? "250px" : "0px",
+            opacity: isComponentMenuOpen ? 1 : 0,
+            transition: {
+              width: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.2 }
+            }
+          }}
+          style={{
+            overflow: 'hidden'
+          }}
+        >
+          <ComponentLibrary setNodes={setNodes} />
+          <IconButton
+            aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
+            icon={isComponentMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+            onClick={toggleComponentMenu}
+            position="absolute"
+            right="-10"
+            top="4"
+            zIndex="10"
+            size="sm"
+            variant="solid"
+            bg="white"
+            borderWidth={1}
+            borderColor="gray.200"
+            borderLeftRadius="0"
+            shadow="md"
+            _hover={{ bg: 'gray.50' }}
+          />
+        </MotionBox>
+      </AnimatePresence>
 
       <Flex direction="column" flex={1}>
         <DiagramToolbar 
