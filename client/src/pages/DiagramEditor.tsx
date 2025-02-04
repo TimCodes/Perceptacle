@@ -88,7 +88,7 @@ export default function DiagramEditor() {
 
   return (
     <Flex h="100vh" bg="gray.50">
-      <Flex position="relative">
+      <Box position="relative" minW={isComponentMenuOpen ? "250px" : "0"} bg="white" borderRight="1px" borderColor="gray.200">
         <Collapse in={isComponentMenuOpen} style={{ display: 'flex' }}>
           <ComponentLibrary setNodes={setNodes} />
         </Collapse>
@@ -97,16 +97,19 @@ export default function DiagramEditor() {
           icon={isComponentMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
           onClick={toggleComponentMenu}
           position="absolute"
-          right="-8"
-          top="2"
-          zIndex="2"
+          right="-10"
+          top="4"
+          zIndex="10"
           size="sm"
           variant="solid"
-          colorScheme="gray"
+          bg="white"
+          borderWidth={1}
+          borderColor="gray.200"
           borderLeftRadius="0"
-          _hover={{ bg: 'gray.200' }}
+          shadow="md"
+          _hover={{ bg: 'gray.50' }}
         />
-      </Flex>
+      </Box>
 
       <Flex direction="column" flex={1}>
         <DiagramToolbar 
