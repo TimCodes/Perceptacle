@@ -1,16 +1,23 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import ComponentLibrary from '@/components/ComponentLibrary';
 import Canvas from '@/components/Canvas';
 import ConfigPanel from '@/components/config-panel';
 import DiagramToolbar from '@/components/DiagramToolbar';
 import { loadDiagram } from '@/lib/diagramStorage';
+import { startMockLogGenerator } from '@/lib/mock-log-generator';
 import { Node, Edge } from 'reactflow';
 
 export default function DiagramEditor() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+
+  useEffect(() => {
+    // Start mock log generation and cleanup on unmount
+    const cleanup = startMockLogGenerator();
+    return () => cleanup();
+  }, []);
 
   const onNodesChange = useCallback((changes: any) => {
     setNodes((nds) => {
