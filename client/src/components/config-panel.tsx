@@ -24,6 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { ExternalLink, Github, Activity, AlertCircle } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
@@ -69,6 +70,18 @@ export default function ConfigPanel() {
         return "#CBD5E0"; // gray.300
     }
   };
+
+  const getLogIcon = (level: string) => {
+    switch (level) {
+      case 'error':
+        return <AlertCircle size={14} className="text-red-500" />;
+      case 'warning':
+        return <AlertCircle size={14} className="text-yellow-500" />;
+      default:
+        return <Activity size={14} className="text-blue-500" />;
+    }
+  };
+
 
   const renderExternalLinkButton = (url: string) => {
     if (!url) return null;
@@ -163,6 +176,46 @@ export default function ConfigPanel() {
     );
   };
 
+  const renderComponentLogs = () => {
+    const logs = selectedNode.data.logs || [];
+
+    return (
+      <Box mt={4}>
+        <Divider my={4} />
+        <HStack mb={4} justify="space-between">
+          <Text fontWeight="bold" fontSize="lg">
+            Component Logs
+          </Text>
+          <Badge>{logs.length} entries</Badge>
+        </HStack>
+
+        <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+          <VStack spacing={2} align="stretch">
+            {logs.slice().reverse().map((log, index) => (
+              <HStack
+                key={index}
+                p={2}
+                bg={log.level === 'error' ? 'red.50' : log.level === 'warning' ? 'yellow.50' : 'blue.50'}
+                borderRadius="md"
+                spacing={3}
+              >
+                {getLogIcon(log.level)}
+                <VStack spacing={0} align="start" flex={1}>
+                  <Text fontSize="sm" fontWeight="medium">
+                    {log.message}
+                  </Text>
+                  <Text fontSize="xs" color="gray.500">
+                    {new Date(log.timestamp).toLocaleString()}
+                  </Text>
+                </VStack>
+              </HStack>
+            ))}
+          </VStack>
+        </ScrollArea>
+      </Box>
+    );
+  };
+
   return (
     <Box p={4} borderLeft="1px" borderColor="gray.200">
       <Text mb={4} fontWeight="bold" fontSize="lg">
@@ -251,6 +304,7 @@ export default function ConfigPanel() {
         </FormControl>
 
         {renderObservabilityMetrics()}
+        {renderComponentLogs()}
       </VStack>
     </Box>
   );

@@ -78,7 +78,15 @@ export default function DiagramCanvas() {
             network: Math.floor(Math.random() * 100),
             lastUpdated: new Date().toISOString(),
             activeAlerts: Math.floor(Math.random() * 5),
-          }
+          },
+          // Initialize empty logs array
+          logs: [
+            {
+              timestamp: new Date().toISOString(),
+              message: 'Component initialized',
+              level: 'info'
+            }
+          ]
         },
         style: {
           background: '#ffffff',

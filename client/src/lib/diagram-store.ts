@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { Node, Edge, ReactFlowInstance } from 'reactflow';
 
+interface LogEntry {
+  timestamp: string;
+  message: string;
+  level: 'info' | 'warning' | 'error';
+}
+
 interface DiagramState {
   nodes: Node[];
   edges: Edge[];
@@ -14,6 +20,7 @@ interface DiagramState {
   saveDiagram: () => void;
   loadDiagram: () => void;
   clearDiagram: () => void;
+  addNodeLog: (nodeId: string, message: string, level?: 'info' | 'warning' | 'error') => void;
 }
 
 export const useDiagramStore = create<DiagramState>((set, get) => ({
@@ -39,6 +46,30 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
       nodes: updatedNodes,
       selectedNode: node
     });
+  },
+
+  addNodeLog: (nodeId: string, message: string, level: 'info' | 'warning' | 'error' = 'info') => {
+    const { nodes } = get();
+    const updatedNodes = nodes.map((node) => {
+      if (node.id === nodeId) {
+        const logs = [...(node.data.logs || []), {
+          timestamp: new Date().toISOString(),
+          message,
+          level
+        }];
+        // Keep only the last 100 logs
+        if (logs.length > 100) logs.shift();
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            logs
+          }
+        };
+      }
+      return node;
+    });
+    set({ nodes: updatedNodes });
   },
 
   saveDiagram: () => {
