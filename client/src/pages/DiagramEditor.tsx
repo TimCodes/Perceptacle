@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, IconButton, Collapse } from '@chakra-ui/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ComponentLibrary from '@/components/ComponentLibrary';
 import Canvas from '@/components/Canvas';
 import ConfigPanel from '@/components/config-panel';
@@ -12,6 +13,7 @@ export default function DiagramEditor() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
 
   useEffect(() => {
     // Start mock log generation and cleanup on unmount
@@ -80,9 +82,31 @@ export default function DiagramEditor() {
     setSelectedNode(updatedNode);
   }, [nodes]);
 
+  const toggleComponentMenu = () => {
+    setIsComponentMenuOpen(!isComponentMenuOpen);
+  };
+
   return (
     <Flex h="100vh" bg="gray.50">
-      <ComponentLibrary setNodes={setNodes} />
+      <Flex position="relative">
+        <Collapse in={isComponentMenuOpen} style={{ display: 'flex' }}>
+          <ComponentLibrary setNodes={setNodes} />
+        </Collapse>
+        <IconButton
+          aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
+          icon={isComponentMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          onClick={toggleComponentMenu}
+          position="absolute"
+          right="-8"
+          top="2"
+          zIndex="2"
+          size="sm"
+          variant="solid"
+          colorScheme="gray"
+          borderLeftRadius="0"
+          _hover={{ bg: 'gray.200' }}
+        />
+      </Flex>
 
       <Flex direction="column" flex={1}>
         <DiagramToolbar 
