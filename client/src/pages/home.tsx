@@ -10,6 +10,42 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const MotionGridItem = motion(GridItem);
 
+const menuVariants = {
+  open: {
+    width: "250px",
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+      mass: 0.8
+    }
+  },
+  closed: {
+    width: "0px",
+    opacity: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 30,
+      mass: 0.8
+    }
+  }
+};
+
+const buttonVariants = {
+  open: {
+    x: 0,
+    rotate: 0,
+    transition: { duration: 0.3 }
+  },
+  closed: {
+    x: -10,
+    rotate: 180,
+    transition: { duration: 0.3 }
+  }
+};
+
 export default function Home() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
 
@@ -23,12 +59,11 @@ export default function Home() {
         templateAreas={`"toolbar toolbar toolbar"
                        "library canvas config"`}
         gridTemplateRows={"60px 1fr"}
-        gridTemplateColumns={isComponentMenuOpen ? "250px 1fr 300px" : "0px 1fr 300px"}
+        gridTemplateColumns={"auto 1fr 300px"}
         h="100vh"
         gap="1"
         color="blackAlpha.700"
         fontWeight="bold"
-        transition="all 0.3s ease-in-out"
       >
         <GridItem area={"toolbar"} bg="white" borderBottom="1px" borderColor="gray.200">
           <DiagramToolbar />
@@ -41,40 +76,33 @@ export default function Home() {
             borderRight="1px"
             borderColor="gray.200"
             overflowY="auto"
-            initial={{ width: isComponentMenuOpen ? "250px" : "0px" }}
-            animate={{ 
-              width: isComponentMenuOpen ? "250px" : "0px",
-              opacity: isComponentMenuOpen ? 1 : 0
-            }}
-            exit={{ width: "0px", opacity: 0 }}
-            transition={{ 
-              type: "spring",
-              stiffness: 300,
-              damping: 30
-            }}
-            style={{
-              position: 'relative',
-              overflow: 'hidden'
-            }}
+            variants={menuVariants}
+            initial="closed"
+            animate={isComponentMenuOpen ? "open" : "closed"}
+            style={{ position: 'relative' }}
           >
             <ComponentLibrary />
-            <IconButton
-              aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
-              icon={isComponentMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-              onClick={toggleComponentMenu}
-              position="absolute"
-              right="-16px"
-              top="4"
-              zIndex={10}
-              size="sm"
-              variant="solid"
-              bg="white"
-              borderWidth={1}
-              borderColor="gray.200"
-              borderLeftRadius={0}
-              shadow="md"
-              _hover={{ bg: 'gray.50' }}
-            />
+            <Box position="absolute" right="-12" top="4" zIndex={10}>
+              <motion.div
+                variants={buttonVariants}
+                initial="open"
+                animate={isComponentMenuOpen ? "open" : "closed"}
+              >
+                <IconButton
+                  aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
+                  icon={<ChevronLeft size={20} />}
+                  onClick={toggleComponentMenu}
+                  size="sm"
+                  variant="solid"
+                  bg="white"
+                  borderWidth={1}
+                  borderColor="gray.200"
+                  borderLeftRadius={0}
+                  shadow="md"
+                  _hover={{ bg: 'gray.50' }}
+                />
+              </motion.div>
+            </Box>
           </MotionGridItem>
         </AnimatePresence>
 
