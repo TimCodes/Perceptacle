@@ -80,7 +80,7 @@ export default function DiagramCanvas() {
         id: `${type}-${Date.now()}`,
         type: 'default',
         position,
-        data: { 
+        data: {
           label: type,
           icon: type,
           status: initialStatus,
@@ -88,6 +88,13 @@ export default function DiagramCanvas() {
           instanceType: '',
           githubUrl: 'https://github.com/example/gcp-component',
           consoleUrl: 'https://console.cloud.google.com/home/dashboard',
+          issues: [
+            {
+              title: 'Example Issue',
+              url: 'https://github.com/example/gcp-component/issues/1',
+              state: 'open'
+            }
+          ],
           metrics: {
             cpu: Math.floor(Math.random() * 100),
             memory: Math.floor(Math.random() * 100),

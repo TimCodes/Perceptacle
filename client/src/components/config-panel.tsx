@@ -26,10 +26,42 @@ import {
   Tabs,
   useColorModeValue,
   SimpleGrid,
+  List,
+  ListItem,
 } from "@chakra-ui/react";
-import { ExternalLink, Github, Activity, AlertCircle } from "lucide-react";
+import { ExternalLink, Github, Activity, AlertCircle, Bug } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import { ScrollArea } from "@/components/ui/scroll-area";
+
+const renderGitHubIssues = (issues = []) => {
+  if (!issues || issues.length === 0) {
+    return (
+      <Text color="gray.500" fontSize="sm">
+        No issues found
+      </Text>
+    );
+  }
+
+  return (
+    <List spacing={2}>
+      {issues.map((issue, index) => (
+        <ListItem key={index} p={2} bg="gray.50" borderRadius="md">
+          <HStack spacing={2}>
+            <Bug size={14} />
+            <VStack align="start" spacing={1}>
+              <Link href={issue.url} isExternal color="blue.500">
+                <Text fontSize="sm">{issue.title}</Text>
+              </Link>
+              <Badge colorScheme={issue.state === 'open' ? 'red' : 'green'}>
+                {issue.state}
+              </Badge>
+            </VStack>
+          </HStack>
+        </ListItem>
+      ))}
+    </List>
+  );
+};
 
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
@@ -227,7 +259,6 @@ export default function ConfigPanel() {
         </TabList>
 
         <TabPanels>
-          {/* Configuration Tab */}
           <TabPanel>
             <VStack spacing={4} align="stretch">
               <FormControl>
@@ -273,7 +304,6 @@ export default function ConfigPanel() {
             </VStack>
           </TabPanel>
 
-          {/* CI/CD Tab */}
           <TabPanel>
             <VStack spacing={4} align="stretch">
               <FormControl>
@@ -297,6 +327,20 @@ export default function ConfigPanel() {
                 <FormHelperText>Link to the component's repository</FormHelperText>
               </FormControl>
 
+              <Divider my={2} />
+
+              <Box>
+                <Text fontWeight="bold" fontSize="md" mb={2}>
+                  GitHub Issues
+                  <Badge ml={2} colorScheme="red">
+                    {selectedNode.data.issues?.length || 0}
+                  </Badge>
+                </Text>
+                <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+                  {renderGitHubIssues(selectedNode.data.issues)}
+                </ScrollArea>
+              </Box>
+
               <FormControl>
                 <FormLabel>Google Console Link</FormLabel>
                 <InputGroup>
@@ -317,7 +361,6 @@ export default function ConfigPanel() {
             </VStack>
           </TabPanel>
 
-          {/* Observability Tab */}
           <TabPanel>
             <VStack spacing={4} align="stretch">
               <Box>
