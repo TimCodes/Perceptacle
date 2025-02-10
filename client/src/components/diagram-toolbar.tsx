@@ -18,6 +18,7 @@ export default function DiagramToolbar() {
   const toast = useToast();
   const { saveDiagram, loadDiagram, clearDiagram, nodes, setSelectedNode } = useDiagramStore();
   const [open, setOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [fuse, setFuse] = useState<Fuse<any> | null>(null);
 
   // Initialize Fuse instance when nodes change
@@ -42,13 +43,16 @@ export default function DiagramToolbar() {
   }, []);
 
   const handleSearch = (value: string) => {
-    if (!fuse || !value) return [];
-    return fuse.search(value);
+    if (!fuse || !value.trim()) {
+      setSearchResults(nodes);
+      return;
+    }
+    const results = fuse.search(value);
+    setSearchResults(results.map(result => result.item));
   };
 
   const handleNodeSelect = (node: any) => {
     setSelectedNode(node);
-    // Center view on the selected node if needed
     setOpen(false);
   };
 
@@ -101,7 +105,10 @@ export default function DiagramToolbar() {
           </Button>
 
           <Button
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setSearchResults(nodes);
+              setOpen(true);
+            }}
             variant="outline"
             size="sm"
             className="gap-2 ml-2"
@@ -128,11 +135,14 @@ export default function DiagramToolbar() {
       </div>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Search nodes..." />
+        <CommandInput 
+          placeholder="Search nodes..." 
+          onValueChange={handleSearch}
+        />
         <CommandList>
           <CommandEmpty>No nodes found.</CommandEmpty>
           <CommandGroup heading="Nodes">
-            {nodes.map((node) => (
+            {searchResults.map((node) => (
               <CommandItem
                 key={node.id}
                 value={node.data.label}
