@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,117 +8,23 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { ExternalLink, Github, Activity, AlertCircle, Bug } from "lucide-react";
+import { ExternalLink, Github, Activity, AlertCircle, Bug, Save } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const renderGitHubIssues = (issues = []) => {
-  if (!issues || issues.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        No issues found
-      </p>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      {issues.map((issue, index) => (
-        <div key={index} className="flex items-start space-x-2 p-2 bg-secondary/20 rounded-md">
-          <Bug className="h-4 w-4 mt-0.5" />
-          <div className="space-y-1">
-            <a
-              href={issue.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm hover:underline text-blue-600"
-            >
-              {issue.title}
-            </a>
-            <Badge variant={issue.state === 'open' ? 'destructive' : 'success'}>
-              {issue.state}
-            </Badge>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const renderCustomFields = (node: any) => {
-  if (!node.data.customFields) return null;
-
-  return (
-    <div className="space-y-4">
-      {node.data.customFields.map((field: any, index: number) => {
-        switch (field.type) {
-          case 'text':
-          case 'url':
-            return (
-              <div key={index} className="space-y-2">
-                <Label>{field.name}</Label>
-                <Input
-                  value={field.value || ''}
-                  onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
-                  placeholder={field.placeholder}
-                />
-              </div>
-            );
-          case 'textarea':
-            return (
-              <div key={index} className="space-y-2">
-                <Label>{field.name}</Label>
-                <Textarea
-                  value={field.value || ''}
-                  onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
-                  placeholder={field.placeholder}
-                />
-              </div>
-            );
-          case 'number':
-            return (
-              <div key={index} className="space-y-2">
-                <Label>{field.name}</Label>
-                <Input
-                  type="number"
-                  value={field.value || ''}
-                  onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
-                  placeholder={field.placeholder}
-                />
-              </div>
-            );
-          case 'select':
-            return (
-              <div key={index} className="space-y-2">
-                <Label>{field.name}</Label>
-                <Select
-                  value={field.value || ''}
-                  onValueChange={(value) => handleCustomFieldChange(field.name, value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={field.placeholder} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {field.options?.map((option: string) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            );
-          default:
-            return null;
-        }
-      })}
-    </div>
-  );
-};
+import { useToast } from "@/hooks/use-toast";
 
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
+  const [editedNode, setEditedNode] = useState(selectedNode);
+  const [hasChanges, setHasChanges] = useState(false);
+  const { toast } = useToast();
+
+  // Reset edited node when selected node changes
+  useEffect(() => {
+    setEditedNode(selectedNode);
+    setHasChanges(false);
+  }, [selectedNode]);
 
   if (!selectedNode) {
     return (
@@ -131,35 +37,40 @@ export default function ConfigPanel() {
   }
 
   const handleChange = (field: string, value: string) => {
-    const updatedNode = {
-      ...selectedNode,
+    setEditedNode(prev => ({
+      ...prev,
       data: {
-        ...selectedNode.data,
+        ...prev.data,
         [field]: value,
       },
-    };
-
-    if (field === "status") {
-      updatedNode.style = {
-        ...selectedNode.style,
+      style: field === "status" ? {
+        ...prev.style,
         border: `2px solid ${getStatusColor(value)}`,
-      };
-    }
-
-    updateSelectedNode(updatedNode);
+      } : prev.style,
+    }));
+    setHasChanges(true);
   };
 
   const handleCustomFieldChange = (fieldName: string, value: string) => {
-    const updatedNode = {
-      ...selectedNode,
+    setEditedNode(prev => ({
+      ...prev,
       data: {
-        ...selectedNode.data,
-        customFields: selectedNode.data.customFields.map((field: any) =>
+        ...prev.data,
+        customFields: prev.data.customFields.map((field: any) =>
           field.name === fieldName ? { ...field, value } : field
         ),
       },
-    };
-    updateSelectedNode(updatedNode);
+    }));
+    setHasChanges(true);
+  };
+
+  const handleSave = () => {
+    updateSelectedNode(editedNode);
+    setHasChanges(false);
+    toast({
+      title: "Changes saved",
+      description: "Node configuration has been updated",
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -188,8 +99,112 @@ export default function ConfigPanel() {
     }
   };
 
+  const renderGitHubIssues = (issues = []) => {
+    if (!issues || issues.length === 0) {
+      return (
+        <p className="text-sm text-muted-foreground">
+          No issues found
+        </p>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {issues.map((issue, index) => (
+          <div key={index} className="flex items-start space-x-2 p-2 bg-secondary/20 rounded-md">
+            <Bug className="h-4 w-4 mt-0.5" />
+            <div className="space-y-1">
+              <a
+                href={issue.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm hover:underline text-blue-600"
+              >
+                {issue.title}
+              </a>
+              <Badge variant={issue.state === 'open' ? 'destructive' : 'success'}>
+                {issue.state}
+              </Badge>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderCustomFields = (node: any) => {
+    if (!node.data.customFields) return null;
+
+    return (
+      <div className="space-y-4">
+        {node.data.customFields.map((field: any, index: number) => {
+          switch (field.type) {
+            case 'text':
+            case 'url':
+              return (
+                <div key={index} className="space-y-2">
+                  <Label>{field.name}</Label>
+                  <Input
+                    value={field.value || ''}
+                    onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                    placeholder={field.placeholder}
+                  />
+                </div>
+              );
+            case 'textarea':
+              return (
+                <div key={index} className="space-y-2">
+                  <Label>{field.name}</Label>
+                  <Textarea
+                    value={field.value || ''}
+                    onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                    placeholder={field.placeholder}
+                  />
+                </div>
+              );
+            case 'number':
+              return (
+                <div key={index} className="space-y-2">
+                  <Label>{field.name}</Label>
+                  <Input
+                    type="number"
+                    value={field.value || ''}
+                    onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                    placeholder={field.placeholder}
+                  />
+                </div>
+              );
+            case 'select':
+              return (
+                <div key={index} className="space-y-2">
+                  <Label>{field.name}</Label>
+                  <Select
+                    value={field.value || ''}
+                    onValueChange={(value) => handleCustomFieldChange(field.name, value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={field.placeholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {field.options?.map((option: string) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              );
+            default:
+              return null;
+          }
+        })}
+      </div>
+    );
+  };
+
   const renderObservabilityMetrics = () => {
-    const metrics = selectedNode.data.metrics || {
+    const metrics = editedNode.data.metrics || {
       cpu: 45,
       memory: 60,
       disk: 30,
@@ -241,7 +256,7 @@ export default function ConfigPanel() {
   };
 
   const renderComponentLogs = () => {
-    const logs = selectedNode.data.logs || [];
+    const logs = editedNode.data.logs || [];
 
     return (
       <div className="space-y-4">
@@ -282,7 +297,15 @@ export default function ConfigPanel() {
 
   return (
     <div className="w-[450px] p-4 border-l">
-      <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Node Configuration</h2>
+        {hasChanges && (
+          <Button onClick={handleSave} size="sm" className="gap-2">
+            <Save className="h-4 w-4" />
+            Save Changes
+          </Button>
+        )}
+      </div>
 
       <Tabs defaultValue="configuration" className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
@@ -296,7 +319,7 @@ export default function ConfigPanel() {
             <div className="space-y-2">
               <Label>Label</Label>
               <Input
-                value={selectedNode.data.label || ""}
+                value={editedNode.data.label || ""}
                 onChange={(e) => handleChange("label", e.target.value)}
               />
             </div>
@@ -305,7 +328,7 @@ export default function ConfigPanel() {
               <Label>Status</Label>
               <select
                 className="w-full p-2 rounded-md border"
-                value={selectedNode.data.status || "active"}
+                value={editedNode.data.status || "active"}
                 onChange={(e) => handleChange("status", e.target.value)}
               >
                 <option value="active">Active</option>
@@ -318,16 +341,16 @@ export default function ConfigPanel() {
             <div className="space-y-2">
               <Label>Description</Label>
               <Input
-                value={selectedNode.data.description || ""}
+                value={editedNode.data.description || ""}
                 onChange={(e) => handleChange("description", e.target.value)}
               />
             </div>
 
-            {selectedNode.data.customFields && selectedNode.data.customFields.length > 0 && (
+            {editedNode.data.customFields && editedNode.data.customFields.length > 0 && (
               <div className="space-y-4">
                 <h3 className="font-medium">Custom Fields</h3>
                 <div className="space-y-4">
-                  {selectedNode.data.customFields.map((field: any, index: number) => (
+                  {editedNode.data.customFields.map((field: any, index: number) => (
                     <div key={index} className="space-y-2">
                       <Label>{field.name}</Label>
                       {field.type === 'select' ? (
@@ -377,16 +400,16 @@ export default function ConfigPanel() {
                   <Github className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     className="pl-8"
-                    value={selectedNode.data.githubUrl || ""}
+                    value={editedNode.data.githubUrl || ""}
                     onChange={(e) => handleChange("githubUrl", e.target.value)}
                     placeholder="https://github.com/user/repo"
                   />
                 </div>
-                {selectedNode.data.githubUrl && (
+                {editedNode.data.githubUrl && (
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => window.open(selectedNode.data.githubUrl, '_blank')}
+                    onClick={() => window.open(editedNode.data.githubUrl, '_blank')}
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Button>
@@ -400,11 +423,11 @@ export default function ConfigPanel() {
               <div className="flex items-center justify-between">
                 <h3 className="font-medium">GitHub Issues</h3>
                 <Badge variant="destructive">
-                  {selectedNode.data.issues?.length || 0}
+                  {editedNode.data.issues?.length || 0}
                 </Badge>
               </div>
               <ScrollArea className="h-[200px] rounded-md border p-4">
-                {renderGitHubIssues(selectedNode.data.issues)}
+                {renderGitHubIssues(editedNode.data.issues)}
               </ScrollArea>
             </div>
 
@@ -412,15 +435,15 @@ export default function ConfigPanel() {
               <Label>Google Console Link</Label>
               <div className="flex space-x-2">
                 <Input
-                  value={selectedNode.data.consoleUrl || ""}
+                  value={editedNode.data.consoleUrl || ""}
                   onChange={(e) => handleChange("consoleUrl", e.target.value)}
                   placeholder="https://console.cloud.google.com/..."
                 />
-                {selectedNode.data.consoleUrl && (
+                {editedNode.data.consoleUrl && (
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => window.open(selectedNode.data.consoleUrl, '_blank')}
+                    onClick={() => window.open(editedNode.data.consoleUrl, '_blank')}
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Button>
@@ -434,8 +457,8 @@ export default function ConfigPanel() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Metrics</h3>
-              <Badge variant={selectedNode.data.status === 'active' ? 'success' : 'destructive'}>
-                {selectedNode.data.status}
+              <Badge variant={editedNode.data.status === 'active' ? 'success' : 'destructive'}>
+                {editedNode.data.status}
               </Badge>
             </div>
             {renderObservabilityMetrics()}
