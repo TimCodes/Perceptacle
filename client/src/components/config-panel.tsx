@@ -321,35 +321,50 @@ export default function ConfigPanel() {
   const renderGitHubIssues = () => {
     const issues = editedNode.data.issues || [];
 
-    if (!issues || issues.length === 0) {
-      return (
-        <p className="text-sm text-muted-foreground">No issues found yet</p>
-      );
-    }
-
     return (
-      <div className="space-y-2">
-        {issues.map((issue, index) => (
-          <div key={index} className="p-2 bg-muted rounded-md">
-            <div className="flex items-center gap-2">
-              <Bug className="h-4 w-4" />
-              <div className="flex flex-col gap-1">
-                <Button
-                  variant="link"
-                  className="h-auto p-0 text-sm text-left"
-                  onClick={() => window.open(issue.url, "_blank")}
-                >
-                  {issue.title}
-                </Button>
-                <Badge
-                  variant={issue.state === "open" ? "destructive" : "success"}
-                >
-                  {issue.state}
-                </Badge>
+      <div className="mt-8 space-y-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium">GitHub Issues</h3>
+          <Badge variant="secondary">{issues.length} issues</Badge>
+        </div>
+
+        <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+          <div className="space-y-2">
+            {issues.map((issue: any, index: number) => (
+              <div
+                key={index}
+                className={cn(
+                  "flex gap-3 p-2 rounded-md",
+                  issue.state === "open"
+                    ? "bg-destructive/10"
+                    : "bg-success/10"
+                )}
+              >
+                <Bug className={cn(
+                  "h-4 w-4",
+                  issue.state === "open"
+                    ? "text-destructive"
+                    : "text-success"
+                )} />
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-sm font-medium text-left justify-start"
+                    onClick={() => window.open(issue.url, "_blank")}
+                  >
+                    {issue.title}
+                  </Button>
+                  <Badge 
+                    variant={issue.state === "open" ? "destructive" : "success"}
+                    className="w-fit"
+                  >
+                    {issue.state}
+                  </Badge>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </ScrollArea>
       </div>
     );
   };
@@ -606,10 +621,7 @@ export default function ConfigPanel() {
                     />
                   </div>
 
-                  <div className="mt-6">
-                    <h3 className="text-sm font-medium mb-4">GitHub Issues</h3>
-                    {renderGitHubIssues()}
-                  </div>
+                  {renderGitHubIssues()}
                 </div>
               </TabsContent>
 
