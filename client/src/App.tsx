@@ -5,7 +5,6 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Settings from "@/pages/settings";
 import { ThemeProvider } from "./lib/theme-provider";
-import { ThemeToggle } from "./components/theme-toggle";
 import { Button } from "./components/ui/button";
 import { Settings as SettingsIcon } from "lucide-react";
 import { useLocation } from "wouter";
@@ -24,7 +23,7 @@ function NavButtons() {
   const [_, setLocation] = useLocation();
 
   return (
-    <div className="absolute right-4 top-4 z-50 flex items-center gap-2">
+    <div className="absolute right-4 top-4 z-50">
       <Button
         variant="outline"
         size="icon"
@@ -32,7 +31,6 @@ function NavButtons() {
       >
         <SettingsIcon className="h-[1.2rem] w-[1.2rem]" />
       </Button>
-      <ThemeToggle />
     </div>
   );
 }
