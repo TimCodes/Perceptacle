@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { cloudComponents } from '@/lib/cloudComponents';
 
 interface ComponentLibraryProps {
-  setNodes: (updater: (nodes: any[]) => any[]) => void;
+  setNodes?: (updater: (nodes: any[]) => any[]) => void;
 }
 
 export default function ComponentLibrary({ setNodes }: ComponentLibraryProps) {
@@ -37,21 +36,20 @@ export default function ComponentLibrary({ setNodes }: ComponentLibraryProps) {
 
       <ScrollArea className="h-[calc(100vh-180px)]">
         <div className="grid grid-cols-2 gap-2">
-          {filteredComponents.map((component) => (
-            <div
-              key={component.type}
-              className="flex flex-col items-center p-2 border rounded-md cursor-grab hover:bg-accent hover:text-accent-foreground"
-              draggable
-              onDragStart={(e) => onDragStart(e, component.type)}
-            >
-              <img
-                src={component.icon}
-                alt={component.label}
-                className="w-8 h-8 mb-1"
-              />
-              <span className="text-sm text-center">{component.label}</span>
-            </div>
-          ))}
+          {filteredComponents.map((component) => {
+            const Icon = component.icon;
+            return (
+              <div
+                key={component.type}
+                className="flex flex-col items-center p-2 border rounded-md cursor-grab hover:bg-accent hover:text-accent-foreground"
+                draggable
+                onDragStart={(e) => onDragStart(e, component.type)}
+              >
+                <Icon className="w-8 h-8 mb-1" />
+                <span className="text-sm text-center">{component.label}</span>
+              </div>
+            );
+          })}
         </div>
       </ScrollArea>
     </div>
