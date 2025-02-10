@@ -8,7 +8,11 @@ import ReactFlow, {
   Connection,
   Edge,
   ReactFlowInstance,
-  Node
+  Node,
+  Handle,
+  Position,
+  ConnectionLineType,
+  MarkerType
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
@@ -33,17 +37,38 @@ const CustomNode = ({ data }: { data: any }) => {
   const Component = cloudComponents.find(comp => comp.type === data.type)?.icon;
 
   return (
-    <div className="p-2 rounded-md bg-background border text-foreground shadow-sm">
+    <div className="relative p-2 rounded-md bg-background border text-foreground shadow-sm">
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="w-3 h-3 border-2 bg-background"
+      />
       <div className="flex items-center gap-2">
         {Component && <Component className="w-5 h-5" />}
         <span className="text-sm font-medium">{data.label}</span>
       </div>
+      <Handle
+        type="source"
+        position={Position.Right}
+        className="w-3 h-3 border-2 bg-background"
+      />
     </div>
   );
 };
 
 const nodeTypes = {
   default: CustomNode,
+};
+
+// Custom edge style
+const defaultEdgeOptions = {
+  type: 'smoothstep',
+  animated: true,
+  style: { stroke: 'hsl(var(--primary))' },
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    color: 'hsl(var(--primary))',
+  },
 };
 
 export default function DiagramCanvas() {
@@ -53,7 +78,25 @@ export default function DiagramCanvas() {
   const { setSelectedNode } = useDiagramStore();
 
   const onConnect = useCallback(
-    (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
+    (params: Connection) => {
+      // Prevent self-connections
+      if (params.source === params.target) {
+        return;
+      }
+
+      setEdges((eds) => 
+        addEdge({
+          ...params,
+          type: 'smoothstep',
+          animated: true,
+          style: { stroke: 'hsl(var(--primary))' },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: 'hsl(var(--primary))',
+          },
+        }, eds)
+      );
+    },
     [setEdges]
   );
 
@@ -140,6 +183,9 @@ export default function DiagramCanvas() {
         onDragOver={onDragOver}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
+        defaultEdgeOptions={defaultEdgeOptions}
+        connectionLineType={ConnectionLineType.SmoothStep}
+        connectionLineStyle={{ stroke: 'hsl(var(--primary))' }}
         fitView
       >
         <Background className="dark:bg-muted/20" />
