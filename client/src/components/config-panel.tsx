@@ -3,8 +3,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
-import { Save } from "lucide-react";
+import { Save, Settings, GitBranch, BarChart } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import {
   Select,
@@ -114,9 +120,44 @@ export default function ConfigPanel() {
       <div className="space-y-4">
         <Tabs defaultValue="configuration" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="configuration">Configuration</TabsTrigger>
-            <TabsTrigger value="cicd">CI/CD</TabsTrigger>
-            <TabsTrigger value="observability">Observability</TabsTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="configuration">
+                    <Settings className="h-4 w-4" />
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Configuration</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="cicd">
+                    <GitBranch className="h-4 w-4" />
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>CI/CD</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="observability">
+                    <BarChart className="h-4 w-4" />
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Observability</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </TabsList>
 
           <TabsContent value="configuration" className="space-y-4">
@@ -191,7 +232,6 @@ export default function ConfigPanel() {
           </TabsContent>
         </Tabs>
 
-        {/* Save Button at the bottom */}
         {hasChanges && (
           <div className="sticky bottom-0 pt-4 pb-2 bg-background border-t mt-4">
             <Button onClick={handleSave} className="w-full gap-2">
