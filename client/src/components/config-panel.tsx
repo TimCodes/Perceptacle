@@ -21,7 +21,8 @@ import {
   AlertCircle,
   AlertTriangle,
   Info,
-  Bug
+  Bug,
+  Ticket
 } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import {
@@ -40,7 +41,6 @@ export default function ConfigPanel() {
   const [hasChanges, setHasChanges] = useState(false);
   const { toast } = useToast();
 
-  // Reset edited node when selected node changes
   useEffect(() => {
     if (selectedNode) {
       setEditedNode({
@@ -72,6 +72,35 @@ export default function ConfigPanel() {
               url: "https://github.com/org/repo/issues/3",
               state: "open"
             }
+          ],
+          tickets: selectedNode.data.tickets || [
+            {
+              id: "TICKET-001",
+              title: "Service degradation in production",
+              status: "open",
+              priority: "high",
+              created: "2025-02-09T10:00:00Z",
+              assignee: "John Doe",
+              description: "Users reporting slow response times and occasional timeouts"
+            },
+            {
+              id: "TICKET-002",
+              title: "SSL Certificate expiring soon",
+              status: "in-progress",
+              priority: "medium",
+              created: "2025-02-08T15:30:00Z",
+              assignee: "Jane Smith",
+              description: "SSL certificate needs to be renewed before March 1st"
+            },
+            {
+              id: "TICKET-003",
+              title: "Backup validation required",
+              status: "closed",
+              priority: "low",
+              created: "2025-02-07T09:15:00Z",
+              assignee: "Mike Johnson",
+              description: "Regular backup validation check pending"
+            }
           ]
         },
       });
@@ -81,7 +110,8 @@ export default function ConfigPanel() {
     }
   }, [selectedNode]);
 
-  if (!editedNode || !selectedNode) {
+  // Add null check at the beginning
+  if (!editedNode) {
     return (
       <div className="w-[585px] p-4 border-l">
         <p className="text-muted-foreground">
@@ -240,7 +270,7 @@ export default function ConfigPanel() {
   };
 
   const renderComponentLogs = () => {
-    const logs = editedNode?.data.logs || [];
+    const logs = editedNode.data.logs || [];
 
     return (
       <div className="mt-8 space-y-4">
@@ -282,7 +312,7 @@ export default function ConfigPanel() {
   };
 
   const renderGitHubIssues = () => {
-    const issues = editedNode?.data.issues || [];
+    const issues = editedNode.data.issues || [];
 
     if (!issues || issues.length === 0) {
       return (
@@ -322,14 +352,86 @@ export default function ConfigPanel() {
     );
   };
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case 'high':
+        return 'text-destructive';
+      case 'medium':
+        return 'text-warning';
+      case 'low':
+        return 'text-success';
+      default:
+        return 'text-muted-foreground';
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'open':
+        return 'destructive';
+      case 'in-progress':
+        return 'warning';
+      case 'closed':
+        return 'success';
+      default:
+        return 'secondary';
+    }
+  };
+
+  const renderTickets = () => {
+    const tickets = editedNode.data.tickets || [];
+
+    if (!tickets || tickets.length === 0) {
+      return (
+        <p className="text-sm text-muted-foreground">
+          No trouble tickets found
+        </p>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {tickets.map((ticket: any, index: number) => (
+          <div
+            key={index}
+            className="p-4 border rounded-lg bg-card"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{ticket.id}</span>
+                  <Badge variant={getStatusBadgeVariant(ticket.status)}>
+                    {ticket.status}
+                  </Badge>
+                </div>
+                <h4 className="text-sm font-semibold">{ticket.title}</h4>
+              </div>
+              <span className={cn("text-xs font-medium", getPriorityColor(ticket.priority))}>
+                {ticket.priority.toUpperCase()}
+              </span>
+            </div>
+
+            <p className="text-sm text-muted-foreground mb-2">
+              {ticket.description}
+            </p>
+
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Assignee: {ticket.assignee}</span>
+              <span>Created: {new Date(ticket.created).toLocaleString()}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="w-[585px] p-4 border-l">
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
       <div className="space-y-4">
-        <Tabs defaultValue="configuration" className="space-y-4 w-[50%]">
-          <TabsList className="grid w-full grid-cols-3 gap-2">
+        <Tabs defaultValue="configuration" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4 gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -365,6 +467,19 @@ export default function ConfigPanel() {
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Observability</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="tickets" className="px-0 w-[40%]">
+                    <Ticket className="h-4 w-4" />
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Tickets</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -460,7 +575,7 @@ export default function ConfigPanel() {
               <div className="space-y-2">
                 <Label>Repository URL</Label>
                 <Input
-                  value={editedNode?.data.repositoryUrl || ""}
+                  value={editedNode.data.repositoryUrl || ""}
                   onChange={(e) =>
                     handleChange("repositoryUrl", e.target.value)
                   }
@@ -471,7 +586,7 @@ export default function ConfigPanel() {
               <div className="space-y-2">
                 <Label>Branch</Label>
                 <Input
-                  value={editedNode?.data.branch || ""}
+                  value={editedNode.data.branch || ""}
                   onChange={(e) => handleChange("branch", e.target.value)}
                   placeholder="main"
                 />
@@ -480,7 +595,7 @@ export default function ConfigPanel() {
               <div className="space-y-2">
                 <Label>Build Command</Label>
                 <Input
-                  value={editedNode?.data.buildCommand || ""}
+                  value={editedNode.data.buildCommand || ""}
                   onChange={(e) => handleChange("buildCommand", e.target.value)}
                   placeholder="npm run build"
                 />
@@ -498,7 +613,7 @@ export default function ConfigPanel() {
               <div className="space-y-2">
                 <Label>Monitoring URL</Label>
                 <Input
-                  value={editedNode?.data.monitoringUrl || ""}
+                  value={editedNode.data.monitoringUrl || ""}
                   onChange={(e) =>
                     handleChange("monitoringUrl", e.target.value)
                   }
@@ -509,7 +624,7 @@ export default function ConfigPanel() {
               <div className="space-y-2">
                 <Label>Logging System</Label>
                 <Select
-                  value={editedNode?.data.loggingSystem || ""}
+                  value={editedNode.data.loggingSystem || ""}
                   onValueChange={(value) =>
                     handleChange("loggingSystem", value)
                   }
@@ -530,7 +645,7 @@ export default function ConfigPanel() {
               <div className="space-y-2">
                 <Label>Metrics Endpoint</Label>
                 <Input
-                  value={editedNode?.data.metricsEndpoint || ""}
+                  value={editedNode.data.metricsEndpoint || ""}
                   onChange={(e) =>
                     handleChange("metricsEndpoint", e.target.value)
                   }
@@ -544,6 +659,18 @@ export default function ConfigPanel() {
               </div>
 
               {renderComponentLogs()}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="tickets" className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium">Trouble Tickets</h3>
+                <Badge variant="secondary">
+                  {editedNode.data.tickets?.length || 0} tickets
+                </Badge>
+              </div>
+              {renderTickets()}
             </div>
           </TabsContent>
         </Tabs>
