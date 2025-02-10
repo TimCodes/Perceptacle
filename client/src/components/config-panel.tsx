@@ -1,78 +1,59 @@
-import {
-  Box,
-  VStack,
-  Input,
-  Text,
-  FormControl,
-  FormLabel,
-  FormHelperText,
-  Select,
-  Link,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
-  IconButton,
-  HStack,
-  Divider,
-  Badge,
-  Progress,
-  Stat,
-  StatLabel,
-  StatNumber,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  useColorModeValue,
-  SimpleGrid,
-  List,
-  ListItem,
-} from "@chakra-ui/react";
+import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Github, Activity, AlertCircle, Bug } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 const renderGitHubIssues = (issues = []) => {
   if (!issues || issues.length === 0) {
     return (
-      <Text color="gray.500" fontSize="sm">
+      <p className="text-sm text-muted-foreground">
         No issues found
-      </Text>
+      </p>
     );
   }
 
   return (
-    <List spacing={2}>
+    <div className="space-y-2">
       {issues.map((issue, index) => (
-        <ListItem key={index} p={2} bg="gray.50" borderRadius="md">
-          <HStack spacing={2}>
-            <Bug size={14} />
-            <VStack align="start" spacing={1}>
-              <Link href={issue.url} isExternal color="blue.500">
-                <Text fontSize="sm">{issue.title}</Text>
-              </Link>
-              <Badge colorScheme={issue.state === 'open' ? 'red' : 'green'}>
-                {issue.state}
-              </Badge>
-            </VStack>
-          </HStack>
-        </ListItem>
+        <div key={index} className="flex items-start space-x-2 p-2 bg-secondary/20 rounded-md">
+          <Bug className="h-4 w-4 mt-0.5" />
+          <div className="space-y-1">
+            <a 
+              href={issue.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm hover:underline text-blue-600"
+            >
+              {issue.title}
+            </a>
+            <Badge variant={issue.state === 'open' ? 'destructive' : 'success'}>
+              {issue.state}
+            </Badge>
+          </div>
+        </div>
       ))}
-    </List>
+    </div>
   );
 };
 
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
 
   if (!selectedNode) {
     return (
-      <Box p={4} borderLeft="1px" borderColor={borderColor} width="450px">
-        <Text color="gray.500">Select a node to configure its properties</Text>
-      </Box>
+      <div className="w-[450px] p-4 border-l">
+        <p className="text-muted-foreground">
+          Select a node to configure its properties
+        </p>
+      </div>
     );
   }
 
@@ -98,61 +79,27 @@ export default function ConfigPanel() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "#48BB78";
+        return "hsl(var(--success))";
       case "warning":
-        return "#ECC94B";
+        return "hsl(var(--warning))";
       case "error":
-        return "#E53E3E";
+        return "hsl(var(--destructive))";
       case "inactive":
-        return "#A0AEC0";
+        return "hsl(var(--muted))";
       default:
-        return "#CBD5E0";
+        return "hsl(var(--border))";
     }
   };
 
   const getLogIcon = (level: string) => {
     switch (level) {
       case 'error':
-        return <AlertCircle size={14} className="text-red-500" />;
+        return <AlertCircle className="h-4 w-4 text-destructive" />;
       case 'warning':
-        return <AlertCircle size={14} className="text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-warning" />;
       default:
-        return <Activity size={14} className="text-blue-500" />;
+        return <Activity className="h-4 w-4 text-primary" />;
     }
-  };
-
-  const renderExternalLinkButton = (url: string) => {
-    if (!url) return null;
-    return (
-      <InputRightElement>
-        <IconButton
-          aria-label="Open link"
-          icon={<ExternalLink size={16} />}
-          size="sm"
-          variant="ghost"
-          onClick={() => window.open(url, '_blank')}
-        />
-      </InputRightElement>
-    );
-  };
-
-  const renderLink = (url: string, icon: React.ReactNode) => {
-    if (!url) return null;
-    return (
-      <Link
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        color="blue.500"
-        fontSize="sm"
-        display="inline-flex"
-        alignItems="center"
-        _hover={{ textDecoration: 'underline', color: 'blue.600' }}
-      >
-        {icon}
-        <Text ml={2}>{url}</Text>
-      </Link>
-    );
   };
 
   const renderObservabilityMetrics = () => {
@@ -166,43 +113,44 @@ export default function ConfigPanel() {
     };
 
     return (
-      <Box>
-        <SimpleGrid columns={2} spacing={4} mb={4}>
-          <Stat>
-            <StatLabel>CPU Usage</StatLabel>
-            <StatNumber>{metrics.cpu}%</StatNumber>
-            <Progress value={metrics.cpu} size="sm" colorScheme={metrics.cpu > 80 ? 'red' : 'blue'} />
-          </Stat>
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { label: "CPU Usage", value: metrics.cpu },
+            { label: "Memory Usage", value: metrics.memory },
+            { label: "Disk Usage", value: metrics.disk },
+            { label: "Network Usage", value: metrics.network },
+          ].map((metric) => (
+            <Card key={metric.label}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {metric.label}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metric.value}%</div>
+                <Progress 
+                  value={metric.value} 
+                  className="mt-2" 
+                  variant={metric.value > 80 ? "destructive" : "default"}
+                />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-          <Stat>
-            <StatLabel>Memory Usage</StatLabel>
-            <StatNumber>{metrics.memory}%</StatNumber>
-            <Progress value={metrics.memory} size="sm" colorScheme={metrics.memory > 80 ? 'red' : 'blue'} />
-          </Stat>
+        <div className="flex items-center space-x-2 text-sm">
+          <Activity className="h-4 w-4" />
+          <span>Last Updated: {new Date(metrics.lastUpdated).toLocaleString()}</span>
+        </div>
 
-          <Stat>
-            <StatLabel>Disk Usage</StatLabel>
-            <StatNumber>{metrics.disk}%</StatNumber>
-            <Progress value={metrics.disk} size="sm" colorScheme={metrics.disk > 80 ? 'red' : 'blue'} />
-          </Stat>
-
-          <Stat>
-            <StatLabel>Network Usage</StatLabel>
-            <StatNumber>{metrics.network}%</StatNumber>
-            <Progress value={metrics.network} size="sm" colorScheme={metrics.network > 80 ? 'red' : 'blue'} />
-          </Stat>
-        </SimpleGrid>
-
-        <HStack spacing={4} mb={2}>
-          <Activity size={16} />
-          <Text fontSize="sm">Last Updated: {new Date(metrics.lastUpdated).toLocaleString()}</Text>
-        </HStack>
-
-        <HStack spacing={4}>
-          <AlertCircle size={16} color={metrics.activeAlerts > 0 ? '#E53E3E' : '#48BB78'} />
-          <Text fontSize="sm">Active Alerts: {metrics.activeAlerts}</Text>
-        </HStack>
-      </Box>
+        <div className="flex items-center space-x-2 text-sm">
+          <AlertCircle 
+            className={`h-4 w-4 ${metrics.activeAlerts > 0 ? 'text-destructive' : 'text-success'}`} 
+          />
+          <span>Active Alerts: {metrics.activeAlerts}</span>
+        </div>
+      </div>
     );
   };
 
@@ -210,175 +158,182 @@ export default function ConfigPanel() {
     const logs = selectedNode.data.logs || [];
 
     return (
-      <Box mt={4}>
-        <HStack mb={4} justify="space-between">
-          <Text fontWeight="bold" fontSize="lg">
-            Component Logs
-          </Text>
-          <Badge>{logs.length} entries</Badge>
-        </HStack>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Component Logs</h3>
+          <Badge variant="secondary">{logs.length} entries</Badge>
+        </div>
 
-        <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-          <VStack spacing={2} align="stretch">
+        <ScrollArea className="h-[300px] rounded-md border p-4">
+          <div className="space-y-2">
             {logs.slice().reverse().map((log: any, index: number) => (
-              <HStack
+              <div
                 key={index}
-                p={2}
-                bg={log.level === 'error' ? 'red.50' : log.level === 'warning' ? 'yellow.50' : 'blue.50'}
-                borderRadius="md"
-                spacing={3}
+                className={`flex items-start space-x-3 p-2 rounded-md
+                  ${log.level === 'error' 
+                    ? 'bg-destructive/10' 
+                    : log.level === 'warning' 
+                      ? 'bg-warning/10' 
+                      : 'bg-primary/10'
+                  }`}
               >
                 {getLogIcon(log.level)}
-                <VStack spacing={0} align="start" flex={1}>
-                  <Text fontSize="sm" fontWeight="medium">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">
                     {log.message}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
+                  </p>
+                  <p className="text-xs text-muted-foreground">
                     {new Date(log.timestamp).toLocaleString()}
-                  </Text>
-                </VStack>
-              </HStack>
+                  </p>
+                </div>
+              </div>
             ))}
-          </VStack>
+          </div>
         </ScrollArea>
-      </Box>
+      </div>
     );
   };
 
   return (
-    <Box p={4} borderLeft="1px" borderColor={borderColor} width="450px">
-      <Text mb={4} fontWeight="bold" fontSize="lg">
-        Node Configuration
-      </Text>
+    <div className="w-[450px] p-4 border-l">
+      <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
-      <Tabs>
-        <TabList>
-          <Tab>Configuration</Tab>
-          <Tab>CI/CD</Tab>
-          <Tab>Observability</Tab>
-        </TabList>
+      <Tabs defaultValue="configuration" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="configuration">Configuration</TabsTrigger>
+          <TabsTrigger value="cicd">CI/CD</TabsTrigger>
+          <TabsTrigger value="observability">Observability</TabsTrigger>
+        </TabsList>
 
-        <TabPanels>
-          <TabPanel>
-            <VStack spacing={4} align="stretch">
-              <FormControl>
-                <FormLabel>Label</FormLabel>
-                <Input
-                  value={selectedNode.data.label || ""}
-                  onChange={(e) => handleChange("label", e.target.value)}
-                />
-                <FormHelperText>Enter a name for this component</FormHelperText>
-              </FormControl>
+        <TabsContent value="configuration" className="space-y-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Label</Label>
+              <Input
+                value={selectedNode.data.label || ""}
+                onChange={(e) => handleChange("label", e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                Enter a name for this component
+              </p>
+            </div>
 
-              <FormControl>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  value={selectedNode.data.status || "active"}
-                  onChange={(e) => handleChange("status", e.target.value)}
-                >
-                  <option value="active">Active</option>
-                  <option value="warning">Warning</option>
-                  <option value="error">Error</option>
-                  <option value="inactive">Inactive</option>
-                </Select>
-                <FormHelperText>Current status of the component</FormHelperText>
-              </FormControl>
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <select
+                className="w-full p-2 rounded-md border"
+                value={selectedNode.data.status || "active"}
+                onChange={(e) => handleChange("status", e.target.value)}
+              >
+                <option value="active">Active</option>
+                <option value="warning">Warning</option>
+                <option value="error">Error</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <p className="text-sm text-muted-foreground">
+                Current status of the component
+              </p>
+            </div>
 
-              <FormControl>
-                <FormLabel>Description</FormLabel>
-                <Input
-                  value={selectedNode.data.description || ""}
-                  onChange={(e) => handleChange("description", e.target.value)}
-                />
-                <FormHelperText>Brief description of the component's purpose</FormHelperText>
-              </FormControl>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Input
+                value={selectedNode.data.description || ""}
+                onChange={(e) => handleChange("description", e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                Brief description of the component's purpose
+              </p>
+            </div>
 
-              <FormControl>
-                <FormLabel>Instance Type</FormLabel>
-                <Input
-                  value={selectedNode.data.instanceType || ""}
-                  onChange={(e) => handleChange("instanceType", e.target.value)}
-                />
-                <FormHelperText>The type of GCP instance (e.g., n1-standard-1)</FormHelperText>
-              </FormControl>
-            </VStack>
-          </TabPanel>
+            <div className="space-y-2">
+              <Label>Instance Type</Label>
+              <Input
+                value={selectedNode.data.instanceType || ""}
+                onChange={(e) => handleChange("instanceType", e.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                The type of GCP instance (e.g., n1-standard-1)
+              </p>
+            </div>
+          </div>
+        </TabsContent>
 
-          <TabPanel>
-            <VStack spacing={4} align="stretch">
-              <FormControl>
-                <FormLabel>GitHub Repository</FormLabel>
-                <InputGroup>
-                  <InputLeftElement>
-                    <Github size={16} />
-                  </InputLeftElement>
+        <TabsContent value="cicd" className="space-y-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>GitHub Repository</Label>
+              <div className="flex space-x-2">
+                <div className="relative flex-1">
+                  <Github className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
+                    className="pl-8"
                     value={selectedNode.data.githubUrl || ""}
                     onChange={(e) => handleChange("githubUrl", e.target.value)}
                     placeholder="https://github.com/user/repo"
                   />
-                  {renderExternalLinkButton(selectedNode.data.githubUrl)}
-                </InputGroup>
+                </div>
                 {selectedNode.data.githubUrl && (
-                  <Box mt={1}>
-                    {renderLink(selectedNode.data.githubUrl, <Github size={14} />)}
-                  </Box>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => window.open(selectedNode.data.githubUrl, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 )}
-                <FormHelperText>Link to the component's repository</FormHelperText>
-              </FormControl>
+              </div>
+            </div>
 
-              <Divider my={2} />
+            <Separator className="my-4" />
 
-              <Box>
-                <Text fontWeight="bold" fontSize="md" mb={2}>
-                  GitHub Issues
-                  <Badge ml={2} colorScheme="red">
-                    {selectedNode.data.issues?.length || 0}
-                  </Badge>
-                </Text>
-                <ScrollArea className="h-[200px] w-full rounded-md border p-4">
-                  {renderGitHubIssues(selectedNode.data.issues)}
-                </ScrollArea>
-              </Box>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">GitHub Issues</h3>
+                <Badge variant="destructive">
+                  {selectedNode.data.issues?.length || 0}
+                </Badge>
+              </div>
+              <ScrollArea className="h-[200px] rounded-md border p-4">
+                {renderGitHubIssues(selectedNode.data.issues)}
+              </ScrollArea>
+            </div>
 
-              <FormControl>
-                <FormLabel>Google Console Link</FormLabel>
-                <InputGroup>
-                  <Input
-                    value={selectedNode.data.consoleUrl || ""}
-                    onChange={(e) => handleChange("consoleUrl", e.target.value)}
-                    placeholder="https://console.cloud.google.com/..."
-                  />
-                  {renderExternalLinkButton(selectedNode.data.consoleUrl)}
-                </InputGroup>
+            <div className="space-y-2">
+              <Label>Google Console Link</Label>
+              <div className="flex space-x-2">
+                <Input
+                  value={selectedNode.data.consoleUrl || ""}
+                  onChange={(e) => handleChange("consoleUrl", e.target.value)}
+                  placeholder="https://console.cloud.google.com/..."
+                />
                 {selectedNode.data.consoleUrl && (
-                  <Box mt={1}>
-                    {renderLink(selectedNode.data.consoleUrl, <ExternalLink size={14} />)}
-                  </Box>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => window.open(selectedNode.data.consoleUrl, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 )}
-                <FormHelperText>Link to the Google Cloud Console</FormHelperText>
-              </FormControl>
-            </VStack>
-          </TabPanel>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
 
-          <TabPanel>
-            <VStack spacing={4} align="stretch">
-              <Box>
-                <HStack mb={4} justify="space-between">
-                  <Text fontWeight="bold" fontSize="lg">
-                    Metrics
-                  </Text>
-                  <Badge colorScheme={selectedNode.data.status === 'active' ? 'green' : 'red'}>
-                    {selectedNode.data.status}
-                  </Badge>
-                </HStack>
-                {renderObservabilityMetrics()}
-              </Box>
-              {renderComponentLogs()}
-            </VStack>
-          </TabPanel>
-        </TabPanels>
+        <TabsContent value="observability" className="space-y-6">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Metrics</h3>
+              <Badge variant={selectedNode.data.status === 'active' ? 'success' : 'destructive'}>
+                {selectedNode.data.status}
+              </Badge>
+            </div>
+            {renderObservabilityMetrics()}
+            {renderComponentLogs()}
+          </div>
+        </TabsContent>
       </Tabs>
-    </Box>
+    </div>
   );
 }
