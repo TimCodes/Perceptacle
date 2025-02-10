@@ -36,15 +36,20 @@ const menuVariants = {
 
 export default function Home() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
+  const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(true);
   const { theme } = useTheme();
 
   const toggleComponentMenu = () => {
     setIsComponentMenuOpen(!isComponentMenuOpen);
   };
 
+  const toggleConfigPanel = () => {
+    setIsConfigPanelOpen(!isConfigPanelOpen);
+  };
+
   return (
     <ReactFlowProvider>
-      <div className="grid h-screen grid-cols-[auto_1fr_300px] grid-rows-[60px_1fr] gap-1">
+      <div className="grid h-screen grid-cols-[auto_1fr_auto] grid-rows-[60px_1fr] gap-1">
         <div className="col-span-3 border-b bg-background">
           <DiagramToolbar />
         </div>
@@ -81,8 +86,30 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="border-l bg-card">
-          <ConfigPanel />
+        <div className="relative">
+          <AnimatePresence initial={false}>
+            <MotionDiv
+              className="h-full border-l bg-card overflow-hidden"
+              variants={menuVariants}
+              initial="closed"
+              animate={isConfigPanelOpen ? "open" : "closed"}
+            >
+              <ConfigPanel />
+            </MotionDiv>
+          </AnimatePresence>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleConfigPanel}
+            className="absolute -left-6 top-4 z-10 rounded-r-none shadow-md"
+          >
+            {isConfigPanelOpen ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       </div>
     </ReactFlowProvider>
