@@ -57,15 +57,17 @@ export default function DiagramToolbar() {
         </Button>
       </div>
 
-      <Button
-        onClick={clearDiagram}
-        variant="destructive"
-        size="sm"
-        className="gap-2"
-      >
-        <Trash2 className="h-4 w-4" />
-        Clear Canvas
-      </Button>
+      <div className="mr-20">
+        <Button
+          onClick={clearDiagram}
+          variant="destructive"
+          size="sm"
+          className="gap-2"
+        >
+          <Trash2 className="h-4 w-4" />
+          Clear Canvas
+        </Button>
+      </div>
     </div>
   );
 }

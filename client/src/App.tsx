@@ -23,7 +23,7 @@ function NavButtons() {
   const [_, setLocation] = useLocation();
 
   return (
-    <div className="absolute right-8 top-4 z-50">
+    <div className="absolute right-12 top-4 z-50">
       <Button
         variant="outline"
         size="icon"
