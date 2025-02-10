@@ -18,6 +18,22 @@ import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
 import { cloudComponents } from '@/lib/cloudComponents';
 
+// Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
+const customComponents = [
+  {
+    type: 'custom_component_1',
+    label: 'Custom Component 1',
+    icon: () => <div>Custom Icon 1</div>,
+    fields: [
+      { name: 'field1', label: 'Field 1', type: 'text', defaultValue: 'default value 1' },
+      { name: 'field2', label: 'Field 2', type: 'number', defaultValue: 0 },
+
+    ]
+  },
+  // Add more custom components here...
+];
+
+
 interface DiagramCanvasProps {
   onNodeSelected?: () => void;
 }
@@ -38,7 +54,7 @@ const getStatusColor = (status: string) => {
 };
 
 const CustomNode = ({ data }: { data: any }) => {
-  const Component = cloudComponents.find(comp => comp.type === data.type)?.icon;
+  const Component = [...cloudComponents, ...customComponents].find(comp => comp.type === data.type)?.icon;
 
   return (
     <div className="relative p-2 rounded-md bg-background border text-foreground shadow-sm">
@@ -124,25 +140,29 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
       });
 
       const initialStatus = 'active';
+      const componentType = type.replace(/-/g, '_');
+      const componentDefinition = [...cloudComponents, ...customComponents].find(
+        (comp) => comp.type === componentType
+      );
+
+      const customFields = componentDefinition?.fields?.map((field) => ({
+        ...field,
+        value: field.defaultValue || '',
+      })) || [];
+
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
         type: 'default',
         position,
         data: {
-          label: type,
+          label: componentDefinition?.label || type,
           type: type,
           status: initialStatus,
-          description: 'Example component description',
+          description: componentDefinition?.description || 'Example component description',
           instanceType: '',
-          githubUrl: 'https://github.com/example/gcp-component',
-          consoleUrl: 'https://console.cloud.google.com/home/dashboard',
-          issues: [
-            {
-              title: 'Example Issue',
-              url: 'https://github.com/example/gcp-component/issues/1',
-              state: 'open'
-            }
-          ],
+          githubUrl: componentDefinition?.githubUrl || 'https://github.com/example/gcp-component',
+          consoleUrl: componentDefinition?.consoleUrl || 'https://console.cloud.google.com/home/dashboard',
+          customFields,
           metrics: {
             cpu: Math.floor(Math.random() * 100),
             memory: Math.floor(Math.random() * 100),

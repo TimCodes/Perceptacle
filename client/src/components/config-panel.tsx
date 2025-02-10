@@ -10,6 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Github, Activity, AlertCircle, Bug } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const renderGitHubIssues = (issues = []) => {
   if (!issues || issues.length === 0) {
@@ -40,6 +42,77 @@ const renderGitHubIssues = (issues = []) => {
           </div>
         </div>
       ))}
+    </div>
+  );
+};
+
+const renderCustomFields = (node: any) => {
+  if (!node.data.customFields) return null;
+
+  return (
+    <div className="space-y-4">
+      {node.data.customFields.map((field: any, index: number) => {
+        switch (field.type) {
+          case 'text':
+          case 'url':
+            return (
+              <div key={index} className="space-y-2">
+                <Label>{field.name}</Label>
+                <Input
+                  value={field.value || ''}
+                  onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                  placeholder={field.placeholder}
+                />
+              </div>
+            );
+          case 'textarea':
+            return (
+              <div key={index} className="space-y-2">
+                <Label>{field.name}</Label>
+                <Textarea
+                  value={field.value || ''}
+                  onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                  placeholder={field.placeholder}
+                />
+              </div>
+            );
+          case 'number':
+            return (
+              <div key={index} className="space-y-2">
+                <Label>{field.name}</Label>
+                <Input
+                  type="number"
+                  value={field.value || ''}
+                  onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                  placeholder={field.placeholder}
+                />
+              </div>
+            );
+          case 'select':
+            return (
+              <div key={index} className="space-y-2">
+                <Label>{field.name}</Label>
+                <Select
+                  value={field.value || ''}
+                  onValueChange={(value) => handleCustomFieldChange(field.name, value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={field.placeholder} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {field.options?.map((option: string) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            );
+          default:
+            return null;
+        }
+      })}
     </div>
   );
 };
@@ -194,6 +267,19 @@ export default function ConfigPanel() {
     );
   };
 
+  const handleCustomFieldChange = (fieldName: string, value: string) => {
+    const updatedNode = {
+      ...selectedNode,
+      data: {
+        ...selectedNode.data,
+        customFields: selectedNode.data.customFields.map((field: any) =>
+          field.name === fieldName ? { ...field, value } : field
+        ),
+      },
+    };
+    updateSelectedNode(updatedNode);
+  };
+
   return (
     <div className="w-[450px] p-4 border-l">
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
@@ -256,6 +342,13 @@ export default function ConfigPanel() {
                 The type of GCP instance (e.g., n1-standard-1)
               </p>
             </div>
+
+            {selectedNode.data.customFields && selectedNode.data.customFields.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="font-medium">Custom Fields</h3>
+                {renderCustomFields(selectedNode)}
+              </div>
+            )}
           </div>
         </TabsContent>
 

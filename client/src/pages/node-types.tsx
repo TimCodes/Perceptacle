@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { cloudComponents } from "@/lib/cloudComponents";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,6 +35,24 @@ const CATEGORIES = [
   "Serverless",
 ];
 
+const FIELD_TYPES = [
+  { value: "text", label: "Text" },
+  { value: "number", label: "Number" },
+  { value: "select", label: "Select" },
+  { value: "textarea", label: "Text Area" },
+  { value: "url", label: "URL" },
+];
+
+interface CustomField {
+  id: string;
+  name: string;
+  type: string;
+  required: boolean;
+  options?: string[]; // For select fields
+  defaultValue?: string;
+  placeholder?: string;
+}
+
 export default function NodeTypes() {
   const [_, setLocation] = useLocation();
   const [selectedType, setSelectedType] = useState<string | null>(null);
@@ -49,16 +67,57 @@ export default function NodeTypes() {
     type: "",
     label: "",
     category: "",
+    fields: [] as CustomField[],
   });
 
   const allComponents = [...cloudComponents, ...customComponents];
   const selectedComponent = allComponents.find(c => c.type === selectedType);
 
+  const addField = () => {
+    const newField: CustomField = {
+      id: Date.now().toString(),
+      name: "",
+      type: "text",
+      required: false,
+    };
+    setNewComponent(prev => ({
+      ...prev,
+      fields: [...prev.fields, newField],
+    }));
+  };
+
+  const updateField = (id: string, updates: Partial<CustomField>) => {
+    setNewComponent(prev => ({
+      ...prev,
+      fields: prev.fields.map(field =>
+        field.id === id ? { ...field, ...updates } : field
+      ),
+    }));
+  };
+
+  const removeField = (id: string) => {
+    setNewComponent(prev => ({
+      ...prev,
+      fields: prev.fields.filter(field => field.id !== id),
+    }));
+  };
+
   const handleCreateComponent = () => {
     if (!newComponent.type || !newComponent.label || !newComponent.category) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all fields",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate field names are unique
+    const fieldNames = newComponent.fields.map(f => f.name);
+    if (new Set(fieldNames).size !== fieldNames.length) {
+      toast({
+        title: "Validation Error",
+        description: "Field names must be unique",
         variant: "destructive",
       });
       return;
@@ -88,7 +147,7 @@ export default function NodeTypes() {
       description: "New component type has been added successfully",
     });
 
-    setNewComponent({ type: "", label: "", category: "" });
+    setNewComponent({ type: "", label: "", category: "", fields: [] });
   };
 
   return (
@@ -113,11 +172,11 @@ export default function NodeTypes() {
               Create New Type
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Create New Component Type</DialogTitle>
               <DialogDescription>
-                Define a new custom component type for your GCP diagrams.
+                Define a new custom component type with custom fields for your GCP diagrams.
               </DialogDescription>
             </DialogHeader>
 
@@ -171,6 +230,127 @@ export default function NodeTypes() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label>Custom Fields</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addField}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Field
+                  </Button>
+                </div>
+
+                <ScrollArea className="h-[300px] rounded-md border p-4">
+                  <div className="space-y-4">
+                    {newComponent.fields.map((field) => (
+                      <Card key={field.id}>
+                        <CardContent className="pt-6">
+                          <div className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                              <Label>Field Configuration</Label>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeField(field.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label>Field Name</Label>
+                                <Input
+                                  value={field.name}
+                                  onChange={(e) =>
+                                    updateField(field.id, { name: e.target.value })
+                                  }
+                                  placeholder="e.g., instanceType"
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Field Type</Label>
+                                <Select
+                                  value={field.type}
+                                  onValueChange={(value) =>
+                                    updateField(field.id, { type: value })
+                                  }
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {FIELD_TYPES.map((type) => (
+                                      <SelectItem
+                                        key={type.value}
+                                        value={type.value}
+                                      >
+                                        {type.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label>Placeholder</Label>
+                                <Input
+                                  value={field.placeholder || ""}
+                                  onChange={(e) =>
+                                    updateField(field.id, {
+                                      placeholder: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Enter placeholder text"
+                                />
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label>Default Value</Label>
+                                <Input
+                                  value={field.defaultValue || ""}
+                                  onChange={(e) =>
+                                    updateField(field.id, {
+                                      defaultValue: e.target.value,
+                                    })
+                                  }
+                                  placeholder="Enter default value"
+                                />
+                              </div>
+                            </div>
+
+                            {field.type === "select" && (
+                              <div className="space-y-2">
+                                <Label>Options (comma-separated)</Label>
+                                <Input
+                                  value={field.options?.join(", ") || ""}
+                                  onChange={(e) =>
+                                    updateField(field.id, {
+                                      options: e.target.value
+                                        .split(",")
+                                        .map((opt) => opt.trim())
+                                        .filter(Boolean),
+                                    })
+                                  }
+                                  placeholder="option1, option2, option3"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </ScrollArea>
               </div>
             </div>
 
@@ -252,6 +432,37 @@ export default function NodeTypes() {
                     <Label>Category</Label>
                     <Input value={selectedComponent.category} readOnly />
                   </div>
+
+                  {selectedComponent.fields && selectedComponent.fields.length > 0 && (
+                    <div className="space-y-4">
+                      <Label className="text-lg">Custom Fields</Label>
+                      <div className="grid gap-4">
+                        {selectedComponent.fields.map((field: CustomField) => (
+                          <Card key={field.id}>
+                            <CardContent className="pt-4">
+                              <div className="grid gap-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium">{field.name}</span>
+                                  <Badge>{FIELD_TYPES.find(t => t.value === field.type)?.label}</Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {field.placeholder && `Placeholder: ${field.placeholder}`}
+                                  {field.defaultValue && ` • Default: ${field.defaultValue}`}
+                                </p>
+                                {field.type === 'select' && field.options && (
+                                  <div className="flex gap-2 flex-wrap">
+                                    {field.options.map((option, i) => (
+                                      <Badge key={i} variant="outline">{option}</Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
