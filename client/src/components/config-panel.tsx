@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
@@ -11,7 +12,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
-import { Save, Settings, GitBranch, BarChart, Activity, AlertCircle } from "lucide-react";
+import { 
+  Save, 
+  Settings, 
+  GitBranch, 
+  BarChart, 
+  Activity, 
+  AlertCircle,
+  AlertTriangle,
+  Info
+} from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import {
   Select,
@@ -129,7 +139,15 @@ export default function ConfigPanel() {
   const renderObservabilityMetrics = () => {
     const metrics = editedNode.data.metrics;
 
-    const StatCard = ({ label, value, progressValue }: { label: string, value: string, progressValue: number }) => (
+    const StatCard = ({
+      label,
+      value,
+      progressValue,
+    }: {
+      label: string;
+      value: string;
+      progressValue: number;
+    }) => (
       <div className="p-4 rounded-lg border bg-card">
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">{label}</p>
@@ -138,7 +156,7 @@ export default function ConfigPanel() {
             value={progressValue}
             className={cn(
               "h-2",
-              progressValue > 80 ? "text-destructive" : "text-primary"
+              progressValue > 80 ? "text-destructive" : "text-primary",
             )}
           />
         </div>
@@ -148,23 +166,41 @@ export default function ConfigPanel() {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
-          <StatCard label="CPU Usage" value={`${metrics.cpu}%`} progressValue={metrics.cpu} />
-          <StatCard label="Memory Usage" value={`${metrics.memory}%`} progressValue={metrics.memory} />
-          <StatCard label="Disk Usage" value={`${metrics.disk}%`} progressValue={metrics.disk} />
-          <StatCard label="Network Usage" value={`${metrics.network}%`} progressValue={metrics.network} />
+          <StatCard
+            label="CPU Usage"
+            value={`${metrics.cpu}%`}
+            progressValue={metrics.cpu}
+          />
+          <StatCard
+            label="Memory Usage"
+            value={`${metrics.memory}%`}
+            progressValue={metrics.memory}
+          />
+          <StatCard
+            label="Disk Usage"
+            value={`${metrics.disk}%`}
+            progressValue={metrics.disk}
+          />
+          <StatCard
+            label="Network Usage"
+            value={`${metrics.network}%`}
+            progressValue={metrics.network}
+          />
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Activity className="h-4 w-4" />
-            <span>Last Updated: {new Date(metrics.lastUpdated).toLocaleString()}</span>
+            <span>
+              Last Updated: {new Date(metrics.lastUpdated).toLocaleString()}
+            </span>
           </div>
 
           <div className="flex items-center gap-2 text-sm">
             <AlertCircle
               className={cn(
                 "h-4 w-4",
-                metrics.activeAlerts > 0 ? "text-destructive" : "text-success"
+                metrics.activeAlerts > 0 ? "text-destructive" : "text-success",
               )}
             />
             <span>Active Alerts: {metrics.activeAlerts}</span>
@@ -174,12 +210,65 @@ export default function ConfigPanel() {
     );
   };
 
+  const getLogIcon = (level: string) => {
+    switch (level) {
+      case "error":
+        return <AlertCircle className="h-4 w-4 text-destructive" />;
+      case "warning":
+        return <AlertTriangle className="h-4 w-4 text-warning" />;
+      default:
+        return <Info className="h-4 w-4 text-primary" />;
+    }
+  };
+
+  const renderComponentLogs = () => {
+    const logs = editedNode?.data.logs || [];
+
+    return (
+      <div className="mt-8 space-y-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium">Component Logs</h3>
+          <Badge variant="secondary">{logs.length} entries</Badge>
+        </div>
+
+        <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+          <div className="space-y-2">
+            {logs
+              .slice()
+              .reverse()
+              .map((log: any, index: number) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "flex gap-3 p-2 rounded-md",
+                    log.level === "error"
+                      ? "bg-destructive/10"
+                      : log.level === "warning"
+                      ? "bg-warning/10"
+                      : "bg-primary/10"
+                  )}
+                >
+                  {getLogIcon(log.level)}
+                  <div className="flex flex-col gap-0.5 flex-1">
+                    <p className="text-sm font-medium">{log.message}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(log.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  };
+
   return (
     <div className="w-[585px] p-4 border-l">
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
       <div className="space-y-4">
-        <Tabs defaultValue="configuration" className="space-y-4">
+        <Tabs defaultValue="configuration" className="space-y-4 w-[50%]">
           <TabsList className="grid w-full grid-cols-3 gap-2">
             <TooltipProvider>
               <Tooltip>
@@ -388,6 +477,8 @@ export default function ConfigPanel() {
                 <h3 className="text-sm font-medium mb-4">Live Metrics</h3>
                 {renderObservabilityMetrics()}
               </div>
+
+              {renderComponentLogs()}
             </div>
           </TabsContent>
         </Tabs>
