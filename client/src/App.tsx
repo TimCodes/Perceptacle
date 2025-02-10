@@ -19,7 +19,7 @@ function Router() {
 
 function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <div className="relative">
