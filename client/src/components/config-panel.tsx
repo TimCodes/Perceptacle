@@ -119,11 +119,11 @@ export default function ConfigPanel() {
 
       <div className="space-y-4">
         <Tabs defaultValue="configuration" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 gap-1">
+          <TabsList className="grid w-full grid-cols-3 gap-4">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="configuration" className="px-2">
+                  <TabsTrigger value="configuration" className="px-1">
                     <Settings className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -136,7 +136,7 @@ export default function ConfigPanel() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="cicd" className="px-2">
+                  <TabsTrigger value="cicd" className="px-1">
                     <GitBranch className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -149,7 +149,7 @@ export default function ConfigPanel() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="observability" className="px-2">
+                  <TabsTrigger value="observability" className="px-1">
                     <BarChart className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
