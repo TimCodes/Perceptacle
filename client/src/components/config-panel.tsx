@@ -20,7 +20,8 @@ import {
   Activity, 
   AlertCircle,
   AlertTriangle,
-  Info
+  Info,
+  Bug
 } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import {
@@ -263,6 +264,48 @@ export default function ConfigPanel() {
     );
   };
 
+  const renderGitHubIssues = () => {
+    const issues = editedNode?.data.issues || [];
+
+    if (!issues || issues.length === 0) {
+      return (
+        <p className="text-sm text-muted-foreground">
+          No issues found yet
+        </p>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {issues.map((issue, index) => (
+          <div
+            key={index}
+            className="p-2 bg-muted rounded-md"
+          >
+            <div className="flex items-center gap-2">
+              <Bug className="h-4 w-4" />
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-sm text-left"
+                  onClick={() => window.open(issue.url, '_blank')}
+                >
+                  {issue.title}
+                </Button>
+                <Badge
+                  variant={issue.state === "open" ? "destructive" : "success"}
+                >
+                  {issue.state}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+
   return (
     <div className="w-[585px] p-4 border-l">
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
@@ -424,6 +467,11 @@ export default function ConfigPanel() {
                   onChange={(e) => handleChange("buildCommand", e.target.value)}
                   placeholder="npm run build"
                 />
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-sm font-medium mb-4">GitHub Issues</h3>
+                {renderGitHubIssues()}
               </div>
             </div>
           </TabsContent>
