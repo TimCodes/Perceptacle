@@ -35,10 +35,18 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
+const tabNames = {
+  configuration: "Configuration",
+  cicd: "CI/CD",
+  observability: "Observability",
+  tickets: "Tickets"
+};
+
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
   const [editedNode, setEditedNode] = useState(selectedNode);
   const [hasChanges, setHasChanges] = useState(false);
+  const [currentTab, setCurrentTab] = useState("configuration");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -424,10 +432,14 @@ export default function ConfigPanel() {
   return (
     <div className="w-[325px] border-l bg-background overflow-hidden flex flex-col">
       <ScrollArea className="flex-1 p-4">
-        <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
+        <h2 className="text-lg font-semibold mb-4">Node {tabNames[currentTab]}</h2>
 
         <div className="space-y-4">
-          <Tabs defaultValue="configuration" className="space-y-4">
+          <Tabs 
+            defaultValue="configuration" 
+            className="space-y-4"
+            onValueChange={setCurrentTab}
+          >
             <TabsList className="grid w-full grid-cols-4">
               <TooltipProvider>
                 <Tooltip>
@@ -484,7 +496,6 @@ export default function ConfigPanel() {
 
             <div className="mt-4">
               <TabsContent value="configuration" className="space-y-4">
-                {/* Configuration tab content */}
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label>Label</Label>
