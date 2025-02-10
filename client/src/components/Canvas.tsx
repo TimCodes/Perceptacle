@@ -1,5 +1,6 @@
-import ReactFlow, { Background, Controls } from "reactflow";
-import "reactflow/dist/style.css";
+import ReactFlow, { Background, Controls } from 'reactflow';
+import 'reactflow/dist/style.css';
+import { Box } from '@chakra-ui/react';
 
 interface CanvasProps {
   nodes: any[];
@@ -19,7 +20,7 @@ export default function Canvas({
   onNodeSelect,
 }: CanvasProps) {
   return (
-    <div className="h-full w-full bg-background">
+    <Box h="100%" w="100%">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -32,6 +33,6 @@ export default function Canvas({
         <Background />
         <Controls />
       </ReactFlow>
-    </div>
+    </Box>
   );
 }

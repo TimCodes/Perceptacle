@@ -1,26 +1,27 @@
-import { useState } from "react";
+import { Box, Grid, GridItem, IconButton } from "@chakra-ui/react";
 import ComponentLibrary from "@/components/component-library";
 import DiagramCanvas from "@/components/diagram-canvas";
 import ConfigPanel from "@/components/config-panel";
 import DiagramToolbar from "@/components/diagram-toolbar";
 import { ReactFlowProvider } from "reactflow";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
 
-const MotionDiv = motion.div;
+// TODO: Update to use the new shadcn/ui Tabs component for better consistency
+// This includes updating the styling and interaction patterns to match the config panel implementation
+const MotionGridItem = motion(GridItem);
 
 const menuVariants = {
   open: {
-    width: "325px",
+    width: "250px",
     opacity: 1,
     transition: {
       type: "spring",
       stiffness: 300,
       damping: 30,
-      mass: 0.8,
-    },
+      mass: 0.8
+    }
   },
   closed: {
     width: "0px",
@@ -29,93 +30,94 @@ const menuVariants = {
       type: "spring",
       stiffness: 300,
       damping: 30,
-      mass: 0.8,
-    },
+      mass: 0.8
+    }
+  }
+};
+
+const buttonVariants = {
+  open: {
+    x: 0,
+    rotate: 0,
+    transition: { duration: 0.3 }
   },
+  closed: {
+    x: -10,
+    rotate: 180,
+    transition: { duration: 0.3 }
+  }
 };
 
 export default function Home() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
-  const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
-  const { theme } = useTheme();
 
   const toggleComponentMenu = () => {
     setIsComponentMenuOpen(!isComponentMenuOpen);
   };
 
-  const toggleConfigPanel = () => {
-    setIsConfigPanelOpen(!isConfigPanelOpen);
-  };
-
-  const handleNodeSelected = () => {
-    setIsConfigPanelOpen(true);
-  };
-
   return (
     <ReactFlowProvider>
-      <div className="grid h-screen grid-cols-[auto_1fr_auto] grid-rows-[60px_1fr] gap-1">
-        <div className="col-span-3 border-b bg-background">
+      <Grid
+        templateAreas={`"toolbar toolbar toolbar"
+                       "library canvas config"`}
+        gridTemplateRows={"60px 1fr"}
+        gridTemplateColumns={"auto 1fr 300px"}
+        h="100vh"
+        gap="1"
+        color="blackAlpha.700"
+        fontWeight="bold"
+      >
+        <GridItem area={"toolbar"} bg="white" borderBottom="1px" borderColor="gray.200">
           <DiagramToolbar />
-        </div>
+        </GridItem>
 
-        <div className="relative">
-          <AnimatePresence initial={false}>
-            <MotionDiv
-              className="h-full border-r bg-card overflow-hidden"
-              variants={menuVariants}
-              initial="closed"
-              animate={isComponentMenuOpen ? "open" : "closed"}
-            >
-              <ComponentLibrary />
-            </MotionDiv>
-          </AnimatePresence>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleComponentMenu}
-            className="absolute -right-6 top-4 z-10 rounded-l-none shadow-md"
+        <AnimatePresence initial={false}>
+          <MotionGridItem
+            area={"library"}
+            bg="white"
+            borderRight="1px"
+            borderColor="gray.200"
+            overflowY="auto"
+            variants={menuVariants}
+            initial="closed"
+            animate={isComponentMenuOpen ? "open" : "closed"}
+            style={{ position: 'relative' }}
           >
-            {isComponentMenuOpen ? (
-              <ChevronLeft className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
+            <ComponentLibrary />
+            <Box position="absolute" right="-12" top="4" zIndex={10}>
+              <motion.div
+                variants={buttonVariants}
+                initial="open"
+                animate={isComponentMenuOpen ? "open" : "closed"}
+              >
+                <IconButton
+                  aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
+                  icon={<ChevronLeft size={20} />}
+                  onClick={toggleComponentMenu}
+                  size="sm"
+                  variant="solid"
+                  bg="white"
+                  borderWidth={1}
+                  borderColor="gray.200"
+                  borderLeftRadius={0}
+                  shadow="md"
+                  _hover={{ bg: 'gray.50' }}
+                />
+              </motion.div>
+            </Box>
+          </MotionGridItem>
+        </AnimatePresence>
 
-        <div className="bg-muted/50">
-          <div className="h-full w-full">
-            <DiagramCanvas onNodeSelected={handleNodeSelected} />
-          </div>
-        </div>
+        <GridItem area={"canvas"} bg="gray.50">
+          <Box h="100%" w="100%">
+            <DiagramCanvas />
+          </Box>
+        </GridItem>
 
-        <div className="relative">
-          <AnimatePresence initial={false}>
-            <MotionDiv
-              className="h-full border-l bg-card overflow-hidden"
-              variants={menuVariants}
-              initial="closed"
-              animate={isConfigPanelOpen ? "open" : "closed"}
-            >
-              <ConfigPanel />
-            </MotionDiv>
-          </AnimatePresence>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleConfigPanel}
-            className="absolute -left-6 top-4 z-10 rounded-r-none shadow-md"
-          >
-            {isConfigPanelOpen ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-      </div>
+        <GridItem area={"config"} bg="white" borderLeft="1px" borderColor="gray.200">
+          <ConfigPanel />
+        </GridItem>
+      </Grid>
     </ReactFlowProvider>
   );
 }

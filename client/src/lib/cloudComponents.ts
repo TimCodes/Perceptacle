@@ -1,99 +1,50 @@
-import {
-  Server,
-  Database,
-  HardDrive,
-  Network,
-  Cloud,
-  Box,
-  Cpu,
-  Globe,
-  Shield,
-  LayoutGrid
-} from 'lucide-react';
-
-export const iconMap = {
-  Server,
-  Database,
-  HardDrive,
-  Network,
-  Cloud,
-  Box,
-  Cpu,
-  Globe,
-  Shield,
-  LayoutGrid
-};
-
-const predefinedComponents = [
+export const cloudComponents = [
   {
     type: 'compute-engine',
     label: 'Compute Engine',
-    icon: Server,
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_compute_192px.png',
     category: 'Compute',
   },
   {
     type: 'cloud-storage',
     label: 'Cloud Storage',
-    icon: HardDrive,
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_cloud_storage_192px.png',
     category: 'Storage',
   },
   {
     type: 'cloud-sql',
     label: 'Cloud SQL',
-    icon: Database,
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_cloud_sql_192px.png',
     category: 'Database',
   },
   {
     type: 'kubernetes-engine',
     label: 'Kubernetes Engine',
-    icon: Box,
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_kubernetes_192px.png',
     category: 'Compute',
   },
   {
     type: 'cloud-functions',
     label: 'Cloud Functions',
-    icon: Cloud,
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_functions_192px.png',
     category: 'Serverless',
+  },
+  {
+    type: 'bigquery',
+    label: 'BigQuery',
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_bigquery_192px.png',
+    category: 'Analytics',
   },
   {
     type: 'cloud-run',
     label: 'Cloud Run',
-    icon: Cpu,
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_cloud_run_192px.png',
     category: 'Serverless',
   },
   {
-    type: 'load-balancer',
-    label: 'Load Balancer',
-    icon: Globe,
-    category: 'Networking',
+    type: 'cloud-pub-sub',
+    label: 'Cloud Pub/Sub',
+    icon: 'https://www.gstatic.com/cloud/images/products/logos/product_pubsub_192px.png',
+    category: 'Messaging',
   },
-  {
-    type: 'cloud-armor',
-    label: 'Cloud Armor',
-    icon: Shield,
-    category: 'Security',
-  },
-  {
-    type: 'app-engine',
-    label: 'App Engine',
-    icon: LayoutGrid,
-    category: 'Compute',
-  }
 ];
-
-// Function to get all components including custom ones
-export const getCloudComponents = () => {
-  const saved = localStorage.getItem("customComponents");
-  const customComponents = saved ? JSON.parse(saved) : [];
-
-  // Map custom components to include Box as default icon if not specified
-  const mappedCustomComponents = customComponents.map(comp => ({
-    ...comp,
-    icon: iconMap[comp.icon] || Box
-  }));
-
-  return [...predefinedComponents, ...mappedCustomComponents];
-};
-
-// Export both the static list and the function
-export const cloudComponents = predefinedComponents;

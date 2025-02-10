@@ -1,17 +1,13 @@
 import { extendTheme } from '@chakra-ui/react';
 
 export const theme = extendTheme({
-  config: {
-    initialColorMode: 'dark',
-    useSystemColorMode: true,
-  },
   styles: {
-    global: (props: { colorMode: string }) => ({
+    global: {
       body: {
-        bg: props.colorMode === 'dark' ? 'gray.800' : 'gray.50',
-        color: props.colorMode === 'dark' ? 'white' : 'gray.900',
+        bg: 'gray.50',
+        color: 'gray.900',
       },
-    }),
+    },
   },
   colors: {
     gray: {
@@ -29,23 +25,18 @@ export const theme = extendTheme({
   },
   components: {
     Button: {
-      baseStyle: (props: { colorMode: string }) => ({
-        _hover: {
-          bg: props.colorMode === 'dark' ? 'gray.700' : 'gray.100',
-        },
-      }),
+      baseStyle: {
+        fontWeight: 'medium',
+      },
+      defaultProps: {
+        colorScheme: 'blue',
+      },
     },
-    Input: {
-      variants: {
-        outline: (props: { colorMode: string }) => ({
-          field: {
-            bg: props.colorMode === 'dark' ? 'gray.700' : 'white',
-            borderColor: props.colorMode === 'dark' ? 'gray.600' : 'gray.200',
-            _hover: {
-              borderColor: props.colorMode === 'dark' ? 'gray.500' : 'gray.300',
-            },
-          },
-        }),
+    FormControl: {
+      baseStyle: {
+        label: {
+          fontWeight: 'medium',
+        },
       },
     },
   },
