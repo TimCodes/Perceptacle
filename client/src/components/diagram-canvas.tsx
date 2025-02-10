@@ -39,10 +39,11 @@ const CustomNode = ({ data }: { data: any }) => {
   return (
     <div className="relative p-2 rounded-md bg-background border text-foreground shadow-sm">
       <Handle
-        type="target"
+        type="source"
         position={Position.Left}
         className="!w-3 !h-3 !-left-1.5 !border-2 !bg-background hover:!bg-muted"
         style={{ zIndex: 1 }}
+        id="left"
       />
       <div className="flex items-center gap-2">
         {Component && <Component className="w-5 h-5" />}
@@ -53,6 +54,7 @@ const CustomNode = ({ data }: { data: any }) => {
         position={Position.Right}
         className="!w-3 !h-3 !-right-1.5 !border-2 !bg-background hover:!bg-muted"
         style={{ zIndex: 1 }}
+        id="right"
       />
     </div>
   );
@@ -79,10 +81,17 @@ export default function DiagramCanvas() {
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
   const { setSelectedNode } = useDiagramStore();
 
+  const isValidConnection = (connection: Connection) => {
+    // Check if source and target handles are on the same side
+    const sourceHandle = connection.sourceHandle;
+    const targetHandle = connection.targetHandle;
+    return sourceHandle === targetHandle;
+  };
+
   const onConnect = useCallback(
     (params: Connection) => {
-      // Prevent self-connections
-      if (params.source === params.target) {
+      // Prevent self-connections and validate handle positions
+      if (params.source === params.target || !isValidConnection(params)) {
         return;
       }
 
