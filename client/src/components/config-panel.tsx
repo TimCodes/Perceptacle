@@ -45,7 +45,7 @@ export default function ConfigPanel() {
 
   if (!editedNode || !selectedNode) {
     return (
-      <div className="w-[450px] p-4 border-l">
+      <div className="w-[585px] p-4 border-l">
         <p className="text-muted-foreground">
           Select a node to configure its properties
         </p>
@@ -114,7 +114,7 @@ export default function ConfigPanel() {
   };
 
   return (
-    <div className="w-[450px] p-4 border-l">
+    <div className="w-[585px] p-4 border-l">
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
       <div className="space-y-4">
