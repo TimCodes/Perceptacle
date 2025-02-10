@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, IconButton } from "@chakra-ui/react";
+import { Box, Grid, GridItem, IconButton, useColorMode } from "@chakra-ui/react";
 import ComponentLibrary from "@/components/component-library";
 import DiagramCanvas from "@/components/diagram-canvas";
 import ConfigPanel from "@/components/config-panel";
@@ -48,6 +48,7 @@ const buttonVariants = {
 
 export default function Home() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
+  const { colorMode } = useColorMode();
 
   const toggleComponentMenu = () => {
     setIsComponentMenuOpen(!isComponentMenuOpen);
@@ -62,19 +63,23 @@ export default function Home() {
         gridTemplateColumns={"auto 1fr 300px"}
         h="100vh"
         gap="1"
-        color="blackAlpha.700"
-        fontWeight="bold"
+        color={colorMode === 'dark' ? 'gray.100' : 'gray.900'}
+        bg={colorMode === 'dark' ? 'gray.800' : 'gray.50'}
       >
-        <GridItem area={"toolbar"} bg="white" borderBottom="1px" borderColor="gray.200">
+        <GridItem area={"toolbar"} 
+          bg={colorMode === 'dark' ? 'gray.900' : 'white'} 
+          borderBottom="1px" 
+          borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
+        >
           <DiagramToolbar />
         </GridItem>
 
         <AnimatePresence initial={false}>
           <MotionGridItem
             area={"library"}
-            bg="white"
+            bg={colorMode === 'dark' ? 'gray.900' : 'white'}
             borderRight="1px"
-            borderColor="gray.200"
+            borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
             overflowY="auto"
             variants={menuVariants}
             initial="closed"
@@ -94,25 +99,29 @@ export default function Home() {
                   onClick={toggleComponentMenu}
                   size="sm"
                   variant="solid"
-                  bg="white"
+                  bg={colorMode === 'dark' ? 'gray.800' : 'white'}
                   borderWidth={1}
-                  borderColor="gray.200"
+                  borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
                   borderLeftRadius={0}
                   shadow="md"
-                  _hover={{ bg: 'gray.50' }}
+                  _hover={{ bg: colorMode === 'dark' ? 'gray.700' : 'gray.50' }}
                 />
               </motion.div>
             </Box>
           </MotionGridItem>
         </AnimatePresence>
 
-        <GridItem area={"canvas"} bg="gray.50">
+        <GridItem area={"canvas"} bg={colorMode === 'dark' ? 'gray.800' : 'gray.50'}>
           <Box h="100%" w="100%">
             <DiagramCanvas />
           </Box>
         </GridItem>
 
-        <GridItem area={"config"} bg="white" borderLeft="1px" borderColor="gray.200">
+        <GridItem area={"config"} 
+          bg={colorMode === 'dark' ? 'gray.900' : 'white'} 
+          borderLeft="1px" 
+          borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
+        >
           <ConfigPanel />
         </GridItem>
       </Grid>
