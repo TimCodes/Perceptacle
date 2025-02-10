@@ -93,7 +93,6 @@ export default function Home() {
         <div className="relative">
           <AnimatePresence initial={false}>
             <MotionDiv
-              className="h-full border-l bg-card overflow-hidden"
               variants={menuVariants}
               initial="closed"
               animate={isConfigPanelOpen ? "open" : "closed"}

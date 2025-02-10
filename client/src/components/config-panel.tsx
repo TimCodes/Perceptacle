@@ -110,10 +110,9 @@ export default function ConfigPanel() {
     }
   }, [selectedNode]);
 
-  // Add null check at the beginning
   if (!editedNode) {
     return (
-      <div className="w-[585px] p-4 border-l">
+      <div className="w-[325px] p-4 border-l">
         <p className="text-muted-foreground">
           Select a node to configure its properties
         </p>
@@ -213,7 +212,7 @@ export default function ConfigPanel() {
 
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <StatCard
             label="CPU Usage"
             value={`${metrics.cpu}%`}
@@ -292,8 +291,8 @@ export default function ConfigPanel() {
                     log.level === "error"
                       ? "bg-destructive/10"
                       : log.level === "warning"
-                      ? "bg-warning/10"
-                      : "bg-primary/10"
+                        ? "bg-warning/10"
+                        : "bg-primary/10",
                   )}
                 >
                   {getLogIcon(log.level)}
@@ -316,26 +315,21 @@ export default function ConfigPanel() {
 
     if (!issues || issues.length === 0) {
       return (
-        <p className="text-sm text-muted-foreground">
-          No issues found yet
-        </p>
+        <p className="text-sm text-muted-foreground">No issues found yet</p>
       );
     }
 
     return (
       <div className="space-y-2">
         {issues.map((issue, index) => (
-          <div
-            key={index}
-            className="p-2 bg-muted rounded-md"
-          >
+          <div key={index} className="p-2 bg-muted rounded-md">
             <div className="flex items-center gap-2">
               <Bug className="h-4 w-4" />
               <div className="flex flex-col gap-1">
                 <Button
                   variant="link"
                   className="h-auto p-0 text-sm text-left"
-                  onClick={() => window.open(issue.url, '_blank')}
+                  onClick={() => window.open(issue.url, "_blank")}
                 >
                   {issue.title}
                 </Button>
@@ -354,27 +348,27 @@ export default function ConfigPanel() {
 
   const getPriorityColor = (priority: string) => {
     switch (priority.toLowerCase()) {
-      case 'high':
-        return 'text-destructive';
-      case 'medium':
-        return 'text-warning';
-      case 'low':
-        return 'text-success';
+      case "high":
+        return "text-destructive";
+      case "medium":
+        return "text-warning";
+      case "low":
+        return "text-success";
       default:
-        return 'text-muted-foreground';
+        return "text-muted-foreground";
     }
   };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'open':
-        return 'destructive';
-      case 'in-progress':
-        return 'warning';
-      case 'closed':
-        return 'success';
+      case "open":
+        return "destructive";
+      case "in-progress":
+        return "warning";
+      case "closed":
+        return "success";
       default:
-        return 'secondary';
+        return "secondary";
     }
   };
 
@@ -392,10 +386,7 @@ export default function ConfigPanel() {
     return (
       <div className="space-y-4">
         {tickets.map((ticket: any, index: number) => (
-          <div
-            key={index}
-            className="p-4 border rounded-lg bg-card"
-          >
+          <div key={index} className="p-4 border rounded-lg bg-card">
             <div className="flex items-start justify-between mb-2">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -406,7 +397,12 @@ export default function ConfigPanel() {
                 </div>
                 <h4 className="text-sm font-semibold">{ticket.title}</h4>
               </div>
-              <span className={cn("text-xs font-medium", getPriorityColor(ticket.priority))}>
+              <span
+                className={cn(
+                  "text-xs font-medium",
+                  getPriorityColor(ticket.priority),
+                )}
+              >
                 {ticket.priority.toUpperCase()}
               </span>
             </div>
@@ -426,264 +422,221 @@ export default function ConfigPanel() {
   };
 
   return (
-    <div className="w-[585px] p-4 border-l">
-      <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
+    <div className="w-[325px] border-l bg-background overflow-hidden flex flex-col">
+      <ScrollArea className="flex-1 p-4">
+        <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
-      <div className="space-y-4">
-        <Tabs defaultValue="configuration" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="configuration" className="px-0 w-[40%]">
-                    <Settings className="h-4 w-4" />
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Configuration</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+        <div className="space-y-4">
+          <Tabs defaultValue="configuration" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-4">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="configuration" className="p-2">
+                      <Settings className="h-4 w-4" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Configuration</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="cicd" className="px-0 w-[40%]">
-                    <GitBranch className="h-4 w-4" />
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>CI/CD</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="cicd" className="p-2">
+                      <GitBranch className="h-4 w-4" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>CI/CD</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="observability" className="px-0 w-[40%]">
-                    <BarChart className="h-4 w-4" />
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Observability</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="observability" className="p-2">
+                      <BarChart className="h-4 w-4" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Observability</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
 
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="tickets" className="px-0 w-[40%]">
-                    <Ticket className="h-4 w-4" />
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Tickets</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </TabsList>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="tickets" className="p-2">
+                      <Ticket className="h-4 w-4" />
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Tickets</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </TabsList>
 
-          <TabsContent value="configuration" className="space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Label</Label>
-                <Input
-                  value={editedNode.data.label || ""}
-                  onChange={(e) => handleChange("label", e.target.value)}
-                />
-              </div>
+            <div className="mt-4">
+              <TabsContent value="configuration" className="space-y-4">
+                {/* Configuration tab content */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Label</Label>
+                    <Input
+                      value={editedNode.data.label || ""}
+                      onChange={(e) => handleChange("label", e.target.value)}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <select
-                  className="w-full p-2 rounded-md border"
-                  value={editedNode.data.status || "active"}
-                  onChange={(e) => handleChange("status", e.target.value)}
-                >
-                  <option value="active">Active</option>
-                  <option value="warning">Warning</option>
-                  <option value="error">Error</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Status</Label>
+                    <Select
+                      value={editedNode.data.status || "active"}
+                      onValueChange={(value) => handleChange("status", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="warning">Warning</SelectItem>
+                        <SelectItem value="error">Error</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Input
-                  value={editedNode.data.description || ""}
-                  onChange={(e) => handleChange("description", e.target.value)}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Input
+                      value={editedNode.data.description || ""}
+                      onChange={(e) => handleChange("description", e.target.value)}
+                    />
+                  </div>
 
-              {editedNode.data.customFields &&
-                editedNode.data.customFields.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="font-medium">Custom Fields</h3>
-                    <div className="space-y-4">
-                      {editedNode.data.customFields.map(
-                        (field: any, index: number) => (
-                          <div key={index} className="space-y-2">
-                            <Label>{field.name}</Label>
-                            {field.type === "select" ? (
-                              <Select
-                                value={field.value || ""}
-                                onValueChange={(value) =>
-                                  handleCustomFieldChange(field.name, value)
-                                }
-                              >
-                                <SelectTrigger>
-                                  <SelectValue
+                  {editedNode.data.customFields &&
+                    editedNode.data.customFields.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="font-medium">Custom Fields</h3>
+                        <div className="space-y-4">
+                          {editedNode.data.customFields.map(
+                            (field: any, index: number) => (
+                              <div key={index} className="space-y-2">
+                                <Label>{field.name}</Label>
+                                {field.type === "select" ? (
+                                  <Select
+                                    value={field.value || ""}
+                                    onValueChange={(value) =>
+                                      handleCustomFieldChange(field.name, value)
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue
+                                        placeholder={field.placeholder}
+                                      />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {field.options?.map((option: string) => (
+                                        <SelectItem key={option} value={option}>
+                                          {option}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Input
+                                    type={
+                                      field.type === "number" ? "number" : "text"
+                                    }
+                                    value={field.value || ""}
+                                    onChange={(e) =>
+                                      handleCustomFieldChange(
+                                        field.name,
+                                        e.target.value,
+                                      )
+                                    }
                                     placeholder={field.placeholder}
                                   />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {field.options?.map((option: string) => (
-                                    <SelectItem key={option} value={option}>
-                                      {option}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <Input
-                                type={
-                                  field.type === "number" ? "number" : "text"
-                                }
-                                value={field.value || ""}
-                                onChange={(e) =>
-                                  handleCustomFieldChange(
-                                    field.name,
-                                    e.target.value,
-                                  )
-                                }
-                                placeholder={field.placeholder}
-                              />
-                            )}
-                          </div>
-                        ),
-                      )}
-                    </div>
+                                )}
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="cicd" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Repository URL</Label>
+                    <Input
+                      value={editedNode.data.repositoryUrl || ""}
+                      onChange={(e) =>
+                        handleChange("repositoryUrl", e.target.value)
+                      }
+                      placeholder="https://github.com/username/repo"
+                    />
                   </div>
-                )}
+
+                  <div className="space-y-2">
+                    <Label>Branch</Label>
+                    <Input
+                      value={editedNode.data.branch || ""}
+                      onChange={(e) => handleChange("branch", e.target.value)}
+                      placeholder="main"
+                    />
+                  </div>
+
+                  <div className="mt-6">
+                    <h3 className="text-sm font-medium mb-4">GitHub Issues</h3>
+                    {renderGitHubIssues()}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="observability" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="mt-6">
+                    <h3 className="text-sm font-medium mb-4">Live Metrics</h3>
+                    {renderObservabilityMetrics()}
+                  </div>
+
+                  {renderComponentLogs()}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="tickets" className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium">Trouble Tickets</h3>
+                    <Badge variant="secondary">
+                      {editedNode.data.tickets?.length || 0} tickets
+                    </Badge>
+                  </div>
+                  {renderTickets()}
+                </div>
+              </TabsContent>
             </div>
-          </TabsContent>
+          </Tabs>
+        </div>
+      </ScrollArea>
 
-          <TabsContent value="cicd" className="space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Repository URL</Label>
-                <Input
-                  value={editedNode.data.repositoryUrl || ""}
-                  onChange={(e) =>
-                    handleChange("repositoryUrl", e.target.value)
-                  }
-                  placeholder="https://github.com/username/repo"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Branch</Label>
-                <Input
-                  value={editedNode.data.branch || ""}
-                  onChange={(e) => handleChange("branch", e.target.value)}
-                  placeholder="main"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Build Command</Label>
-                <Input
-                  value={editedNode.data.buildCommand || ""}
-                  onChange={(e) => handleChange("buildCommand", e.target.value)}
-                  placeholder="npm run build"
-                />
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-sm font-medium mb-4">GitHub Issues</h3>
-                {renderGitHubIssues()}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="observability" className="space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Monitoring URL</Label>
-                <Input
-                  value={editedNode.data.monitoringUrl || ""}
-                  onChange={(e) =>
-                    handleChange("monitoringUrl", e.target.value)
-                  }
-                  placeholder="https://monitoring.example.com"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Logging System</Label>
-                <Select
-                  value={editedNode.data.loggingSystem || ""}
-                  onValueChange={(value) =>
-                    handleChange("loggingSystem", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select logging system" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="stackdriver">
-                      Google Cloud Logging
-                    </SelectItem>
-                    <SelectItem value="cloudwatch">AWS CloudWatch</SelectItem>
-                    <SelectItem value="elastic">Elastic Stack</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Metrics Endpoint</Label>
-                <Input
-                  value={editedNode.data.metricsEndpoint || ""}
-                  onChange={(e) =>
-                    handleChange("metricsEndpoint", e.target.value)
-                  }
-                  placeholder="/metrics"
-                />
-              </div>
-
-              <div className="mt-6">
-                <h3 className="text-sm font-medium mb-4">Live Metrics</h3>
-                {renderObservabilityMetrics()}
-              </div>
-
-              {renderComponentLogs()}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="tickets" className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Trouble Tickets</h3>
-                <Badge variant="secondary">
-                  {editedNode.data.tickets?.length || 0} tickets
-                </Badge>
-              </div>
-              {renderTickets()}
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {hasChanges && (
-          <div className="sticky bottom-0 pt-4 pb-2 bg-background border-t mt-4">
-            <Button onClick={handleSave} className="w-full gap-2">
-              <Save className="h-4 w-4" />
-              Save Changes
-            </Button>
-          </div>
-        )}
-      </div>
+      {hasChanges && (
+        <div className="sticky bottom-0 p-4 bg-background border-t mt-4">
+          <Button onClick={handleSave} className="w-full gap-2">
+            <Save className="h-4 w-4" />
+            Save Changes
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
