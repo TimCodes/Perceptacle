@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
 import { cloudComponents } from "@/lib/cloudComponents";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,12 +25,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
 
 const CATEGORIES = [
   "Compute",
@@ -54,7 +48,7 @@ interface CustomField {
   name: string;
   type: string;
   required: boolean;
-  options?: string[]; // For select fields
+  options?: string[];
   defaultValue?: string;
   placeholder?: string;
 }
@@ -67,6 +61,15 @@ export default function NodeTypes() {
     return saved ? JSON.parse(saved) : [];
   });
   const { toast } = useToast();
+  const [openFieldIds, setOpenFieldIds] = useState<string[]>([]);
+
+  const toggleFieldConfig = (fieldId: string) => {
+    setOpenFieldIds(prev => 
+      prev.includes(fieldId) 
+        ? prev.filter(id => id !== fieldId)
+        : [...prev, fieldId]
+    );
+  };
 
   // Form state
   const [newComponent, setNewComponent] = useState({
@@ -90,6 +93,8 @@ export default function NodeTypes() {
       ...prev,
       fields: [...prev.fields, newField],
     }));
+    // Automatically open the configuration for the new field
+    setOpenFieldIds(prev => [...prev, newField.id]);
   };
 
   const updateField = (id: string, updates: Partial<CustomField>) => {
@@ -106,7 +111,112 @@ export default function NodeTypes() {
       ...prev,
       fields: prev.fields.filter(field => field.id !== id),
     }));
+    setOpenFieldIds(prev => prev.filter(fieldId => fieldId !== id));
   };
+
+  const renderFieldPreview = (field: CustomField) => (
+    <div className="space-y-2 p-4 bg-accent/10 rounded-lg">
+      <div className="flex items-center justify-between">
+        <span className="font-medium">{field.name || "Unnamed Field"}</span>
+        <Badge>{FIELD_TYPES.find(t => t.value === field.type)?.label || "Text"}</Badge>
+      </div>
+      {field.type === 'select' && field.options && field.options.length > 0 && (
+        <div className="flex gap-2 flex-wrap">
+          {field.options.map((option, i) => (
+            <Badge key={i} variant="outline">{option}</Badge>
+          ))}
+        </div>
+      )}
+      <div className="text-sm text-muted-foreground">
+        {field.placeholder && `Placeholder: ${field.placeholder}`}
+        {field.defaultValue && ` • Default: ${field.defaultValue}`}
+      </div>
+    </div>
+  );
+
+  const renderFieldConfiguration = (field: CustomField) => (
+    <div className="space-y-4 pt-4">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => removeField(field.id)}
+          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Remove Field
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Field Name</Label>
+          <Input
+            value={field.name}
+            onChange={(e) => updateField(field.id, { name: e.target.value })}
+            placeholder="e.g., instanceType"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Field Type</Label>
+          <Select
+            value={field.type}
+            onValueChange={(value) => updateField(field.id, { type: value })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {FIELD_TYPES.map((type) => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Placeholder</Label>
+          <Input
+            value={field.placeholder || ""}
+            onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
+            placeholder="Enter placeholder text"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Default Value</Label>
+          <Input
+            value={field.defaultValue || ""}
+            onChange={(e) => updateField(field.id, { defaultValue: e.target.value })}
+            placeholder="Enter default value"
+          />
+        </div>
+      </div>
+
+      {field.type === "select" && (
+        <div className="space-y-2">
+          <Label>Options (comma-separated)</Label>
+          <Input
+            value={field.options?.join(", ") || ""}
+            onChange={(e) =>
+              updateField(field.id, {
+                options: e.target.value
+                  .split(",")
+                  .map((opt) => opt.trim())
+                  .filter(Boolean),
+              })
+            }
+            placeholder="option1, option2, option3"
+          />
+        </div>
+      )}
+    </div>
+  );
 
   const handleCreateComponent = () => {
     if (!newComponent.type || !newComponent.label || !newComponent.category) {
@@ -252,142 +362,35 @@ export default function NodeTypes() {
                   </Button>
                 </div>
 
-                <ScrollArea className="h-[300px] rounded-md border p-4">
-                  <div className="space-y-4">
-                    {newComponent.fields.map((field) => (
-                      <Card key={field.id}>
-                        <CardContent className="pt-6">
-                          <div className="grid gap-4">
-                            {/* Preview Section */}
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium">{field.name || "Unnamed Field"}</span>
-                                <Badge>{FIELD_TYPES.find(t => t.value === field.type)?.label || "Text"}</Badge>
-                              </div>
-                              {field.type === 'select' && field.options && field.options.length > 0 && (
-                                <div className="flex gap-2 flex-wrap">
-                                  {field.options.map((option, i) => (
-                                    <Badge key={i} variant="outline">{option}</Badge>
-                                  ))}
-                                </div>
-                              )}
-                              <div className="text-sm text-muted-foreground">
-                                {field.placeholder && `Placeholder: ${field.placeholder}`}
-                                {field.defaultValue && ` • Default: ${field.defaultValue}`}
-                              </div>
-                            </div>
+                <div className="space-y-4">
+                  {newComponent.fields.map((field) => (
+                    <Card key={field.id}>
+                      <CardContent className="pt-6">
+                        <div className="space-y-4">
+                          {/* Field Preview */}
+                          {renderFieldPreview(field)}
 
-                            {/* Configuration Section */}
-                            <Collapsible>
-                              <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg border p-2 font-medium hover:bg-accent">
-                                Field Configuration
-                                <ChevronDown className="h-4 w-4" />
-                              </CollapsibleTrigger>
-                              <CollapsibleContent className="pt-2">
-                                <div className="space-y-4">
-                                  <div className="flex items-center justify-between">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeField(field.id)}
-                                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    >
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      Remove Field
-                                    </Button>
-                                  </div>
+                          {/* Toggle Configuration Button */}
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between"
+                            onClick={() => toggleFieldConfig(field.id)}
+                          >
+                            Field Configuration
+                            <ChevronRight
+                              className={`h-4 w-4 transition-transform ${
+                                openFieldIds.includes(field.id) ? 'rotate-90' : ''
+                              }`}
+                            />
+                          </Button>
 
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                      <Label>Field Name</Label>
-                                      <Input
-                                        value={field.name}
-                                        onChange={(e) =>
-                                          updateField(field.id, { name: e.target.value })
-                                        }
-                                        placeholder="e.g., instanceType"
-                                      />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                      <Label>Field Type</Label>
-                                      <Select
-                                        value={field.type}
-                                        onValueChange={(value) =>
-                                          updateField(field.id, { type: value })
-                                        }
-                                      >
-                                        <SelectTrigger>
-                                          <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                          {FIELD_TYPES.map((type) => (
-                                            <SelectItem
-                                              key={type.value}
-                                              value={type.value}
-                                            >
-                                              {type.label}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                    </div>
-                                  </div>
-
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                      <Label>Placeholder</Label>
-                                      <Input
-                                        value={field.placeholder || ""}
-                                        onChange={(e) =>
-                                          updateField(field.id, {
-                                            placeholder: e.target.value,
-                                          })
-                                        }
-                                        placeholder="Enter placeholder text"
-                                      />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                      <Label>Default Value</Label>
-                                      <Input
-                                        value={field.defaultValue || ""}
-                                        onChange={(e) =>
-                                          updateField(field.id, {
-                                            defaultValue: e.target.value,
-                                          })
-                                        }
-                                        placeholder="Enter default value"
-                                      />
-                                    </div>
-                                  </div>
-
-                                  {field.type === "select" && (
-                                    <div className="space-y-2">
-                                      <Label>Options (comma-separated)</Label>
-                                      <Input
-                                        value={field.options?.join(", ") || ""}
-                                        onChange={(e) =>
-                                          updateField(field.id, {
-                                            options: e.target.value
-                                              .split(",")
-                                              .map((opt) => opt.trim())
-                                              .filter(Boolean),
-                                          })
-                                        }
-                                        placeholder="option1, option2, option3"
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-                              </CollapsibleContent>
-                            </Collapsible>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
+                          {/* Field Configuration */}
+                          {openFieldIds.includes(field.id) && renderFieldConfiguration(field)}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </div>
 
