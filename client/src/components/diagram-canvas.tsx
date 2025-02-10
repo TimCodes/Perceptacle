@@ -11,35 +11,34 @@ import ReactFlow, {
   Node
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Box, HStack, Text } from '@chakra-ui/react';
 import { useDiagramStore } from '@/lib/diagram-store';
-import { GCPComponents } from '@/lib/gcp-components';
+import { cloudComponents } from '@/lib/cloudComponents';
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'active':
-      return '#48BB78';
+      return 'hsl(var(--success))';
     case 'warning':
-      return '#ECC94B';
+      return 'hsl(var(--warning))';
     case 'error':
-      return '#E53E3E';
+      return 'hsl(var(--destructive))';
     case 'inactive':
-      return '#A0AEC0';
+      return 'hsl(var(--muted))';
     default:
-      return '#CBD5E0';
+      return 'hsl(var(--border))';
   }
 };
 
 const CustomNode = ({ data }: { data: any }) => {
-  const Icon = GCPComponents.find(comp => comp.type === data.icon)?.icon;
+  const Component = cloudComponents.find(comp => comp.type === data.type)?.icon;
 
   return (
-    <Box p={2}>
-      <HStack spacing={2} alignItems="center">
-        {Icon && <Icon size={20} />}
-        <Text fontSize="sm">{data.label}</Text>
-      </HStack>
-    </Box>
+    <div className="p-2 rounded-md bg-background border text-foreground shadow-sm">
+      <div className="flex items-center gap-2">
+        {Component && <Component className="w-5 h-5" />}
+        <span className="text-sm font-medium">{data.label}</span>
+      </div>
+    </div>
   );
 };
 
@@ -82,7 +81,7 @@ export default function DiagramCanvas() {
         position,
         data: {
           label: type,
-          icon: type,
+          type: type,
           status: initialStatus,
           description: 'Example component description',
           instanceType: '',
@@ -111,11 +110,11 @@ export default function DiagramCanvas() {
             }
           ]
         },
+        className: 'dark:bg-background dark:text-foreground',
         style: {
-          background: '#ffffff',
           border: `2px solid ${getStatusColor(initialStatus)}`,
-          borderRadius: '4px',
-          width: 180
+          borderRadius: '8px',
+          minWidth: 180
         }
       };
 
@@ -129,21 +128,23 @@ export default function DiagramCanvas() {
   }, [setSelectedNode]);
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      onInit={setRfInstance}
-      onDrop={onDrop}
-      onDragOver={onDragOver}
-      onNodeClick={onNodeClick}
-      nodeTypes={nodeTypes}
-      fitView
-    >
-      <Background />
-      <Controls />
-    </ReactFlow>
+    <div className="h-full w-full bg-background">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onInit={setRfInstance}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onNodeClick={onNodeClick}
+        nodeTypes={nodeTypes}
+        fitView
+      >
+        <Background className="dark:bg-muted/20" />
+        <Controls className="dark:bg-background dark:border-border" />
+      </ReactFlow>
+    </div>
   );
 }
