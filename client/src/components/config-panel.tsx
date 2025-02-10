@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import {
   Tooltip,
   TooltipContent,
@@ -10,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
-import { Save, Settings, GitBranch, BarChart } from "lucide-react";
+import { Save, Settings, GitBranch, BarChart, Activity, AlertCircle } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import {
   Select,
@@ -20,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export default function ConfigPanel() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
@@ -35,6 +37,14 @@ export default function ConfigPanel() {
         data: {
           ...selectedNode.data,
           customFields: selectedNode.data.customFields || [],
+          metrics: selectedNode.data.metrics || {
+            cpu: 45,
+            memory: 60,
+            disk: 30,
+            network: 25,
+            lastUpdated: new Date().toISOString(),
+            activeAlerts: 2,
+          },
         },
       });
       setHasChanges(false);
@@ -116,12 +126,60 @@ export default function ConfigPanel() {
     }
   };
 
+  const renderObservabilityMetrics = () => {
+    const metrics = editedNode.data.metrics;
+
+    const StatCard = ({ label, value, progressValue }: { label: string, value: string, progressValue: number }) => (
+      <div className="p-4 rounded-lg border bg-card">
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">{label}</p>
+          <p className="text-2xl font-bold">{value}</p>
+          <Progress
+            value={progressValue}
+            className={cn(
+              "h-2",
+              progressValue > 80 ? "text-destructive" : "text-primary"
+            )}
+          />
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <StatCard label="CPU Usage" value={`${metrics.cpu}%`} progressValue={metrics.cpu} />
+          <StatCard label="Memory Usage" value={`${metrics.memory}%`} progressValue={metrics.memory} />
+          <StatCard label="Disk Usage" value={`${metrics.disk}%`} progressValue={metrics.disk} />
+          <StatCard label="Network Usage" value={`${metrics.network}%`} progressValue={metrics.network} />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Activity className="h-4 w-4" />
+            <span>Last Updated: {new Date(metrics.lastUpdated).toLocaleString()}</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm">
+            <AlertCircle
+              className={cn(
+                "h-4 w-4",
+                metrics.activeAlerts > 0 ? "text-destructive" : "text-success"
+              )}
+            />
+            <span>Active Alerts: {metrics.activeAlerts}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="w-[585px] p-4 border-l">
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
       <div className="space-y-4">
-        <Tabs defaultValue="configuration" className="space-y-4 w-[50%]">
+        <Tabs defaultValue="configuration" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 gap-2">
             <TooltipProvider>
               <Tooltip>
@@ -324,6 +382,11 @@ export default function ConfigPanel() {
                   }
                   placeholder="/metrics"
                 />
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-sm font-medium mb-4">Live Metrics</h3>
+                {renderObservabilityMetrics()}
               </div>
             </div>
           </TabsContent>
