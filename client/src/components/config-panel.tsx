@@ -126,7 +126,7 @@ export default function ConfigPanel() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="configuration" className="px-0">
+                  <TabsTrigger value="configuration" className="px-0 w-[40%]">
                     <Settings className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -139,7 +139,7 @@ export default function ConfigPanel() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="cicd" className="px-0">
+                  <TabsTrigger value="cicd" className="px-0 w-[40%]">
                     <GitBranch className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -152,7 +152,7 @@ export default function ConfigPanel() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="observability" className="px-0">
+                  <TabsTrigger value="observability" className="px-0 w-[40%]">
                     <BarChart className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
