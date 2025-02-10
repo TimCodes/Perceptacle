@@ -3,30 +3,182 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useLocation } from "wouter";
 import { cloudComponents } from "@/lib/cloudComponents";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+
+const CATEGORIES = [
+  "Compute",
+  "Storage",
+  "Database",
+  "Networking",
+  "Security",
+  "Serverless",
+];
 
 export default function NodeTypes() {
   const [_, setLocation] = useLocation();
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [customComponents, setCustomComponents] = useState(() => {
+    const saved = localStorage.getItem("customComponents");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const { toast } = useToast();
 
-  const selectedComponent = cloudComponents.find(c => c.type === selectedType);
+  // Form state
+  const [newComponent, setNewComponent] = useState({
+    type: "",
+    label: "",
+    category: "",
+  });
+
+  const allComponents = [...cloudComponents, ...customComponents];
+  const selectedComponent = allComponents.find(c => c.type === selectedType);
+
+  const handleCreateComponent = () => {
+    if (!newComponent.type || !newComponent.label || !newComponent.category) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const exists = allComponents.some(c => c.type === newComponent.type);
+    if (exists) {
+      toast({
+        title: "Type already exists",
+        description: "Please use a unique component type",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const component = {
+      ...newComponent,
+      icon: "Box", // Default icon
+    };
+
+    const updatedComponents = [...customComponents, component];
+    setCustomComponents(updatedComponents);
+    localStorage.setItem("customComponents", JSON.stringify(updatedComponents));
+
+    toast({
+      title: "Component Created",
+      description: "New component type has been added successfully",
+    });
+
+    setNewComponent({ type: "", label: "", category: "" });
+  };
 
   return (
     <div className="container mx-auto p-8">
-      <div className="mb-8 flex items-center gap-4">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => setLocation("/")}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Editor
-        </Button>
-        <h1 className="text-2xl font-bold">Node Types</h1>
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setLocation("/")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Editor
+          </Button>
+          <h1 className="text-2xl font-bold">Node Types</h1>
+        </div>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Type
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Component Type</DialogTitle>
+              <DialogDescription>
+                Define a new custom component type for your GCP diagrams.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="type">Component Type ID</Label>
+                <Input
+                  id="type"
+                  placeholder="e.g., custom-service"
+                  value={newComponent.type}
+                  onChange={(e) => setNewComponent(prev => ({
+                    ...prev,
+                    type: e.target.value
+                  }))}
+                />
+                <p className="text-sm text-muted-foreground">
+                  A unique identifier for this component type
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="label">Display Name</Label>
+                <Input
+                  id="label"
+                  placeholder="e.g., Custom Service"
+                  value={newComponent.label}
+                  onChange={(e) => setNewComponent(prev => ({
+                    ...prev,
+                    label: e.target.value
+                  }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={newComponent.category}
+                  onValueChange={(value) => setNewComponent(prev => ({
+                    ...prev,
+                    category: value
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button onClick={handleCreateComponent}>Create Component</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-[300px_1fr] gap-6">
@@ -37,7 +189,7 @@ export default function NodeTypes() {
           <CardContent>
             <ScrollArea className="h-[calc(100vh-250px)]">
               <div className="space-y-2">
-                {cloudComponents.map((component) => {
+                {allComponents.map((component) => {
                   const Icon = component.icon;
                   return (
                     <div
@@ -54,6 +206,9 @@ export default function NodeTypes() {
                           {component.category}
                         </div>
                       </div>
+                      {customComponents.some(c => c.type === component.type) && (
+                        <Badge variant="secondary">Custom</Badge>
+                      )}
                     </div>
                   );
                 })}
@@ -76,6 +231,9 @@ export default function NodeTypes() {
                   <div>
                     <h2 className="text-2xl font-bold">{selectedComponent.label}</h2>
                     <Badge>{selectedComponent.category}</Badge>
+                    {customComponents.some(c => c.type === selectedComponent.type) && (
+                      <Badge variant="secondary" className="ml-2">Custom</Badge>
+                    )}
                   </div>
                 </div>
 

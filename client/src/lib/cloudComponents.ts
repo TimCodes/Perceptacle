@@ -11,6 +11,19 @@ import {
   LayoutGrid
 } from 'lucide-react';
 
+export const iconMap = {
+  Server,
+  Database,
+  HardDrive,
+  Network,
+  Cloud,
+  Box,
+  Cpu,
+  Globe,
+  Shield,
+  LayoutGrid
+};
+
 export const cloudComponents = [
   {
     type: 'compute-engine',
