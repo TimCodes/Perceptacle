@@ -121,7 +121,7 @@ export default function ConfigPanel() {
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
       <div className="space-y-4">
-        <Tabs defaultValue="configuration" className="space-y-4 w-full">
+        <Tabs defaultValue="configuration" className="space-y-4 w-[50%]">
           <TabsList className="grid w-full grid-cols-3 gap-2">
             <TooltipProvider>
               <Tooltip>
@@ -191,9 +191,7 @@ export default function ConfigPanel() {
                 <Label>Description</Label>
                 <Input
                   value={editedNode.data.description || ""}
-                  onChange={(e) =>
-                    handleChange("description", e.target.value)
-                  }
+                  onChange={(e) => handleChange("description", e.target.value)}
                 />
               </div>
 
@@ -276,9 +274,7 @@ export default function ConfigPanel() {
                 <Label>Build Command</Label>
                 <Input
                   value={editedNode?.data.buildCommand || ""}
-                  onChange={(e) =>
-                    handleChange("buildCommand", e.target.value)
-                  }
+                  onChange={(e) => handleChange("buildCommand", e.target.value)}
                   placeholder="npm run build"
                 />
               </div>
