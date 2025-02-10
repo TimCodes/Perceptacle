@@ -18,6 +18,10 @@ import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
 import { cloudComponents } from '@/lib/cloudComponents';
 
+interface DiagramCanvasProps {
+  onNodeSelected?: () => void;
+}
+
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'active':
@@ -73,7 +77,7 @@ const defaultEdgeOptions = {
   },
 };
 
-export default function DiagramCanvas() {
+export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
@@ -170,7 +174,8 @@ export default function DiagramCanvas() {
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNode(node);
-  }, [setSelectedNode]);
+    onNodeSelected?.();
+  }, [setSelectedNode, onNodeSelected]);
 
   return (
     <div className="h-full w-full bg-background">

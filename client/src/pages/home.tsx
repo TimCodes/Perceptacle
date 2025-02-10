@@ -47,6 +47,10 @@ export default function Home() {
     setIsConfigPanelOpen(!isConfigPanelOpen);
   };
 
+  const handleNodeSelected = () => {
+    setIsConfigPanelOpen(true);
+  };
+
   return (
     <ReactFlowProvider>
       <div className="grid h-screen grid-cols-[auto_1fr_auto] grid-rows-[60px_1fr] gap-1">
@@ -82,7 +86,7 @@ export default function Home() {
 
         <div className="bg-muted/50">
           <div className="h-full w-full">
-            <DiagramCanvas />
+            <DiagramCanvas onNodeSelected={handleNodeSelected} />
           </div>
         </div>
 
