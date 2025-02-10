@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useDiagramStore } from '@/lib/diagram-store';
-import { cloudComponents } from '@/lib/cloudComponents';
+import { getCloudComponents } from '@/lib/cloudComponents';
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
 const customComponents = [
@@ -54,7 +54,8 @@ const getStatusColor = (status: string) => {
 };
 
 const CustomNode = ({ data }: { data: any }) => {
-  const Component = [...cloudComponents, ...customComponents].find(comp => comp.type === data.type)?.icon;
+  const components = getCloudComponents();
+  const Component = components.find(comp => comp.type === data.type)?.icon;
 
   return (
     <div className="relative p-2 rounded-md bg-background border text-foreground shadow-sm">
@@ -141,7 +142,8 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
 
       const initialStatus = 'active';
       const componentType = type.replace(/-/g, '_');
-      const componentDefinition = [...cloudComponents, ...customComponents].find(
+      const components = getCloudComponents();
+      const componentDefinition = components.find(
         (comp) => comp.type === componentType
       );
 

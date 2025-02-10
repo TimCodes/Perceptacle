@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
-import { cloudComponents } from '@/lib/cloudComponents';
+import { getCloudComponents } from '@/lib/cloudComponents';
 
 interface ComponentLibraryProps {
   setNodes?: (updater: (nodes: any[]) => any[]) => void;
@@ -10,8 +10,9 @@ interface ComponentLibraryProps {
 
 export default function ComponentLibrary({ setNodes }: ComponentLibraryProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const components = getCloudComponents();
 
-  const filteredComponents = cloudComponents.filter(
+  const filteredComponents = components.filter(
     component => component.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

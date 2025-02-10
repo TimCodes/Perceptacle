@@ -24,7 +24,7 @@ export const iconMap = {
   LayoutGrid
 };
 
-export const cloudComponents = [
+const predefinedComponents = [
   {
     type: 'compute-engine',
     label: 'Compute Engine',
@@ -80,3 +80,20 @@ export const cloudComponents = [
     category: 'Compute',
   }
 ];
+
+// Function to get all components including custom ones
+export const getCloudComponents = () => {
+  const saved = localStorage.getItem("customComponents");
+  const customComponents = saved ? JSON.parse(saved) : [];
+
+  // Map custom components to include Box as default icon if not specified
+  const mappedCustomComponents = customComponents.map(comp => ({
+    ...comp,
+    icon: iconMap[comp.icon] || Box
+  }));
+
+  return [...predefinedComponents, ...mappedCustomComponents];
+};
+
+// Export both the static list and the function
+export const cloudComponents = predefinedComponents;
