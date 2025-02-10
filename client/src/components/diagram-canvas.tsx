@@ -41,7 +41,8 @@ const CustomNode = ({ data }: { data: any }) => {
       <Handle
         type="target"
         position={Position.Left}
-        className="w-3 h-3 border-2 bg-background"
+        className="!w-3 !h-3 !-left-1.5 !border-2 !bg-background hover:!bg-muted"
+        style={{ zIndex: 1 }}
       />
       <div className="flex items-center gap-2">
         {Component && <Component className="w-5 h-5" />}
@@ -50,7 +51,8 @@ const CustomNode = ({ data }: { data: any }) => {
       <Handle
         type="source"
         position={Position.Right}
-        className="w-3 h-3 border-2 bg-background"
+        className="!w-3 !h-3 !-right-1.5 !border-2 !bg-background hover:!bg-muted"
+        style={{ zIndex: 1 }}
       />
     </div>
   );
@@ -84,7 +86,7 @@ export default function DiagramCanvas() {
         return;
       }
 
-      setEdges((eds) => 
+      setEdges((eds) =>
         addEdge({
           ...params,
           type: 'smoothstep',
