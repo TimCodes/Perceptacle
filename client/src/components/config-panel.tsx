@@ -12,12 +12,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
-import { 
-  Save, 
-  Settings, 
-  GitBranch, 
-  BarChart, 
-  Activity, 
+import {
+  Save,
+  Settings,
+  GitBranch,
+  BarChart,
+  Activity,
   AlertCircle,
   AlertTriangle,
   Info,
@@ -56,6 +56,23 @@ export default function ConfigPanel() {
             lastUpdated: new Date().toISOString(),
             activeAlerts: 2,
           },
+          issues: selectedNode.data.issues || [
+            {
+              title: "Memory leak in production environment",
+              url: "https://github.com/org/repo/issues/1",
+              state: "open"
+            },
+            {
+              title: "Update dependencies to latest versions",
+              url: "https://github.com/org/repo/issues/2",
+              state: "closed"
+            },
+            {
+              title: "Add error handling for API failures",
+              url: "https://github.com/org/repo/issues/3",
+              state: "open"
+            }
+          ]
         },
       });
       setHasChanges(false);
