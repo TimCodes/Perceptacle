@@ -22,11 +22,21 @@ export default function ConfigPanel() {
 
   // Reset edited node when selected node changes
   useEffect(() => {
-    setEditedNode(selectedNode);
-    setHasChanges(false);
+    if (selectedNode) {
+      setEditedNode({
+        ...selectedNode,
+        data: {
+          ...selectedNode.data,
+          customFields: selectedNode.data.customFields || []
+        }
+      });
+      setHasChanges(false);
+    } else {
+      setEditedNode(null);
+    }
   }, [selectedNode]);
 
-  if (!selectedNode) {
+  if (!editedNode || !selectedNode) {
     return (
       <div className="w-[450px] p-4 border-l">
         <p className="text-muted-foreground">
@@ -37,40 +47,48 @@ export default function ConfigPanel() {
   }
 
   const handleChange = (field: string, value: string) => {
-    setEditedNode(prev => ({
-      ...prev,
-      data: {
-        ...prev.data,
-        [field]: value,
-      },
-      style: field === "status" ? {
-        ...prev.style,
-        border: `2px solid ${getStatusColor(value)}`,
-      } : prev.style,
-    }));
+    setEditedNode(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          [field]: value,
+        },
+        style: field === "status" ? {
+          ...prev.style,
+          border: `2px solid ${getStatusColor(value)}`,
+        } : prev.style,
+      };
+    });
     setHasChanges(true);
   };
 
   const handleCustomFieldChange = (fieldName: string, value: string) => {
-    setEditedNode(prev => ({
-      ...prev,
-      data: {
-        ...prev.data,
-        customFields: prev.data.customFields.map((field: any) =>
-          field.name === fieldName ? { ...field, value } : field
-        ),
-      },
-    }));
+    setEditedNode(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        data: {
+          ...prev.data,
+          customFields: prev.data.customFields.map((field: any) =>
+            field.name === fieldName ? { ...field, value } : field
+          ),
+        },
+      };
+    });
     setHasChanges(true);
   };
 
   const handleSave = () => {
-    updateSelectedNode(editedNode);
-    setHasChanges(false);
-    toast({
-      title: "Changes saved",
-      description: "Node configuration has been updated",
-    });
+    if (editedNode) {
+      updateSelectedNode(editedNode);
+      setHasChanges(false);
+      toast({
+        title: "Changes saved",
+        description: "Node configuration has been updated",
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
