@@ -1,64 +1,59 @@
-import {
-  Box,
-  VStack,
-  Input,
-  Text,
-  SimpleGrid,
-  InputGroup,
-  InputLeftElement,
-} from '@chakra-ui/react';
-import { Search } from 'lucide-react';
-import { useState } from 'react';
-import { GCPComponents } from '@/lib/gcp-components';
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import { cloudComponents } from '@/lib/cloudComponents';
 
-export default function ComponentLibrary() {
+interface ComponentLibraryProps {
+  setNodes: (updater: (nodes: any[]) => any[]) => void;
+}
+
+export default function ComponentLibrary({ setNodes }: ComponentLibraryProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredComponents = GCPComponents.filter(component =>
-    component.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredComponents = cloudComponents.filter(
+    component => component.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
+  const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
 
   return (
-    <Box p={4} borderRight="1px" borderColor="gray.200" bg="white">
-      <VStack spacing={4} align="stretch">
-        <Box position="relative">
-          <InputGroup>
-            <InputLeftElement>
-              <Search size={20} />
-            </InputLeftElement>
-            <Input
-              placeholder="Search components..."
-              value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
-        </Box>
+    <div className="p-4 h-full">
+      <h2 className="text-lg font-semibold mb-4">Components</h2>
 
-        <SimpleGrid columns={2} spacing={4}>
+      <div className="relative mb-4">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search components..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-8"
+        />
+      </div>
+
+      <ScrollArea className="h-[calc(100vh-180px)]">
+        <div className="grid grid-cols-2 gap-2">
           {filteredComponents.map((component) => (
-            <Box
+            <div
               key={component.type}
-              p={2}
-              border="1px"
-              borderColor="gray.200"
-              borderRadius="md"
-              cursor="grab"
+              className="flex flex-col items-center p-2 border rounded-md cursor-grab hover:bg-accent hover:text-accent-foreground"
               draggable
               onDragStart={(e) => onDragStart(e, component.type)}
-              _hover={{ bg: 'gray.50' }}
-              textAlign="center"
             >
-              <component.icon size={32} style={{ margin: '0 auto' }} />
-              <Text fontSize="sm" mt={2}>{component.name}</Text>
-            </Box>
+              <img
+                src={component.icon}
+                alt={component.label}
+                className="w-8 h-8 mb-1"
+              />
+              <span className="text-sm text-center">{component.label}</span>
+            </div>
           ))}
-        </SimpleGrid>
-      </VStack>
-    </Box>
+        </div>
+      </ScrollArea>
+    </div>
   );
 }

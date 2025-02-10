@@ -1,8 +1,9 @@
-import { Flex, Button } from '@chakra-ui/react';
-import { Save, Trash2, Plus, Download } from 'lucide-react';
-import { useCallback } from 'react';
-import { useDiagramStore } from '@/lib/diagram-store';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Save, Trash2, Plus, Download } from "lucide-react";
+import { useCallback } from "react";
+import { useDiagramStore } from "@/lib/diagram-store";
+import { useToast } from "@/hooks/use-toast";
 
 export default function DiagramToolbar() {
   const toast = useToast();
@@ -13,63 +14,58 @@ export default function DiagramToolbar() {
     toast({
       title: "Diagram saved",
       description: "Your diagram has been saved to local storage",
-      status: "success",
-      duration: 3000,
     });
   }, [saveDiagram, toast]);
 
   const handleNew = useCallback(() => {
-    if (window.confirm('Are you sure you want to create a new diagram? All unsaved changes will be lost.')) {
+    if (window.confirm("Are you sure you want to create a new diagram? All unsaved changes will be lost.")) {
       clearDiagram();
     }
   }, [clearDiagram]);
 
   return (
-    <Flex p={4} justify="space-between" bg="white" borderBottom="1px" borderColor="gray.200">
-      <Flex gap={2}>
+    <div className="flex justify-between items-center p-4 border-b bg-background">
+      <div className="flex gap-2">
         <Button
           onClick={handleNew}
           variant="outline"
-          display="flex"
-          alignItems="center"
-          gap={2}
+          size="sm"
+          className="gap-2"
         >
-          <Plus size={16} />
+          <Plus className="h-4 w-4" />
           New
         </Button>
+
         <Button
           onClick={handleSave}
           variant="outline"
-          display="flex"
-          alignItems="center"
-          gap={2}
+          size="sm"
+          className="gap-2"
         >
-          <Save size={16} />
+          <Save className="h-4 w-4" />
           Save
         </Button>
+
         <Button
           onClick={loadDiagram}
           variant="outline"
-          display="flex"
-          alignItems="center"
-          gap={2}
+          size="sm"
+          className="gap-2"
         >
-          <Download size={16} />
+          <Download className="h-4 w-4" />
           Load
         </Button>
-      </Flex>
+      </div>
 
       <Button
-        onClick={handleNew}
-        colorScheme="red"
-        variant="ghost"
-        display="flex"
-        alignItems="center"
-        gap={2}
+        onClick={clearDiagram}
+        variant="destructive"
+        size="sm"
+        className="gap-2"
       >
-        <Trash2 size={16} />
+        <Trash2 className="h-4 w-4" />
         Clear Canvas
       </Button>
-    </Flex>
+    </div>
   );
 }
