@@ -1,14 +1,15 @@
-import { Box, Grid, GridItem, IconButton, useColorMode } from "@chakra-ui/react";
+import { useState } from "react";
 import ComponentLibrary from "@/components/component-library";
 import DiagramCanvas from "@/components/diagram-canvas";
 import ConfigPanel from "@/components/config-panel";
 import DiagramToolbar from "@/components/diagram-toolbar";
 import { ReactFlowProvider } from "reactflow";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 
-const MotionGridItem = motion(GridItem);
+const MotionDiv = motion.div;
 
 const menuVariants = {
   open: {
@@ -48,7 +49,7 @@ const buttonVariants = {
 
 export default function Home() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
-  const { colorMode } = useColorMode();
+  const { theme } = useTheme();
 
   const toggleComponentMenu = () => {
     setIsComponentMenuOpen(!isComponentMenuOpen);
@@ -56,75 +57,52 @@ export default function Home() {
 
   return (
     <ReactFlowProvider>
-      <Grid
-        templateAreas={`"toolbar toolbar toolbar"
-                       "library canvas config"`}
-        gridTemplateRows={"60px 1fr"}
-        gridTemplateColumns={"auto 1fr 300px"}
-        h="100vh"
-        gap="1"
-        color={colorMode === 'dark' ? 'gray.100' : 'gray.900'}
-        bg={colorMode === 'dark' ? 'gray.800' : 'gray.50'}
-      >
-        <GridItem area={"toolbar"} 
-          bg={colorMode === 'dark' ? 'gray.900' : 'white'} 
-          borderBottom="1px" 
-          borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
-        >
+      <div className="grid h-screen grid-cols-[auto_1fr_300px] grid-rows-[60px_1fr] gap-1">
+        <div className="col-span-3 border-b bg-background">
           <DiagramToolbar />
-        </GridItem>
+        </div>
 
         <AnimatePresence initial={false}>
-          <MotionGridItem
-            area={"library"}
-            bg={colorMode === 'dark' ? 'gray.900' : 'white'}
-            borderRight="1px"
-            borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
-            overflowY="auto"
+          <MotionDiv
+            className="relative border-r bg-card"
             variants={menuVariants}
             initial="closed"
             animate={isComponentMenuOpen ? "open" : "closed"}
-            style={{ position: 'relative' }}
           >
             <ComponentLibrary />
-            <Box position="absolute" right="-12" top="4" zIndex={10}>
+            <div className="absolute -right-12 top-4 z-10">
               <motion.div
                 variants={buttonVariants}
                 initial="open"
                 animate={isComponentMenuOpen ? "open" : "closed"}
               >
-                <IconButton
-                  aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
-                  icon={<ChevronLeft size={20} />}
-                  onClick={toggleComponentMenu}
+                <Button
+                  variant="outline"
                   size="sm"
-                  variant="solid"
-                  bg={colorMode === 'dark' ? 'gray.800' : 'white'}
-                  borderWidth={1}
-                  borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
-                  borderLeftRadius={0}
-                  shadow="md"
-                  _hover={{ bg: colorMode === 'dark' ? 'gray.700' : 'gray.50' }}
-                />
+                  onClick={toggleComponentMenu}
+                  className="rounded-l-none shadow-md"
+                >
+                  {isComponentMenuOpen ? (
+                    <ChevronLeft className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </Button>
               </motion.div>
-            </Box>
-          </MotionGridItem>
+            </div>
+          </MotionDiv>
         </AnimatePresence>
 
-        <GridItem area={"canvas"} bg={colorMode === 'dark' ? 'gray.800' : 'gray.50'}>
-          <Box h="100%" w="100%">
+        <div className="bg-muted/50">
+          <div className="h-full w-full">
             <DiagramCanvas />
-          </Box>
-        </GridItem>
+          </div>
+        </div>
 
-        <GridItem area={"config"} 
-          bg={colorMode === 'dark' ? 'gray.900' : 'white'} 
-          borderLeft="1px" 
-          borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.200'}
-        >
+        <div className="border-l bg-card">
           <ConfigPanel />
-        </GridItem>
-      </Grid>
+        </div>
+      </div>
     </ReactFlowProvider>
   );
 }
