@@ -13,7 +13,7 @@ const MotionDiv = motion.div;
 
 const menuVariants = {
   open: {
-    width: "250px",
+    width: "325px",
     opacity: 1,
     transition: {
       type: "spring",
