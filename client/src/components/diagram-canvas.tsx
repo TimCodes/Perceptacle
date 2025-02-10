@@ -65,9 +65,40 @@ const CustomNode = ({ data }: { data: any }) => {
         className="!w-3 !h-3 !-left-1.5 !border-2 !bg-background hover:!bg-muted"
         style={{ zIndex: 1 }}
       />
-      <div className="flex items-center gap-2">
-        {Component && <Component className="w-5 h-5" />}
-        <span className="text-sm font-medium">{data.label}</span>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          {Component && <Component className="w-5 h-5" />}
+          <span className="text-sm font-medium">{data.label}</span>
+        </div>
+
+        {/* Custom Fields Section */}
+        {data.customFields && data.customFields.length > 0 && (
+          <div className="border-t pt-2 mt-1 space-y-1">
+            {data.customFields.map((field: any, index: number) => (
+              <div key={index} className="flex items-center gap-2 text-xs">
+                <span className="text-muted-foreground">{field.name}:</span>
+                <span className="font-medium">
+                  {field.type === 'select' ? (
+                    <span className="px-1.5 py-0.5 bg-accent/50 rounded-sm">
+                      {field.value || '(Not set)'}
+                    </span>
+                  ) : field.type === 'url' ? (
+                    <a 
+                      href={field.value} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      {field.value ? 'Link' : '(Not set)'}
+                    </a>
+                  ) : (
+                    field.value || '(Not set)'
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <Handle
         type="source"
