@@ -36,7 +36,7 @@ const menuVariants = {
 
 export default function Home() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
-  const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(true);
+  const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const { theme } = useTheme();
 
   const toggleComponentMenu = () => {
