@@ -28,7 +28,7 @@ const renderGitHubIssues = (issues = []) => {
         <div key={index} className="flex items-start space-x-2 p-2 bg-secondary/20 rounded-md">
           <Bug className="h-4 w-4 mt-0.5" />
           <div className="space-y-1">
-            <a 
+            <a
               href={issue.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -149,6 +149,19 @@ export default function ConfigPanel() {
     updateSelectedNode(updatedNode);
   };
 
+  const handleCustomFieldChange = (fieldName: string, value: string) => {
+    const updatedNode = {
+      ...selectedNode,
+      data: {
+        ...selectedNode.data,
+        customFields: selectedNode.data.customFields.map((field: any) =>
+          field.name === fieldName ? { ...field, value } : field
+        ),
+      },
+    };
+    updateSelectedNode(updatedNode);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -202,9 +215,9 @@ export default function ConfigPanel() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metric.value}%</div>
-                <Progress 
-                  value={metric.value} 
-                  className="mt-2" 
+                <Progress
+                  value={metric.value}
+                  className="mt-2"
                   variant={metric.value > 80 ? "destructive" : "default"}
                 />
               </CardContent>
@@ -218,8 +231,8 @@ export default function ConfigPanel() {
         </div>
 
         <div className="flex items-center space-x-2 text-sm">
-          <AlertCircle 
-            className={`h-4 w-4 ${metrics.activeAlerts > 0 ? 'text-destructive' : 'text-success'}`} 
+          <AlertCircle
+            className={`h-4 w-4 ${metrics.activeAlerts > 0 ? 'text-destructive' : 'text-success'}`}
           />
           <span>Active Alerts: {metrics.activeAlerts}</span>
         </div>
@@ -243,10 +256,10 @@ export default function ConfigPanel() {
               <div
                 key={index}
                 className={`flex items-start space-x-3 p-2 rounded-md
-                  ${log.level === 'error' 
-                    ? 'bg-destructive/10' 
-                    : log.level === 'warning' 
-                      ? 'bg-warning/10' 
+                  ${log.level === 'error'
+                    ? 'bg-destructive/10'
+                    : log.level === 'warning'
+                      ? 'bg-warning/10'
                       : 'bg-primary/10'
                   }`}
               >
@@ -265,19 +278,6 @@ export default function ConfigPanel() {
         </ScrollArea>
       </div>
     );
-  };
-
-  const handleCustomFieldChange = (fieldName: string, value: string) => {
-    const updatedNode = {
-      ...selectedNode,
-      data: {
-        ...selectedNode.data,
-        customFields: selectedNode.data.customFields.map((field: any) =>
-          field.name === fieldName ? { ...field, value } : field
-        ),
-      },
-    };
-    updateSelectedNode(updatedNode);
   };
 
   return (
@@ -299,9 +299,6 @@ export default function ConfigPanel() {
                 value={selectedNode.data.label || ""}
                 onChange={(e) => handleChange("label", e.target.value)}
               />
-              <p className="text-sm text-muted-foreground">
-                Enter a name for this component
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -316,9 +313,6 @@ export default function ConfigPanel() {
                 <option value="error">Error</option>
                 <option value="inactive">Inactive</option>
               </select>
-              <p className="text-sm text-muted-foreground">
-                Current status of the component
-              </p>
             </div>
 
             <div className="space-y-2">
@@ -327,26 +321,48 @@ export default function ConfigPanel() {
                 value={selectedNode.data.description || ""}
                 onChange={(e) => handleChange("description", e.target.value)}
               />
-              <p className="text-sm text-muted-foreground">
-                Brief description of the component's purpose
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Instance Type</Label>
-              <Input
-                value={selectedNode.data.instanceType || ""}
-                onChange={(e) => handleChange("instanceType", e.target.value)}
-              />
-              <p className="text-sm text-muted-foreground">
-                The type of GCP instance (e.g., n1-standard-1)
-              </p>
             </div>
 
             {selectedNode.data.customFields && selectedNode.data.customFields.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <h3 className="font-medium">Custom Fields</h3>
-                {renderCustomFields(selectedNode)}
+                <div className="space-y-4">
+                  {selectedNode.data.customFields.map((field: any, index: number) => (
+                    <div key={index} className="space-y-2">
+                      <Label>{field.name}</Label>
+                      {field.type === 'select' ? (
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(value) => handleCustomFieldChange(field.name, value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={field.placeholder} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {field.options?.map((option: string) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : field.type === 'textarea' ? (
+                        <Textarea
+                          value={field.value || ''}
+                          onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                          placeholder={field.placeholder}
+                        />
+                      ) : (
+                        <Input
+                          type={field.type === 'number' ? 'number' : 'text'}
+                          value={field.value || ''}
+                          onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
+                          placeholder={field.placeholder}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
