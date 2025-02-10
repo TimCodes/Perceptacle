@@ -19,8 +19,8 @@ const menuVariants = {
       type: "spring",
       stiffness: 300,
       damping: 30,
-      mass: 0.8
-    }
+      mass: 0.8,
+    },
   },
   closed: {
     width: "0px",
@@ -29,9 +29,9 @@ const menuVariants = {
       type: "spring",
       stiffness: 300,
       damping: 30,
-      mass: 0.8
-    }
-  }
+      mass: 0.8,
+    },
+  },
 };
 
 export default function Home() {

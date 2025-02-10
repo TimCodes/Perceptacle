@@ -34,8 +34,8 @@ export default function ConfigPanel() {
         ...selectedNode,
         data: {
           ...selectedNode.data,
-          customFields: selectedNode.data.customFields || []
-        }
+          customFields: selectedNode.data.customFields || [],
+        },
       });
       setHasChanges(false);
     } else {
@@ -54,7 +54,7 @@ export default function ConfigPanel() {
   }
 
   const handleChange = (field: string, value: string) => {
-    setEditedNode(prev => {
+    setEditedNode((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
@@ -62,24 +62,27 @@ export default function ConfigPanel() {
           ...prev.data,
           [field]: value,
         },
-        style: field === "status" ? {
-          ...prev.style,
-          border: `2px solid ${getStatusColor(value)}`,
-        } : prev.style,
+        style:
+          field === "status"
+            ? {
+                ...prev.style,
+                border: `2px solid ${getStatusColor(value)}`,
+              }
+            : prev.style,
       };
     });
     setHasChanges(true);
   };
 
   const handleCustomFieldChange = (fieldName: string, value: string) => {
-    setEditedNode(prev => {
+    setEditedNode((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
         data: {
           ...prev.data,
           customFields: prev.data.customFields.map((field: any) =>
-            field.name === fieldName ? { ...field, value } : field
+            field.name === fieldName ? { ...field, value } : field,
           ),
         },
       };
@@ -118,12 +121,12 @@ export default function ConfigPanel() {
       <h2 className="text-lg font-semibold mb-4">Node Configuration</h2>
 
       <div className="space-y-4">
-        <Tabs defaultValue="configuration" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 gap-4">
+        <Tabs defaultValue="configuration" className="space-y-4 w-full">
+          <TabsList className="grid w-full grid-cols-3 gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="configuration" className="px-1">
+                  <TabsTrigger value="configuration" className="px-0">
                     <Settings className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -136,7 +139,7 @@ export default function ConfigPanel() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="cicd" className="px-1">
+                  <TabsTrigger value="cicd" className="px-0">
                     <GitBranch className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -149,7 +152,7 @@ export default function ConfigPanel() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <TabsTrigger value="observability" className="px-1">
+                  <TabsTrigger value="observability" className="px-0">
                     <BarChart className="h-4 w-4" />
                   </TabsTrigger>
                 </TooltipTrigger>
@@ -188,46 +191,62 @@ export default function ConfigPanel() {
                 <Label>Description</Label>
                 <Input
                   value={editedNode.data.description || ""}
-                  onChange={(e) => handleChange("description", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("description", e.target.value)
+                  }
                 />
               </div>
 
-              {editedNode.data.customFields && editedNode.data.customFields.length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="font-medium">Custom Fields</h3>
+              {editedNode.data.customFields &&
+                editedNode.data.customFields.length > 0 && (
                   <div className="space-y-4">
-                    {editedNode.data.customFields.map((field: any, index: number) => (
-                      <div key={index} className="space-y-2">
-                        <Label>{field.name}</Label>
-                        {field.type === 'select' ? (
-                          <Select
-                            value={field.value || ''}
-                            onValueChange={(value) => handleCustomFieldChange(field.name, value)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder={field.placeholder} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {field.options?.map((option: string) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Input
-                            type={field.type === 'number' ? 'number' : 'text'}
-                            value={field.value || ''}
-                            onChange={(e) => handleCustomFieldChange(field.name, e.target.value)}
-                            placeholder={field.placeholder}
-                          />
-                        )}
-                      </div>
-                    ))}
+                    <h3 className="font-medium">Custom Fields</h3>
+                    <div className="space-y-4">
+                      {editedNode.data.customFields.map(
+                        (field: any, index: number) => (
+                          <div key={index} className="space-y-2">
+                            <Label>{field.name}</Label>
+                            {field.type === "select" ? (
+                              <Select
+                                value={field.value || ""}
+                                onValueChange={(value) =>
+                                  handleCustomFieldChange(field.name, value)
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue
+                                    placeholder={field.placeholder}
+                                  />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {field.options?.map((option: string) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <Input
+                                type={
+                                  field.type === "number" ? "number" : "text"
+                                }
+                                value={field.value || ""}
+                                onChange={(e) =>
+                                  handleCustomFieldChange(
+                                    field.name,
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder={field.placeholder}
+                              />
+                            )}
+                          </div>
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </TabsContent>
 
@@ -237,7 +256,9 @@ export default function ConfigPanel() {
                 <Label>Repository URL</Label>
                 <Input
                   value={editedNode?.data.repositoryUrl || ""}
-                  onChange={(e) => handleChange("repositoryUrl", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("repositoryUrl", e.target.value)
+                  }
                   placeholder="https://github.com/username/repo"
                 />
               </div>
@@ -255,7 +276,9 @@ export default function ConfigPanel() {
                 <Label>Build Command</Label>
                 <Input
                   value={editedNode?.data.buildCommand || ""}
-                  onChange={(e) => handleChange("buildCommand", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("buildCommand", e.target.value)
+                  }
                   placeholder="npm run build"
                 />
               </div>
@@ -268,7 +291,9 @@ export default function ConfigPanel() {
                 <Label>Monitoring URL</Label>
                 <Input
                   value={editedNode?.data.monitoringUrl || ""}
-                  onChange={(e) => handleChange("monitoringUrl", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("monitoringUrl", e.target.value)
+                  }
                   placeholder="https://monitoring.example.com"
                 />
               </div>
@@ -277,13 +302,17 @@ export default function ConfigPanel() {
                 <Label>Logging System</Label>
                 <Select
                   value={editedNode?.data.loggingSystem || ""}
-                  onValueChange={(value) => handleChange("loggingSystem", value)}
+                  onValueChange={(value) =>
+                    handleChange("loggingSystem", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select logging system" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="stackdriver">Google Cloud Logging</SelectItem>
+                    <SelectItem value="stackdriver">
+                      Google Cloud Logging
+                    </SelectItem>
                     <SelectItem value="cloudwatch">AWS CloudWatch</SelectItem>
                     <SelectItem value="elastic">Elastic Stack</SelectItem>
                   </SelectContent>
@@ -294,7 +323,9 @@ export default function ConfigPanel() {
                 <Label>Metrics Endpoint</Label>
                 <Input
                   value={editedNode?.data.metricsEndpoint || ""}
-                  onChange={(e) => handleChange("metricsEndpoint", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("metricsEndpoint", e.target.value)
+                  }
                   placeholder="/metrics"
                 />
               </div>
