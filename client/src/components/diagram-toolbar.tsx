@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, Trash2, Plus, Download, Search } from "lucide-react";
+import { Save, Trash2, Plus, Download, Search, Sparkles } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import { useToast } from "@/hooks/use-toast";
 import Fuse from 'fuse.js';
+import { getComponentSuggestions } from "@/lib/suggestions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   CommandDialog,
   CommandEmpty,
@@ -12,14 +20,17 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 
 export default function DiagramToolbar() {
   const toast = useToast();
   const { saveDiagram, loadDiagram, clearDiagram, nodes, setSelectedNode } = useDiagramStore();
   const [open, setOpen] = useState(false);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState<Array<{ type: string; reason: string }>>([]);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [fuse, setFuse] = useState<Fuse<any> | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Initialize Fuse instance when nodes change
   useEffect(() => {
@@ -54,6 +65,23 @@ export default function DiagramToolbar() {
   const handleNodeSelect = (node: any) => {
     setSelectedNode(node);
     setOpen(false);
+  };
+
+  const handleGetSuggestions = async () => {
+    setLoading(true);
+    try {
+      const result = await getComponentSuggestions(nodes);
+      setSuggestions(result);
+      setSuggestionsOpen(true);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to get suggestions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSave = useCallback(() => {
@@ -111,13 +139,24 @@ export default function DiagramToolbar() {
             }}
             variant="outline"
             size="sm"
-            className="gap-2 ml-2"
+            className="gap-2"
           >
             <Search className="h-4 w-4" />
             Search Nodes
-            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground ml-2">
+            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
               <span className="text-xs">⌘</span>K
             </kbd>
+          </Button>
+
+          <Button
+            onClick={handleGetSuggestions}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={loading}
+          >
+            <Sparkles className="h-4 w-4" />
+            {loading ? "Getting Suggestions..." : "Get Suggestions"}
           </Button>
         </div>
 
@@ -159,6 +198,39 @@ export default function DiagramToolbar() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
+
+      <Dialog open={suggestionsOpen} onOpenChange={setSuggestionsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Suggested Components</DialogTitle>
+            <DialogDescription>
+              Based on your current architecture, here are some suggested GCP components to consider:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {suggestions.map((suggestion, index) => (
+              <div key={index} className="p-4 rounded-lg border">
+                <h4 className="font-medium mb-2">{
+                  cloudComponents.find(c => c.type === suggestion.type)?.label || suggestion.type
+                }</h4>
+                <p className="text-sm text-muted-foreground">{suggestion.reason}</p>
+              </div>
+            ))}
+            {suggestions.length === 0 && (
+              <p className="text-center text-muted-foreground py-4">
+                No suggestions available at the moment.
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+
+const cloudComponents = [
+  { type: 'compute_engine', label: 'Compute Engine' },
+  { type: 'cloud_sql', label: 'Cloud SQL' },
+  { type: 'cloud_storage', label: 'Cloud Storage' },
+  // Add more components as needed
+];
