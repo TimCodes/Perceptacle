@@ -230,6 +230,76 @@ export default function ConfigPanel() {
               )}
             </div>
           </TabsContent>
+
+          <TabsContent value="cicd" className="space-y-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Repository URL</Label>
+                <Input
+                  value={editedNode?.data.repositoryUrl || ""}
+                  onChange={(e) => handleChange("repositoryUrl", e.target.value)}
+                  placeholder="https://github.com/username/repo"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Branch</Label>
+                <Input
+                  value={editedNode?.data.branch || ""}
+                  onChange={(e) => handleChange("branch", e.target.value)}
+                  placeholder="main"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Build Command</Label>
+                <Input
+                  value={editedNode?.data.buildCommand || ""}
+                  onChange={(e) => handleChange("buildCommand", e.target.value)}
+                  placeholder="npm run build"
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="observability" className="space-y-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Monitoring URL</Label>
+                <Input
+                  value={editedNode?.data.monitoringUrl || ""}
+                  onChange={(e) => handleChange("monitoringUrl", e.target.value)}
+                  placeholder="https://monitoring.example.com"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Logging System</Label>
+                <Select
+                  value={editedNode?.data.loggingSystem || ""}
+                  onValueChange={(value) => handleChange("loggingSystem", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select logging system" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="stackdriver">Google Cloud Logging</SelectItem>
+                    <SelectItem value="cloudwatch">AWS CloudWatch</SelectItem>
+                    <SelectItem value="elastic">Elastic Stack</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Metrics Endpoint</Label>
+                <Input
+                  value={editedNode?.data.metricsEndpoint || ""}
+                  onChange={(e) => handleChange("metricsEndpoint", e.target.value)}
+                  placeholder="/metrics"
+                />
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
 
         {hasChanges && (
