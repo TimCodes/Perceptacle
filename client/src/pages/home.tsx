@@ -34,19 +34,6 @@ const menuVariants = {
   }
 };
 
-const buttonVariants = {
-  open: {
-    x: 0,
-    rotate: 0,
-    transition: { duration: 0.3 }
-  },
-  closed: {
-    x: -10,
-    rotate: 180,
-    transition: { duration: 0.3 }
-  }
-};
-
 export default function Home() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
   const { theme } = useTheme();
@@ -62,36 +49,31 @@ export default function Home() {
           <DiagramToolbar />
         </div>
 
-        <AnimatePresence initial={false}>
-          <MotionDiv
-            className="relative border-r bg-card"
-            variants={menuVariants}
-            initial="closed"
-            animate={isComponentMenuOpen ? "open" : "closed"}
+        <div className="relative">
+          <AnimatePresence initial={false}>
+            <MotionDiv
+              className="h-full border-r bg-card overflow-hidden"
+              variants={menuVariants}
+              initial="closed"
+              animate={isComponentMenuOpen ? "open" : "closed"}
+            >
+              <ComponentLibrary />
+            </MotionDiv>
+          </AnimatePresence>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleComponentMenu}
+            className="absolute -right-6 top-4 z-10 rounded-l-none shadow-md"
           >
-            <ComponentLibrary />
-            <div className="absolute -right-12 top-4 z-10">
-              <motion.div
-                variants={buttonVariants}
-                initial="open"
-                animate={isComponentMenuOpen ? "open" : "closed"}
-              >
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleComponentMenu}
-                  className="rounded-l-none shadow-md"
-                >
-                  {isComponentMenuOpen ? (
-                    <ChevronLeft className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
-                </Button>
-              </motion.div>
-            </div>
-          </MotionDiv>
-        </AnimatePresence>
+            {isComponentMenuOpen ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
 
         <div className="bg-muted/50">
           <div className="h-full w-full">
