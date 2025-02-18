@@ -42,12 +42,18 @@ function DropDown({ onComponentSelect }: DropDownProps) {
             <Plus className="h-6 w-6" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-0" align="start">
-          <Command>
-            <CommandInput placeholder="Search components..." />
-            <CommandList>
+        <PopoverContent className="w-[300px] p-0" align="start" sideOffset={5}>
+          <Command className="rounded-lg border shadow-md">
+            <div className="flex items-center border-b px-3">
+              <CommandInput 
+                placeholder="Search components..." 
+                className="py-3 h-12 text-sm"
+              />
+              <span className="ml-1 h-2 w-2 rounded-full bg-orange-500" />
+            </div>
+            <CommandList className="max-h-[300px] overflow-y-auto p-2">
               <CommandEmpty>No components found.</CommandEmpty>
-              <CommandGroup heading="Cloud Components">
+              <CommandGroup heading="Cloud Components" className="text-xs text-muted-foreground">
                 {cloudComponents.map((component) => {
                   const Icon = component.icon;
                   return (
@@ -58,12 +64,12 @@ function DropDown({ onComponentSelect }: DropDownProps) {
                         onComponentSelect(component);
                         setOpen(false);
                       }}
-                      className="flex items-center gap-2 py-3"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-accent rounded-md cursor-pointer"
                     >
-                      <Icon className="h-5 w-5" />
-                      <div className="flex flex-col">
-                        <span className="font-medium">{component.label}</span>
-                        <span className="text-sm text-muted-foreground">
+                      <Icon className="h-5 w-5 shrink-0" />
+                      <div className="flex flex-col flex-1 overflow-hidden">
+                        <span className="font-medium truncate">{component.label}</span>
+                        <span className="text-xs text-muted-foreground truncate">
                           {component.category}
                         </span>
                       </div>
