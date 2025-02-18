@@ -52,9 +52,9 @@ export default function Home() {
                 "h-full bg-background border-l",
                 "overflow-hidden"
               )}
-              initial={{ width: 0 }}
+              initial={{ width: "24px" }}
               animate={{ 
-                width: isConfigPanelOpen ? "325px" : "0px",
+                width: isConfigPanelOpen ? "325px" : "24px",
               }}
               transition={{
                 type: "spring",
@@ -70,7 +70,7 @@ export default function Home() {
             variant="outline"
             size="sm"
             onClick={toggleConfigPanel}
-            className="absolute -left-6 top-4 z-10 rounded-l-none shadow-md"
+            className="absolute left-0 top-4 z-10 shadow-md"
           >
             {isConfigPanelOpen ? (
               <ChevronRight className="h-4 w-4" />
