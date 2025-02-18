@@ -49,7 +49,6 @@ function DropDown({ onComponentSelect }: DropDownProps) {
                 placeholder="Search components..." 
                 className="py-3 h-12 text-sm"
               />
-              <span className="ml-1 h-2 w-2 rounded-full bg-orange-500" />
             </div>
             <CommandList className="max-h-[300px] overflow-y-auto p-2">
               <CommandEmpty>No components found.</CommandEmpty>
