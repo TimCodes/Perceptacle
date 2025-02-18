@@ -91,11 +91,11 @@ export default function Home() {
         </div>
 
         <div className="bg-muted/50 relative">
+          <div className="absolute top-6 left-6 z-10">
+            <DropDown onComponentSelect={handleComponentSelect} />
+          </div>
           <div className="h-full w-full">
             <DiagramCanvas onNodeSelected={handleNodeSelected} />
-          </div>
-          <div className="absolute bottom-6 left-6 z-10">
-            <DropDown onComponentSelect={handleComponentSelect} />
           </div>
         </div>
 
