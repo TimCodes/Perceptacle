@@ -1,5 +1,4 @@
 import { useState } from "react";
-import ComponentLibrary from "@/components/component-library";
 import DiagramCanvas from "@/components/diagram-canvas";
 import ConfigPanel from "@/components/config-panel";
 import DiagramToolbar from "@/components/diagram-toolbar";
@@ -36,13 +35,8 @@ const menuVariants = {
 };
 
 export default function Home() {
-  const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const { theme } = useTheme();
-
-  const toggleComponentMenu = () => {
-    setIsComponentMenuOpen(!isComponentMenuOpen);
-  };
 
   const toggleConfigPanel = () => {
     setIsConfigPanelOpen(!isConfigPanelOpen);
@@ -59,35 +53,9 @@ export default function Home() {
 
   return (
     <ReactFlowProvider>
-      <div className="grid h-screen grid-cols-[auto_1fr_auto] grid-rows-[60px_1fr] gap-1">
-        <div className="col-span-3 border-b bg-background">
+      <div className="grid h-screen grid-cols-[1fr_auto] grid-rows-[60px_1fr] gap-1">
+        <div className="col-span-2 border-b bg-background">
           <DiagramToolbar />
-        </div>
-
-        <div className="relative">
-          <AnimatePresence initial={false}>
-            <MotionDiv
-              className="h-full border-r bg-card overflow-hidden"
-              variants={menuVariants}
-              initial="closed"
-              animate={isComponentMenuOpen ? "open" : "closed"}
-            >
-              <ComponentLibrary />
-            </MotionDiv>
-          </AnimatePresence>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleComponentMenu}
-            className="absolute -right-6 top-4 z-10 rounded-l-none shadow-md"
-          >
-            {isComponentMenuOpen ? (
-              <ChevronLeft className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
         </div>
 
         <div className="bg-muted/50 relative">
