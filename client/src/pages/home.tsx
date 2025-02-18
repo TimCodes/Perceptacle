@@ -8,31 +8,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 const MotionDiv = motion.div;
-
-const menuVariants = {
-  open: {
-    width: "325px",
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 30,
-      mass: 0.8,
-    },
-  },
-  closed: {
-    width: "0px",
-    opacity: 0,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 30,
-      mass: 0.8,
-    },
-  },
-};
 
 export default function Home() {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -47,13 +25,12 @@ export default function Home() {
   };
 
   const handleComponentSelect = (component: any) => {
-    // This will be handled by DiagramCanvas through the store
     console.log('Selected component:', component);
   };
 
   return (
     <ReactFlowProvider>
-      <div className="grid h-screen grid-cols-[1fr_auto] grid-rows-[60px_1fr] gap-1">
+      <div className="h-screen grid grid-cols-[1fr_auto] grid-rows-[60px_1fr] overflow-hidden">
         <div className="col-span-2 border-b bg-background">
           <DiagramToolbar />
         </div>
@@ -68,11 +45,22 @@ export default function Home() {
         </div>
 
         <div className="relative">
-          <AnimatePresence initial={false}>
+          <AnimatePresence initial={false} mode="wait">
             <MotionDiv
-              variants={menuVariants}
-              initial="closed"
-              animate={isConfigPanelOpen ? "open" : "closed"}
+              key="config-panel"
+              className={cn(
+                "h-full bg-background border-l",
+                "overflow-hidden"
+              )}
+              initial={{ width: 0 }}
+              animate={{ 
+                width: isConfigPanelOpen ? "325px" : "0px",
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 30
+              }}
             >
               <ConfigPanel />
             </MotionDiv>
@@ -82,7 +70,7 @@ export default function Home() {
             variant="outline"
             size="sm"
             onClick={toggleConfigPanel}
-            className="absolute -left-6 top-4 z-10 rounded-r-none shadow-md"
+            className="absolute -left-6 top-4 z-10 rounded-l-none shadow-md"
           >
             {isConfigPanelOpen ? (
               <ChevronRight className="h-4 w-4" />
