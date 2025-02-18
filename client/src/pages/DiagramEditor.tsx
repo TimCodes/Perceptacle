@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Box, Flex, IconButton } from '@chakra-ui/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ComponentLibrary from '@/components/ComponentLibrary';
@@ -9,8 +8,10 @@ import DiagramToolbar from '@/components/DiagramToolbar';
 import { loadDiagram } from '@/lib/diagramStorage';
 import { startMockLogGenerator } from '@/lib/mock-log-generator';
 import { Node, Edge } from 'reactflow';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const MotionBox = motion(Box);
+const MotionDiv = motion.div;
 
 export default function DiagramEditor() {
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -19,7 +20,6 @@ export default function DiagramEditor() {
   const [isComponentMenuOpen, setIsComponentMenuOpen] = useState(true);
 
   useEffect(() => {
-    // Start mock log generation and cleanup on unmount
     const cleanup = startMockLogGenerator();
     return () => cleanup();
   }, []);
@@ -90,55 +90,50 @@ export default function DiagramEditor() {
   };
 
   return (
-    <Flex h="100vh" bg="gray.50">
+    <div className="h-screen grid grid-cols-[auto_1fr_auto]">
       <AnimatePresence initial={false}>
-        <MotionBox
-          position="relative"
-          bg="white"
-          borderRight="1px"
-          borderColor="gray.200"
+        <MotionDiv
+          className={cn(
+            "relative bg-background border-r",
+            "overflow-hidden"
+          )}
           initial={false}
           animate={{
             width: isComponentMenuOpen ? "250px" : "0px",
             opacity: isComponentMenuOpen ? 1 : 0,
-            transition: {
-              width: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
-            }
           }}
-          style={{
-            overflow: 'hidden'
+          transition={{
+            width: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.2 }
           }}
         >
           <ComponentLibrary setNodes={setNodes} />
-          <IconButton
-            aria-label={isComponentMenuOpen ? "Close menu" : "Open menu"}
-            icon={isComponentMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-            onClick={toggleComponentMenu}
-            position="absolute"
-            right="-10"
-            top="4"
-            zIndex="10"
+          <Button
+            variant="outline"
             size="sm"
-            variant="solid"
-            bg="white"
-            borderWidth={1}
-            borderColor="gray.200"
-            borderLeftRadius="0"
-            shadow="md"
-            _hover={{ bg: 'gray.50' }}
-          />
-        </MotionBox>
+            onClick={toggleComponentMenu}
+            className={cn(
+              "absolute -right-6 top-4 z-10",
+              "rounded-l-none shadow-md"
+            )}
+          >
+            {isComponentMenuOpen ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        </MotionDiv>
       </AnimatePresence>
 
-      <Flex direction="column" flex={1}>
+      <div className="flex flex-col">
         <DiagramToolbar 
           onSave={onSave} 
           onLoad={onLoad}
           onClear={onClear}
         />
 
-        <Box flex={1}>
+        <div className="flex-1">
           <Canvas
             nodes={nodes}
             edges={edges}
@@ -147,13 +142,15 @@ export default function DiagramEditor() {
             onConnect={onConnect}
             onNodeSelect={onNodeSelect}
           />
-        </Box>
-      </Flex>
+        </div>
+      </div>
 
-      <ConfigPanel 
-        selectedNode={selectedNode}
-        onNodeUpdate={onNodeUpdate}
-      />
-    </Flex>
+      {selectedNode && (
+        <ConfigPanel 
+          selectedNode={selectedNode}
+          onNodeUpdate={onNodeUpdate}
+        />
+      )}
+    </div>
   );
 }
