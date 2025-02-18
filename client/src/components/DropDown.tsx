@@ -1,0 +1,89 @@
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import { cloudComponents } from '@/lib/cloudComponents';
+
+interface CloudComponent {
+  type: string;
+  label: string;
+  icon: any;
+  category: string;
+}
+
+interface DropDownProps {
+  onComponentSelect: (component: CloudComponent) => void;
+}
+
+function DropDown({ onComponentSelect }: DropDownProps) {
+  const [open, setOpen] = useState(false);
+  const [selectedComponent, setSelectedComponent] = useState<CloudComponent | null>(null);
+
+  return (
+    <div className="relative">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+            size="icon"
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Search components..." />
+            <CommandList>
+              <CommandEmpty>No components found.</CommandEmpty>
+              <CommandGroup heading="Cloud Components">
+                {cloudComponents.map((component) => {
+                  const Icon = component.icon;
+                  return (
+                    <CommandItem
+                      key={component.type}
+                      onSelect={() => {
+                        setSelectedComponent(component);
+                        onComponentSelect(component);
+                        setOpen(false);
+                      }}
+                      className="flex items-center gap-2 py-3"
+                    >
+                      <Icon className="h-5 w-5" />
+                      <div className="flex flex-col">
+                        <span className="font-medium">{component.label}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {component.category}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
+      {selectedComponent && (
+        <div className="fixed top-20 left-6 max-w-sm p-6 bg-card rounded-lg shadow-lg border">
+          <h2 className="text-2xl font-semibold mb-2">{selectedComponent.label}</h2>
+          <p className="text-muted-foreground">Category: {selectedComponent.category}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default DropDown;

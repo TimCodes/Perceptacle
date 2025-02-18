@@ -3,6 +3,7 @@ import ComponentLibrary from "@/components/component-library";
 import DiagramCanvas from "@/components/diagram-canvas";
 import ConfigPanel from "@/components/config-panel";
 import DiagramToolbar from "@/components/diagram-toolbar";
+import DropDown from "@/components/DropDown";
 import { ReactFlowProvider } from "reactflow";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,6 +52,11 @@ export default function Home() {
     setIsConfigPanelOpen(true);
   };
 
+  const handleComponentSelect = (component: any) => {
+    // This will be handled by DiagramCanvas through the store
+    console.log('Selected component:', component);
+  };
+
   return (
     <ReactFlowProvider>
       <div className="grid h-screen grid-cols-[auto_1fr_auto] grid-rows-[60px_1fr] gap-1">
@@ -84,9 +90,12 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className="bg-muted/50">
+        <div className="bg-muted/50 relative">
           <div className="h-full w-full">
             <DiagramCanvas onNodeSelected={handleNodeSelected} />
+          </div>
+          <div className="absolute bottom-6 left-6 z-10">
+            <DropDown onComponentSelect={handleComponentSelect} />
           </div>
         </div>
 
