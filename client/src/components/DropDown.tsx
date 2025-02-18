@@ -31,6 +31,11 @@ function DropDown({ onComponentSelect }: DropDownProps) {
   const [open, setOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<CloudComponent | null>(null);
 
+  const onDragStart = (event: React.DragEvent, nodeType: string) => {
+    event.dataTransfer.setData('application/reactflow', nodeType);
+    event.dataTransfer.effectAllowed = 'move';
+  };
+
   return (
     <div className="relative">
       <Popover open={open} onOpenChange={setOpen}>
@@ -63,7 +68,9 @@ function DropDown({ onComponentSelect }: DropDownProps) {
                         onComponentSelect(component);
                         setOpen(false);
                       }}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-accent rounded-md cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-accent rounded-md cursor-grab"
+                      draggable
+                      onDragStart={(e) => onDragStart(e, component.type)}
                     >
                       <Icon className="h-5 w-5 shrink-0" />
                       <div className="flex flex-col flex-1 overflow-hidden">
