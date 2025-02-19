@@ -22,7 +22,7 @@ import {
   AlertTriangle,
   Info,
   Bug,
-  Ticket
+  Ticket,
 } from "lucide-react";
 import { useDiagramStore } from "@/lib/diagram-store";
 import {
@@ -39,7 +39,7 @@ const tabNames = {
   configuration: "Configuration",
   cicd: "CI/CD",
   observability: "Observability",
-  tickets: "Tickets"
+  tickets: "Tickets",
 };
 
 export default function ConfigPanel() {
@@ -68,18 +68,18 @@ export default function ConfigPanel() {
             {
               title: "Memory leak in production environment",
               url: "https://github.com/org/repo/issues/1",
-              state: "open"
+              state: "open",
             },
             {
               title: "Update dependencies to latest versions",
               url: "https://github.com/org/repo/issues/2",
-              state: "closed"
+              state: "closed",
             },
             {
               title: "Add error handling for API failures",
               url: "https://github.com/org/repo/issues/3",
-              state: "open"
-            }
+              state: "open",
+            },
           ],
           tickets: selectedNode.data.tickets || [
             {
@@ -89,7 +89,8 @@ export default function ConfigPanel() {
               priority: "high",
               created: "2025-02-09T10:00:00Z",
               assignee: "John Doe",
-              description: "Users reporting slow response times and occasional timeouts"
+              description:
+                "Users reporting slow response times and occasional timeouts",
             },
             {
               id: "TICKET-002",
@@ -98,7 +99,8 @@ export default function ConfigPanel() {
               priority: "medium",
               created: "2025-02-08T15:30:00Z",
               assignee: "Jane Smith",
-              description: "SSL certificate needs to be renewed before March 1st"
+              description:
+                "SSL certificate needs to be renewed before March 1st",
             },
             {
               id: "TICKET-003",
@@ -107,9 +109,9 @@ export default function ConfigPanel() {
               priority: "low",
               created: "2025-02-07T09:15:00Z",
               assignee: "Mike Johnson",
-              description: "Regular backup validation check pending"
-            }
-          ]
+              description: "Regular backup validation check pending",
+            },
+          ],
         },
       });
       setHasChanges(false);
@@ -337,15 +339,17 @@ export default function ConfigPanel() {
                   "flex gap-3 p-2 rounded-md",
                   issue.state === "open"
                     ? "bg-destructive/10"
-                    : "bg-success/10"
+                    : "bg-success/10",
                 )}
               >
-                <Bug className={cn(
-                  "h-4 w-4",
-                  issue.state === "open"
-                    ? "text-destructive"
-                    : "text-success"
-                )} />
+                <Bug
+                  className={cn(
+                    "h-4 w-4",
+                    issue.state === "open"
+                      ? "text-destructive"
+                      : "text-success",
+                  )}
+                />
                 <div className="flex flex-col gap-0.5 flex-1">
                   <Button
                     variant="link"
@@ -354,7 +358,7 @@ export default function ConfigPanel() {
                   >
                     {issue.title}
                   </Button>
-                  <Badge 
+                  <Badge
                     variant={issue.state === "open" ? "destructive" : "success"}
                     className="w-fit"
                   >
@@ -445,17 +449,19 @@ export default function ConfigPanel() {
   };
 
   return (
-    <div className="w-[325px] border-l bg-background overflow-hidden flex flex-col">
+    <div className="w-[375px] border-l \ overflow-hidden flex flex-col">
       <ScrollArea className="flex-1 p-4">
-        <h2 className="text-lg font-semibold mb-4">Node {tabNames[currentTab]}</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Node {tabNames[currentTab]}
+        </h2>
 
         <div className="space-y-4">
-          <Tabs 
-            defaultValue="configuration" 
+          <Tabs
+            defaultValue="configuration"
             className="space-y-4"
             onValueChange={setCurrentTab}
           >
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-[340px] grid-cols-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -542,7 +548,9 @@ export default function ConfigPanel() {
                     <Label>Description</Label>
                     <Input
                       value={editedNode.data.description || ""}
-                      onChange={(e) => handleChange("description", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("description", e.target.value)
+                      }
                     />
                   </div>
 
@@ -578,7 +586,9 @@ export default function ConfigPanel() {
                                 ) : (
                                   <Input
                                     type={
-                                      field.type === "number" ? "number" : "text"
+                                      field.type === "number"
+                                        ? "number"
+                                        : "text"
                                     }
                                     value={field.value || ""}
                                     onChange={(e) =>

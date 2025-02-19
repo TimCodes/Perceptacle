@@ -21,12 +21,12 @@ export default function Home() {
   };
 
   const handleComponentSelect = (component: any) => {
-    console.log('Selected component:', component);
+    console.log("Selected component:", component);
   };
 
   return (
     <ReactFlowProvider>
-      <div className="h-screen flex flex-col">
+      <div className="h-screen w-screen flex flex-col">
         <div className="border-b bg-background">
           <DiagramToolbar />
         </div>
@@ -44,13 +44,13 @@ export default function Home() {
               <MotionDiv
                 key="config-panel"
                 className="h-full bg-background border-l"
-                initial={{ width: 0 }}
-                animate={{ width: 325 }}
+                initial={{ width: "0px" }}
+                animate={{ width: "400px", right: -10 }}
                 exit={{ width: 0 }}
                 transition={{
                   type: "spring",
                   stiffness: 300,
-                  damping: 30
+                  damping: 30,
                 }}
               >
                 <ConfigPanel />
@@ -64,7 +64,7 @@ export default function Home() {
             onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
             className={cn(
               "absolute top-4 z-10 shadow-md",
-              isConfigPanelOpen ? "right-[325px]" : "right-0"
+              isConfigPanelOpen ? "right-[400px]" : "right-0",
             )}
           >
             {isConfigPanelOpen ? (
