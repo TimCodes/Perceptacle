@@ -56,14 +56,14 @@ export default function Home() {
             <DiagramCanvas onNodeSelected={handleNodeSelected} />
           </div>
 
-          <AnimatePresence initial={false} mode="wait">
-            {isConfigPanelOpen ? (
+          <AnimatePresence initial={false}>
+            {isConfigPanelOpen && (
               <MotionDiv
                 key="config-panel"
-                className="h-full bg-background border-l"
-                initial={{ width: 0 }}
-                animate={{ width: 325 }}
-                exit={{ width: 0 }}
+                className="h-full bg-background border-l overflow-hidden"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 325, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
                 transition={{
                   type: "spring",
                   stiffness: 300,
@@ -72,7 +72,7 @@ export default function Home() {
               >
                 <ConfigPanel />
               </MotionDiv>
-            ) : null}
+            )}
           </AnimatePresence>
 
           <Button
