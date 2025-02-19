@@ -16,10 +16,6 @@ export default function Home() {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const { theme } = useTheme();
 
-  const toggleConfigPanel = () => {
-    setIsConfigPanelOpen(!isConfigPanelOpen);
-  };
-
   const handleNodeSelected = () => {
     setIsConfigPanelOpen(true);
   };
@@ -30,33 +26,27 @@ export default function Home() {
 
   return (
     <ReactFlowProvider>
-      <div className="h-screen flex flex-col overflow-hidden">
+      <div className="h-screen flex flex-col">
         <div className="border-b bg-background">
           <DiagramToolbar />
         </div>
 
-        <div className="flex-1 flex">
+        <div className="flex-1 flex relative">
           <div className="flex-1 relative bg-muted/50">
             <div className="absolute top-6 left-6 z-10">
               <DropDown onComponentSelect={handleComponentSelect} />
             </div>
-            <div className="h-full w-full">
-              <DiagramCanvas onNodeSelected={handleNodeSelected} />
-            </div>
+            <DiagramCanvas onNodeSelected={handleNodeSelected} />
           </div>
 
-          <div className="relative">
-            <AnimatePresence initial={false} mode="wait">
+          <AnimatePresence initial={false} mode="wait">
+            {isConfigPanelOpen ? (
               <MotionDiv
                 key="config-panel"
-                className={cn(
-                  "h-full bg-background border-l",
-                  "overflow-hidden"
-                )}
-                initial={{ width: "24px" }}
-                animate={{ 
-                  width: isConfigPanelOpen ? "325px" : "24px",
-                }}
+                className="h-full bg-background border-l"
+                initial={{ width: 0 }}
+                animate={{ width: 325 }}
+                exit={{ width: 0 }}
                 transition={{
                   type: "spring",
                   stiffness: 300,
@@ -65,21 +55,24 @@ export default function Home() {
               >
                 <ConfigPanel />
               </MotionDiv>
-            </AnimatePresence>
+            ) : null}
+          </AnimatePresence>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleConfigPanel}
-              className="absolute left-0 top-4 z-10 shadow-md"
-            >
-              {isConfigPanelOpen ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
+            className={cn(
+              "absolute top-4 z-10 shadow-md",
+              isConfigPanelOpen ? "right-[325px]" : "right-0"
+            )}
+          >
+            {isConfigPanelOpen ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
         </div>
       </div>
     </ReactFlowProvider>
