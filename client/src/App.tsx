@@ -5,7 +5,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Settings from "@/pages/settings";
 import NodeTypes from "@/pages/node-types";
-import { ThemeProvider } from "./lib/theme-provider";
+import { ThemeProvider } from "./utils/theme-provider";
 
 import Navbar from "@/components/navbar";
 

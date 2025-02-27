@@ -24,7 +24,7 @@ import {
   Bug,
   Ticket,
 } from "lucide-react";
-import { useDiagramStore } from "@/lib/diagram-store";
+import { useDiagramStore } from "@/utils/diagram-store";
 import {
   Select,
   SelectContent,
@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 const tabNames = {
   configuration: "Configuration",
@@ -451,9 +451,7 @@ export default function ConfigPanel() {
   return (
     <div className="w-[375px] border-l bg-background overflow-hidden flex flex-col h-full">
       <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">
-          Node {tabNames[currentTab]}
-        </h2>
+        <h2 className="text-lg font-semibold">Node {tabNames[currentTab]}</h2>
       </div>
 
       <ScrollArea className="flex-1">

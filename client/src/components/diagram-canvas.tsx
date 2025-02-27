@@ -15,8 +15,8 @@ import ReactFlow, {
   MarkerType
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { useDiagramStore } from '@/lib/diagram-store';
-import { getCloudComponents } from '@/lib/cloudComponents';
+import { useDiagramStore } from '@/utils/diagram-store';
+import { getCloudComponents } from '@/utils/cloudComponents';
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
 const customComponents = [

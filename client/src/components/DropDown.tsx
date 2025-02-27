@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { cloudComponents } from '@/lib/cloudComponents';
+import { cloudComponents } from "@/utils/cloudComponents";
 
 interface CloudComponent {
   type: string;
@@ -29,11 +29,12 @@ interface DropDownProps {
 
 function DropDown({ onComponentSelect }: DropDownProps) {
   const [open, setOpen] = useState(false);
-  const [selectedComponent, setSelectedComponent] = useState<CloudComponent | null>(null);
+  const [selectedComponent, setSelectedComponent] =
+    useState<CloudComponent | null>(null);
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
-    event.dataTransfer.setData('application/reactflow', nodeType);
-    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData("application/reactflow", nodeType);
+    event.dataTransfer.effectAllowed = "move";
   };
 
   return (
@@ -50,14 +51,17 @@ function DropDown({ onComponentSelect }: DropDownProps) {
         <PopoverContent className="w-[300px] p-0" align="start" sideOffset={5}>
           <Command className="rounded-lg border shadow-md">
             <div className="flex items-center border-b px-3">
-              <CommandInput 
-                placeholder="Search components..." 
+              <CommandInput
+                placeholder="Search components..."
                 className="py-3 h-12 text-sm"
               />
             </div>
             <CommandList className="max-h-[300px] overflow-y-auto p-2">
               <CommandEmpty>No components found.</CommandEmpty>
-              <CommandGroup heading="Cloud Components" className="text-xs text-muted-foreground">
+              <CommandGroup
+                heading="Cloud Components"
+                className="text-xs text-muted-foreground"
+              >
                 {cloudComponents.map((component) => {
                   const Icon = component.icon;
                   return (
@@ -74,7 +78,9 @@ function DropDown({ onComponentSelect }: DropDownProps) {
                     >
                       <Icon className="h-5 w-5 shrink-0" />
                       <div className="flex flex-col flex-1 overflow-hidden">
-                        <span className="font-medium truncate">{component.label}</span>
+                        <span className="font-medium truncate">
+                          {component.label}
+                        </span>
                         <span className="text-xs text-muted-foreground truncate">
                           {component.category}
                         </span>
@@ -90,8 +96,12 @@ function DropDown({ onComponentSelect }: DropDownProps) {
 
       {selectedComponent && (
         <div className="fixed top-20 left-6 max-w-sm p-6 bg-card rounded-lg shadow-lg border">
-          <h2 className="text-2xl font-semibold mb-2">{selectedComponent.label}</h2>
-          <p className="text-muted-foreground">Category: {selectedComponent.category}</p>
+          <h2 className="text-2xl font-semibold mb-2">
+            {selectedComponent.label}
+          </h2>
+          <p className="text-muted-foreground">
+            Category: {selectedComponent.category}
+          </p>
         </div>
       )}
     </div>

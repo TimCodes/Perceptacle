@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Sparkles } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
-import { useDiagramStore } from "@/lib/diagram-store";
+import { useDiagramStore } from "@/utils/diagram-store";
 import { useToast } from "@/hooks/use-toast";
 import Fuse from "fuse.js";
-import { getComponentSuggestions } from "@/lib/suggestions";
+import { getComponentSuggestions } from "@/utils/suggestions";
 import {
   Dialog,
   DialogContent,
