@@ -38,7 +38,7 @@ export default function Home() {
           <DiagramToolbar />
         </div>
  */}
-        <div className="flex-1 flex relative bg-zinc-300 h-[65px]">
+        <div className="flex-1 flex relative">
           <div className="flex-1 relative bg-muted/50">
             <div className="absolute top-6 left-6 z-10">
               <DropDown onComponentSelect={handleComponentSelect} />
@@ -69,8 +69,8 @@ export default function Home() {
             {isConfigPanelOpen ? (
               <MotionDiv
                 key="config-panel"
-                className="h-[65px] bg-zinc-300 bg-blue border-l"
-                initial={{ width: "0px", height: "100px" }}
+                className="h-full bg-background border-l "
+                initial={{ width: "0px" }}
                 animate={{ width: "400px", right: -10 }}
                 exit={{ width: 0 }}
                 transition={{
