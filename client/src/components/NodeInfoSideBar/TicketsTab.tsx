@@ -2,7 +2,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
 import { getStatusBadgeVariant, getPriorityColor } from "./utils";
-import TicketList from '@/components/TicketList';'
+import TicketList from "@/components/TicketList";
 
 export const TicketsTab = ({ editedNode }) => {
   const tickets = editedNode.data.tickets || [];

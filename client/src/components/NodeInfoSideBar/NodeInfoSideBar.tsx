@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Save } from "lucide-react";
-import { useDiagramStore } from "@/lib/diagram-store";
+import { useDiagramStore } from "@/utils/diagram-store";
 import { useToast } from "@/hooks/use-toast";
 import { TabNavigation } from "./TabNavigation";
 import { ConfigurationTab } from "./ConfigurationTab";

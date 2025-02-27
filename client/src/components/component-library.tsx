@@ -2,23 +2,23 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
-import { getCloudComponents } from '@/lib/cloudComponents';
+import { getCloudComponents } from "@/utils/cloudComponents";
 
 interface ComponentLibraryProps {
   setNodes?: (updater: (nodes: any[]) => any[]) => void;
 }
 
 export default function ComponentLibrary({ setNodes }: ComponentLibraryProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const components = getCloudComponents();
 
-  const filteredComponents = components.filter(
-    component => component.label.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredComponents = components.filter((component) =>
+    component.label.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
-    event.dataTransfer.setData('application/reactflow', nodeType);
-    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData("application/reactflow", nodeType);
+    event.dataTransfer.effectAllowed = "move";
   };
 
   return (

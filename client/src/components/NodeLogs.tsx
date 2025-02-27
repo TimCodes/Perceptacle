@@ -2,7 +2,18 @@ import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
-import { getLogIcon } from "@/utils/helpers";
+import { AlertCircle, AlertTriangle, Info } from "lucide-react";
+
+const getLogIcon = (level) => {
+  switch (level) {
+    case "error":
+      return <AlertCircle className="h-4 w-4 text-destructive" />;
+    case "warning":
+      return <AlertTriangle className="h-4 w-4 text-warning" />;
+    default:
+      return <Info className="h-4 w-4 text-primary" />;
+  }
+};
 
 export const Nodelogs = ({ logs }) => (
   <div className="mt-8 space-y-4">
@@ -41,3 +52,5 @@ export const Nodelogs = ({ logs }) => (
     </ScrollArea>
   </div>
 );
+
+export default Nodelogs;

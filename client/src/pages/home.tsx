@@ -1,7 +1,5 @@
 import { useState } from "react";
 import DiagramCanvas from "@/components/diagram-canvas";
-import ConfigPanel from "@/components/config-panel";
-import DiagramToolbar from "@/components/diagram-toolbar";
 import DropDown from "@/components/DropDown";
 import { ReactFlowProvider } from "reactflow";
 import {
@@ -15,7 +13,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
+
+import NodeInfoSideBar from "@/components/NodeInfoSideBar/NodeInfoSideBar";
 
 const MotionDiv = motion.div;
 
@@ -79,7 +79,7 @@ export default function Home() {
                   damping: 30,
                 }}
               >
-                <ConfigPanel />
+                <NodeInfoSideBar />
               </MotionDiv>
             ) : null}
           </AnimatePresence>
