@@ -221,7 +221,7 @@ export default function ConfigPanel() {
     );
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 h-90px">
         <div className="grid grid-cols-1 gap-4">
           <StatCard
             label="CPU Usage"
@@ -449,19 +449,19 @@ export default function ConfigPanel() {
   };
 
   return (
-    <div className="w-[375px] border-l \ overflow-hidden flex flex-col">
+    <div className="w-[375px] border-l bg-background overflow-hidden h-90px flex flex-col">
       <ScrollArea className="flex-1 p-4">
         <h2 className="text-lg font-semibold mb-4">
           Node {tabNames[currentTab]}
         </h2>
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <Tabs
             defaultValue="configuration"
             className="space-y-4"
             onValueChange={setCurrentTab}
           >
-            <TabsList className="grid w-[340px] grid-cols-4">
+            <TabsList className="grid w-[345px] grid-cols-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -659,7 +659,7 @@ export default function ConfigPanel() {
               </TabsContent>
             </div>
           </Tabs>
-        </div>
+        </div> */}
       </ScrollArea>
 
       {hasChanges && (

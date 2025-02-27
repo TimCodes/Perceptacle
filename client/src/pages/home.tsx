@@ -10,6 +10,7 @@ import {
   Save,
   Download,
   Trash2,
+  Plus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -32,12 +33,12 @@ export default function Home() {
 
   return (
     <ReactFlowProvider>
-      <div className="h-screen w-screen flex flex-col">
-        <div className="border-b bg-background">
+      <div className="h-[calc(100vh-65px)]  w-screen flex flex-col">
+        {/* <div className="border-b bg-background">
           <DiagramToolbar />
         </div>
-
-        <div className="flex-1 flex relative">
+ */}
+        <div className="flex-1 flex relative bg-zinc-300 h-[65px]">
           <div className="flex-1 relative bg-muted/50">
             <div className="absolute top-6 left-6 z-10">
               <DropDown onComponentSelect={handleComponentSelect} />
@@ -55,6 +56,12 @@ export default function Home() {
               <Button variant="ghost" size="icon" title="Clear Canvas">
                 <Trash2 className="h-4 w-4" />
               </Button>
+              <Button variant="ghost" size="icon" title="Load Diagram">
+                <Plus className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" title="Clear Canvas">
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </div>
 
@@ -62,8 +69,8 @@ export default function Home() {
             {isConfigPanelOpen ? (
               <MotionDiv
                 key="config-panel"
-                className="h-full bg-background border-l"
-                initial={{ width: "0px" }}
+                className="h-[65px] bg-zinc-300 bg-blue border-l"
+                initial={{ width: "0px", height: "100px" }}
                 animate={{ width: "400px", right: -10 }}
                 exit={{ width: 0 }}
                 transition={{

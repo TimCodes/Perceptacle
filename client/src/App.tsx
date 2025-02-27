@@ -6,9 +6,8 @@ import Home from "@/pages/home";
 import Settings from "@/pages/settings";
 import NodeTypes from "@/pages/node-types";
 import { ThemeProvider } from "./lib/theme-provider";
-import { Button } from "./components/ui/button";
-import { Settings as SettingsIcon, Library } from "lucide-react";
-import { useLocation } from "wouter";
+
+import Navbar from "@/components/navbar";
 
 function Router() {
   return (
@@ -21,35 +20,12 @@ function Router() {
   );
 }
 
-function NavButtons() {
-  const [_, setLocation] = useLocation();
-
-  return (
-    <div className="absolute right-12 top-4 z-50 flex gap-2">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setLocation("/node-types")}
-      >
-        <Library className="h-[1.2rem] w-[1.2rem]" />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => setLocation("/settings")}
-      >
-        <SettingsIcon className="h-[1.2rem] w-[1.2rem]" />
-      </Button>
-    </div>
-  );
-}
-
 function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <QueryClientProvider client={queryClient}>
         <div className="min-h-screen bg-background text-foreground">
-          <NavButtons />
+          <Navbar />
           <Router />
         </div>
       </QueryClientProvider>
