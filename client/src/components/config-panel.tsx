@@ -221,7 +221,7 @@ export default function ConfigPanel() {
     );
 
     return (
-      <div className="space-y-6 h-90px">
+      <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4">
           <StatCard
             label="CPU Usage"
@@ -449,19 +449,21 @@ export default function ConfigPanel() {
   };
 
   return (
-    <div className="w-[375px] border-l bg-background overflow-hidden h-90px flex flex-col">
-      <ScrollArea className="flex-1 p-4">
-        <h2 className="text-lg font-semibold mb-4">
+    <div className="w-[375px] border-l bg-background overflow-hidden flex flex-col h-full">
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-semibold">
           Node {tabNames[currentTab]}
         </h2>
+      </div>
 
-        {/* <div className="space-y-4">
+      <ScrollArea className="flex-1">
+        <div className="p-4">
           <Tabs
             defaultValue="configuration"
             className="space-y-4"
             onValueChange={setCurrentTab}
           >
-            <TabsList className="grid w-[345px] grid-cols-4">
+            <TabsList className="grid w-full grid-cols-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -515,7 +517,7 @@ export default function ConfigPanel() {
               </TooltipProvider>
             </TabsList>
 
-            <div className="mt-4">
+            <div className="space-y-4">
               <TabsContent value="configuration" className="space-y-4">
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -659,11 +661,11 @@ export default function ConfigPanel() {
               </TabsContent>
             </div>
           </Tabs>
-        </div> */}
+        </div>
       </ScrollArea>
 
       {hasChanges && (
-        <div className="sticky bottom-0 p-4 bg-background border-t mt-4">
+        <div className="p-4 bg-background border-t">
           <Button onClick={handleSave} className="w-full gap-2">
             <Save className="h-4 w-4" />
             Save Changes
