@@ -1,7 +1,7 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import GitHubIssues from "@/components/GitHubIssues";
+import GitHubIssues from "@/components/NodeInfoSideBar/GitHubIssues";
 
 export const CICDTab = ({ editedNode, handleChange }) => (
   <div className="space-y-4">
@@ -26,3 +26,5 @@ export const CICDTab = ({ editedNode, handleChange }) => (
     <GitHubIssues issues={editedNode.data.issues || []} />
   </div>
 );
+
+export default CICDTab;

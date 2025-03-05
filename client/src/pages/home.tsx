@@ -1,21 +1,15 @@
 import { useState } from "react";
-import DiagramCanvas from "@/components/diagram-canvas";
-import DropDown from "@/components/DropDown";
+import DiagramCanvas from "@/components//DiagramCanvas/DiagramCanvas";
+import DropDown from "@/components/NodeTypeDropdown/DropDown";
 import { ReactFlowProvider } from "reactflow";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Save,
-  Download,
-  Trash2,
-  Plus,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { cn } from "@/utils/cn";
 
 import NodeInfoSideBar from "@/components/NodeInfoSideBar/NodeInfoSideBar";
+import DiagramToolbar from "@/components/DiagramCanvas/DiagramToolbar";
 
 const MotionDiv = motion.div;
 
@@ -45,33 +39,14 @@ export default function Home() {
             </div>
             <DiagramCanvas onNodeSelected={handleNodeSelected} />
           </div>
-          <div className="absolute left-6 top-1/2 -translate-y-1/2 z-20">
-            <div className="bg-background border rounded-lg shadow-lg flex flex-col gap-2 p-2">
-              <Button variant="ghost" size="icon" title="Save Diagram">
-                <Save className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" title="Load Diagram">
-                <Download className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" title="Clear Canvas">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" title="Load Diagram">
-                <Plus className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" title="Clear Canvas">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
+          <DiagramToolbar />
           <AnimatePresence initial={false} mode="wait">
             {isConfigPanelOpen ? (
               <MotionDiv
                 key="config-panel"
-                className="h-full bg-background border-l "
+                className="bg-background border-l"
                 initial={{ width: "0px" }}
-                animate={{ width: "400px", right: -10 }}
+                animate={{ width: "400px" }}
                 exit={{ width: 0 }}
                 transition={{
                   type: "spring",

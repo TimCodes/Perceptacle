@@ -7,7 +7,7 @@ import Settings from "@/pages/settings";
 import NodeTypes from "@/pages/node-types";
 import { ThemeProvider } from "./utils/theme-provider";
 
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/NavBar/NavBar";
 
 function Router() {
   return (

@@ -67,11 +67,6 @@ function DropDown({ onComponentSelect }: DropDownProps) {
                   return (
                     <CommandItem
                       key={component.type}
-                      onSelect={() => {
-                        setSelectedComponent(component);
-                        onComponentSelect(component);
-                        setOpen(false);
-                      }}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-accent rounded-md cursor-grab"
                       draggable
                       onDragStart={(e) => onDragStart(e, component.type)}

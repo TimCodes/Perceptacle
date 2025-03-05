@@ -16,13 +16,8 @@ const getLogIcon = (level) => {
 };
 
 export const Nodelogs = ({ logs }) => (
-  <div className="mt-8 space-y-4">
-    <div className="flex items-center justify-between mb-2">
-      <h3 className="text-sm font-medium">Component Logs</h3>
-      <Badge variant="secondary">{logs.length} entries</Badge>
-    </div>
-
-    <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+  <div className="w-full">
+    <ScrollArea className="h-[250px] rounded-md border p-4">
       <div className="space-y-2">
         {logs
           .slice()
