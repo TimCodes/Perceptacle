@@ -24,10 +24,8 @@ function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen bg-background text-foreground">
-          <Navbar />
-          <Router />
-        </div>
+        <Navbar />
+        <Router />
       </QueryClientProvider>
     </ThemeProvider>
   );

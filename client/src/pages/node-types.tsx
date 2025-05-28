@@ -275,7 +275,7 @@ export default function NodeTypes() {
   };
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="p-4 h-[calc(100vh-65px)] w-screen">
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="outline" size="sm" onClick={() => setLocation("/")}>

@@ -190,5 +190,5 @@ const cloudComponents = [
   { type: "compute_engine", label: "Compute Engine" },
   { type: "cloud_sql", label: "Cloud SQL" },
   { type: "cloud_storage", label: "Cloud Storage" },
-  // Add more components as needed
+  // Add more components as needed when needed
 ];
