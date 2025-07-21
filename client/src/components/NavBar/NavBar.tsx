@@ -10,7 +10,7 @@ export default function NavBar() {
         <div className="flex ">
           <div className="flex-shrink-0 flex items-center">
             <Button variant="ghost" onClick={() => setLocation("/")}>
-              GitHub Manager
+              GitHub Manager(S)
             </Button>
           </div>
         </div>
