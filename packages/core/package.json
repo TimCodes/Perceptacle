@@ -19,6 +19,11 @@
   "dependencies": {
     "zod": "^3.22.0"
   },
+  "dependencies": {
+    "zod": "^3.22.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0"
+  },
   "devDependencies": {
     "typescript": "^5.0.0"
   }

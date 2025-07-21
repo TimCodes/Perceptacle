@@ -1,6 +1,12 @@
 
-// Core package exports
+// Types
 export * from './types/index.js';
-export * from './utils/index.js';
-export * from './constants/index.js';
+
+// Schemas and validation
 export * from './schemas/index.js';
+
+// Constants
+export * from './constants/index.js';
+
+// Utilities
+export * from './utils/index.js';

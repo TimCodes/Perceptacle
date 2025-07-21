@@ -1,15 +1,35 @@
 
-import { z } from 'zod';
-
-// Node/Component types
-export interface NodeType {
+// Diagram types
+export interface DiagramNode {
+  id: string;
   type: string;
-  label: string;
-  icon: string;
-  category: string;
-  fields?: CustomField[];
+  position: { x: number; y: number };
+  data: {
+    label: string;
+    category: string;
+    fields?: Record<string, any>;
+    [key: string]: any;
+  };
 }
 
+export interface DiagramEdge {
+  id: string;
+  source: string;
+  target: string;
+  type?: string;
+  data?: Record<string, any>;
+}
+
+export interface Diagram {
+  id: string;
+  name: string;
+  nodes: DiagramNode[];
+  edges: DiagramEdge[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Component types
 export interface CustomField {
   id: string;
   name: string;
@@ -20,35 +40,15 @@ export interface CustomField {
   placeholder?: string;
 }
 
-// Diagram types
-export interface DiagramNode {
-  id: string;
+export interface ComponentType {
   type: string;
-  position: { x: number; y: number };
-  data: {
-    label: string;
-    [key: string]: any;
-  };
+  label: string;
+  category: string;
+  icon: string;
+  fields?: CustomField[];
 }
 
-export interface DiagramEdge {
-  id: string;
-  source: string;
-  target: string;
-  type?: string;
-}
-
-export interface Diagram {
-  id: string;
-  name: string;
-  description?: string;
-  nodes: DiagramNode[];
-  edges: DiagramEdge[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// API types
+// API Response types
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -56,11 +56,22 @@ export interface ApiResponse<T = any> {
   message?: string;
 }
 
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+// Node type categories
+export type NodeCategory = 
+  | 'Compute' 
+  | 'Storage' 
+  | 'Database' 
+  | 'Networking' 
+  | 'Security' 
+  | 'Serverless';
+
+// Field types for dynamic forms
+export type FieldType = 'text' | 'number' | 'select' | 'textarea' | 'url';
+
+export interface FieldTypeOption {
+  value: FieldType;
+  label: string;
 }
+
+// Theme types
+export type Theme = 'light' | 'dark' | 'system';

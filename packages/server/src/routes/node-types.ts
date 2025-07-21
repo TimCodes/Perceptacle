@@ -1,81 +1,183 @@
 
 import { Router } from 'express';
-import { createSuccessResponse, createErrorResponse, validateFieldNames } from '@github-manager/core';
-import type { NodeType } from '@github-manager/core';
+import { 
+  componentTypeSchema,
+  createComponentTypeSchema,
+  updateComponentTypeSchema,
+  type ComponentType,
+  type CreateComponentType,
+  type UpdateComponentType,
+  generateId,
+  validateUniqueFieldNames,
+  getComponentIcon
+} from '@github-manager/core';
 
 const router = Router();
 
-// In-memory storage (replace with database in production)
-let customNodeTypes: NodeType[] = [];
+// In-memory storage for demo (replace with database in production)
+let customComponents: ComponentType[] = [];
 
-// GET /api/node-types - Get all custom node types
+// GET /api/node-types - Get all custom component types
 router.get('/', (req, res) => {
-  res.json(createSuccessResponse(customNodeTypes));
-});
-
-// GET /api/node-types/:type - Get node type by type
-router.get('/:type', (req, res) => {
-  const nodeType = customNodeTypes.find(nt => nt.type === req.params.type);
-  if (!nodeType) {
-    return res.status(404).json(createErrorResponse('Node type not found'));
+  try {
+    res.json({
+      success: true,
+      data: customComponents
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch node types'
+    });
   }
-  res.json(createSuccessResponse(nodeType));
 });
 
-// POST /api/node-types - Create new node type
+// GET /api/node-types/:type - Get component type by type
+router.get('/:type', (req, res) => {
+  try {
+    const component = customComponents.find(c => c.type === req.params.type);
+    
+    if (!component) {
+      return res.status(404).json({
+        success: false,
+        error: 'Component type not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: component
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch component type'
+    });
+  }
+});
+
+// POST /api/node-types - Create new component type
 router.post('/', (req, res) => {
   try {
-    const nodeType: NodeType = req.body;
+    const result = createComponentTypeSchema.safeParse(req.body);
     
-    // Validate required fields
-    if (!nodeType.type || !nodeType.label || !nodeType.category) {
-      return res.status(400).json(createErrorResponse('Missing required fields'));
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid component type data',
+        details: result.error.errors
+      });
     }
-    
+
     // Check if type already exists
-    if (customNodeTypes.some(nt => nt.type === nodeType.type)) {
-      return res.status(409).json(createErrorResponse('Node type already exists'));
+    const exists = customComponents.some(c => c.type === result.data.type);
+    if (exists) {
+      return res.status(409).json({
+        success: false,
+        error: 'Component type already exists'
+      });
     }
-    
+
     // Validate field names are unique
-    if (nodeType.fields && !validateFieldNames(nodeType.fields)) {
-      return res.status(400).json(createErrorResponse('Field names must be unique'));
+    if (result.data.fields && !validateUniqueFieldNames(result.data.fields)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Field names must be unique'
+      });
     }
-    
-    customNodeTypes.push(nodeType);
-    res.status(201).json(createSuccessResponse(nodeType));
+
+    const component: ComponentType = {
+      ...result.data,
+      icon: getComponentIcon(result.data.category)
+    };
+
+    customComponents.push(component);
+
+    res.status(201).json({
+      success: true,
+      data: component
+    });
   } catch (error) {
-    res.status(400).json(createErrorResponse('Invalid node type data'));
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create component type'
+    });
   }
 });
 
-// PUT /api/node-types/:type - Update node type
+// PUT /api/node-types/:type - Update component type
 router.put('/:type', (req, res) => {
-  const index = customNodeTypes.findIndex(nt => nt.type === req.params.type);
-  if (index === -1) {
-    return res.status(404).json(createErrorResponse('Node type not found'));
+  try {
+    const componentIndex = customComponents.findIndex(c => c.type === req.params.type);
+    
+    if (componentIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: 'Component type not found'
+      });
+    }
+
+    const result = updateComponentTypeSchema.safeParse(req.body);
+    
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid component type data',
+        details: result.error.errors
+      });
+    }
+
+    // Validate field names are unique if fields are being updated
+    if (result.data.fields && !validateUniqueFieldNames(result.data.fields)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Field names must be unique'
+      });
+    }
+
+    const updatedComponent: ComponentType = {
+      ...customComponents[componentIndex],
+      ...result.data
+    };
+
+    customComponents[componentIndex] = updatedComponent;
+
+    res.json({
+      success: true,
+      data: updatedComponent
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update component type'
+    });
   }
-  
-  const updatedNodeType = { ...customNodeTypes[index], ...req.body };
-  
-  // Validate field names are unique
-  if (updatedNodeType.fields && !validateFieldNames(updatedNodeType.fields)) {
-    return res.status(400).json(createErrorResponse('Field names must be unique'));
-  }
-  
-  customNodeTypes[index] = updatedNodeType;
-  res.json(createSuccessResponse(customNodeTypes[index]));
 });
 
-// DELETE /api/node-types/:type - Delete node type
+// DELETE /api/node-types/:type - Delete component type
 router.delete('/:type', (req, res) => {
-  const index = customNodeTypes.findIndex(nt => nt.type === req.params.type);
-  if (index === -1) {
-    return res.status(404).json(createErrorResponse('Node type not found'));
+  try {
+    const componentIndex = customComponents.findIndex(c => c.type === req.params.type);
+    
+    if (componentIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: 'Component type not found'
+      });
+    }
+
+    customComponents.splice(componentIndex, 1);
+
+    res.json({
+      success: true,
+      message: 'Component type deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete component type'
+    });
   }
-  
-  customNodeTypes.splice(index, 1);
-  res.json(createSuccessResponse({ message: 'Node type deleted successfully' }));
 });
 
-export { router as nodeTypeRoutes };
+export default router;
