@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Plus, Trash2, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
-import { cloudComponents } from "@/lib/cloudComponents";
+import { cloudComponents } from "@/utils/cloudComponents";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -64,10 +64,10 @@ export default function NodeTypes() {
   const [openFieldIds, setOpenFieldIds] = useState<string[]>([]);
 
   const toggleFieldConfig = (fieldId: string) => {
-    setOpenFieldIds(prev => 
-      prev.includes(fieldId) 
-        ? prev.filter(id => id !== fieldId)
-        : [...prev, fieldId]
+    setOpenFieldIds((prev) =>
+      prev.includes(fieldId)
+        ? prev.filter((id) => id !== fieldId)
+        : [...prev, fieldId],
     );
   };
 
@@ -80,7 +80,7 @@ export default function NodeTypes() {
   });
 
   const allComponents = [...cloudComponents, ...customComponents];
-  const selectedComponent = allComponents.find(c => c.type === selectedType);
+  const selectedComponent = allComponents.find((c) => c.type === selectedType);
 
   const addField = () => {
     const newField: CustomField = {
@@ -89,41 +89,45 @@ export default function NodeTypes() {
       type: "text",
       required: false,
     };
-    setNewComponent(prev => ({
+    setNewComponent((prev) => ({
       ...prev,
       fields: [...prev.fields, newField],
     }));
     // Automatically open the configuration for the new field
-    setOpenFieldIds(prev => [...prev, newField.id]);
+    setOpenFieldIds((prev) => [...prev, newField.id]);
   };
 
   const updateField = (id: string, updates: Partial<CustomField>) => {
-    setNewComponent(prev => ({
+    setNewComponent((prev) => ({
       ...prev,
-      fields: prev.fields.map(field =>
-        field.id === id ? { ...field, ...updates } : field
+      fields: prev.fields.map((field) =>
+        field.id === id ? { ...field, ...updates } : field,
       ),
     }));
   };
 
   const removeField = (id: string) => {
-    setNewComponent(prev => ({
+    setNewComponent((prev) => ({
       ...prev,
-      fields: prev.fields.filter(field => field.id !== id),
+      fields: prev.fields.filter((field) => field.id !== id),
     }));
-    setOpenFieldIds(prev => prev.filter(fieldId => fieldId !== id));
+    setOpenFieldIds((prev) => prev.filter((fieldId) => fieldId !== id));
   };
 
   const renderFieldPreview = (field: CustomField) => (
     <div className="space-y-2 p-4 bg-accent/10 rounded-lg">
       <div className="flex items-center justify-between">
         <span className="font-medium">{field.name || "Unnamed Field"}</span>
-        <Badge>{FIELD_TYPES.find(t => t.value === field.type)?.label || "Text"}</Badge>
+        <Badge>
+          {FIELD_TYPES.find((t) => t.value === field.type)?.label || "Text"}
+        </Badge>
       </div>
-      {field.type === 'select' && field.options && field.options.length > 0 && (
+      {field.type === "select" && field.options && field.options.length > 0 && (
         <div className="flex gap-2 flex-wrap">
           {field.options.map((option, i) => (
-            <Badge key={i} variant="outline">{option}</Badge>
+            <Badge key={i} variant="outline">
+              {option}
+            </Badge>
           ))}
         </div>
       )}
@@ -183,7 +187,9 @@ export default function NodeTypes() {
           <Label>Placeholder</Label>
           <Input
             value={field.placeholder || ""}
-            onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
+            onChange={(e) =>
+              updateField(field.id, { placeholder: e.target.value })
+            }
             placeholder="Enter placeholder text"
           />
         </div>
@@ -192,7 +198,9 @@ export default function NodeTypes() {
           <Label>Default Value</Label>
           <Input
             value={field.defaultValue || ""}
-            onChange={(e) => updateField(field.id, { defaultValue: e.target.value })}
+            onChange={(e) =>
+              updateField(field.id, { defaultValue: e.target.value })
+            }
             placeholder="Enter default value"
           />
         </div>
@@ -229,7 +237,7 @@ export default function NodeTypes() {
     }
 
     // Validate field names are unique
-    const fieldNames = newComponent.fields.map(f => f.name);
+    const fieldNames = newComponent.fields.map((f) => f.name);
     if (new Set(fieldNames).size !== fieldNames.length) {
       toast({
         title: "Validation Error",
@@ -239,7 +247,7 @@ export default function NodeTypes() {
       return;
     }
 
-    const exists = allComponents.some(c => c.type === newComponent.type);
+    const exists = allComponents.some((c) => c.type === newComponent.type);
     if (exists) {
       toast({
         title: "Type already exists",
@@ -267,14 +275,10 @@ export default function NodeTypes() {
   };
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="p-4 h-[calc(100vh-65px)] w-screen">
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setLocation("/")}
-          >
+          <Button variant="outline" size="sm" onClick={() => setLocation("/")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Editor
           </Button>
@@ -292,7 +296,8 @@ export default function NodeTypes() {
             <DialogHeader>
               <DialogTitle>Create New Component Type</DialogTitle>
               <DialogDescription>
-                Define a new custom component type with custom fields for your GCP diagrams.
+                Define a new custom component type with custom fields for your
+                GCP diagrams.
               </DialogDescription>
             </DialogHeader>
 
@@ -303,10 +308,12 @@ export default function NodeTypes() {
                   id="type"
                   placeholder="e.g., custom-service"
                   value={newComponent.type}
-                  onChange={(e) => setNewComponent(prev => ({
-                    ...prev,
-                    type: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setNewComponent((prev) => ({
+                      ...prev,
+                      type: e.target.value,
+                    }))
+                  }
                 />
                 <p className="text-sm text-muted-foreground">
                   A unique identifier for this component type
@@ -319,10 +326,12 @@ export default function NodeTypes() {
                   id="label"
                   placeholder="e.g., Custom Service"
                   value={newComponent.label}
-                  onChange={(e) => setNewComponent(prev => ({
-                    ...prev,
-                    label: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setNewComponent((prev) => ({
+                      ...prev,
+                      label: e.target.value,
+                    }))
+                  }
                 />
               </div>
 
@@ -330,10 +339,12 @@ export default function NodeTypes() {
                 <Label htmlFor="category">Category</Label>
                 <Select
                   value={newComponent.category}
-                  onValueChange={(value) => setNewComponent(prev => ({
-                    ...prev,
-                    category: value
-                  }))}
+                  onValueChange={(value) =>
+                    setNewComponent((prev) => ({
+                      ...prev,
+                      category: value,
+                    }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
@@ -379,13 +390,16 @@ export default function NodeTypes() {
                             Field Configuration
                             <ChevronRight
                               className={`h-4 w-4 transition-transform ${
-                                openFieldIds.includes(field.id) ? 'rotate-90' : ''
+                                openFieldIds.includes(field.id)
+                                  ? "rotate-90"
+                                  : ""
                               }`}
                             />
                           </Button>
 
                           {/* Field Configuration */}
-                          {openFieldIds.includes(field.id) && renderFieldConfiguration(field)}
+                          {openFieldIds.includes(field.id) &&
+                            renderFieldConfiguration(field)}
                         </div>
                       </CardContent>
                     </Card>
@@ -415,7 +429,9 @@ export default function NodeTypes() {
                     <div
                       key={component.type}
                       className={`flex items-center gap-3 p-3 rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground ${
-                        selectedType === component.type ? 'bg-accent text-accent-foreground' : ''
+                        selectedType === component.type
+                          ? "bg-accent text-accent-foreground"
+                          : ""
                       }`}
                       onClick={() => setSelectedType(component.type)}
                     >
@@ -426,9 +442,9 @@ export default function NodeTypes() {
                           {component.category}
                         </div>
                       </div>
-                      {customComponents.some(c => c.type === component.type) && (
-                        <Badge variant="secondary">Custom</Badge>
-                      )}
+                      {customComponents.some(
+                        (c) => c.type === component.type,
+                      ) && <Badge variant="secondary">Custom</Badge>}
                     </div>
                   );
                 })}
@@ -449,10 +465,16 @@ export default function NodeTypes() {
                     <selectedComponent.icon className="h-12 w-12" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold">{selectedComponent.label}</h2>
+                    <h2 className="text-2xl font-bold">
+                      {selectedComponent.label}
+                    </h2>
                     <Badge>{selectedComponent.category}</Badge>
-                    {customComponents.some(c => c.type === selectedComponent.type) && (
-                      <Badge variant="secondary" className="ml-2">Custom</Badge>
+                    {customComponents.some(
+                      (c) => c.type === selectedComponent.type,
+                    ) && (
+                      <Badge variant="secondary" className="ml-2">
+                        Custom
+                      </Badge>
                     )}
                   </div>
                 </div>
@@ -473,36 +495,52 @@ export default function NodeTypes() {
                     <Input value={selectedComponent.category} readOnly />
                   </div>
 
-                  {selectedComponent.fields && selectedComponent.fields.length > 0 && (
-                    <div className="space-y-4">
-                      <Label className="text-lg">Custom Fields</Label>
-                      <div className="grid gap-4">
-                        {selectedComponent.fields.map((field: CustomField) => (
-                          <Card key={field.id}>
-                            <CardContent className="pt-4">
-                              <div className="grid gap-2">
-                                <div className="flex items-center justify-between">
-                                  <span className="font-medium">{field.name}</span>
-                                  <Badge>{FIELD_TYPES.find(t => t.value === field.type)?.label}</Badge>
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                  {field.placeholder && `Placeholder: ${field.placeholder}`}
-                                  {field.defaultValue && ` • Default: ${field.defaultValue}`}
-                                </p>
-                                {field.type === 'select' && field.options && (
-                                  <div className="flex gap-2 flex-wrap">
-                                    {field.options.map((option, i) => (
-                                      <Badge key={i} variant="outline">{option}</Badge>
-                                    ))}
+                  {selectedComponent.fields &&
+                    selectedComponent.fields.length > 0 && (
+                      <div className="space-y-4">
+                        <Label className="text-lg">Custom Fields</Label>
+                        <div className="grid gap-4">
+                          {selectedComponent.fields.map(
+                            (field: CustomField) => (
+                              <Card key={field.id}>
+                                <CardContent className="pt-4">
+                                  <div className="grid gap-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-medium">
+                                        {field.name}
+                                      </span>
+                                      <Badge>
+                                        {
+                                          FIELD_TYPES.find(
+                                            (t) => t.value === field.type,
+                                          )?.label
+                                        }
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                      {field.placeholder &&
+                                        `Placeholder: ${field.placeholder}`}
+                                      {field.defaultValue &&
+                                        ` • Default: ${field.defaultValue}`}
+                                    </p>
+                                    {field.type === "select" &&
+                                      field.options && (
+                                        <div className="flex gap-2 flex-wrap">
+                                          {field.options.map((option, i) => (
+                                            <Badge key={i} variant="outline">
+                                              {option}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      )}
                                   </div>
-                                )}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                                </CardContent>
+                              </Card>
+                            ),
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -511,7 +549,9 @@ export default function NodeTypes() {
                     <CardContent className="p-6">
                       <div className="flex items-center gap-2 w-48">
                         <selectedComponent.icon className="h-5 w-5" />
-                        <span className="font-medium">{selectedComponent.label}</span>
+                        <span className="font-medium">
+                          {selectedComponent.label}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>

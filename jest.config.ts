@@ -17,9 +17,6 @@ const config: Config = {
       jsx: 'react-jsx'
     }]
   },
-  transformIgnorePatterns: [
-    '/node_modules/(?!(@chakra-ui|@emotion|framer-motion)/)',
-  ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
 };
 

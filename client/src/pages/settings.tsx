@@ -11,18 +11,14 @@ export default function Settings() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="mb-8 flex items-center gap-4">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => setLocation("/")}
-        >
+    <div className="p-4 h-[calc(100vh-65px)] w-screen">
+      {/* <div className="flex items-center gap-4">
+        <Button variant="outline" size="sm" onClick={() => setLocation("/")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Editor
         </Button>
         <h1 className="text-2xl font-bold">Settings</h1>
-      </div>
+      </div> */}
 
       <div className="grid gap-6">
         <Card>
@@ -35,7 +31,9 @@ export default function Settings() {
               <Switch
                 id="dark-mode"
                 checked={theme === "dark"}
-                onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                onCheckedChange={(checked) =>
+                  setTheme(checked ? "dark" : "light")
+                }
               />
             </div>
           </CardContent>
