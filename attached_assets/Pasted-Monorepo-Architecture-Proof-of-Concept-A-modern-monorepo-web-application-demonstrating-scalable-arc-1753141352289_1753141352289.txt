@@ -1,0 +1,223 @@
+Monorepo Architecture Proof of Concept
+A modern monorepo web application demonstrating scalable architecture patterns with independent packages, shared utilities, and comprehensive Docker orchestration.
+
+🏗️ Architecture Overview
+This project showcases a production-ready monorepo structure with three core packages:
+
+@poc/client - React frontend with Vite build system
+@poc/server - Express.js API backend with TypeScript
+@poc/core - Shared utilities, types, and common functionality
+📦 Package Structure
+monorepo-poc/
+├── packages/
+│   ├── client/          # React frontend application
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   ├── nginx.conf
+│   │   └── package.json
+│   ├── server/          # Express.js backend API
+│   │   ├── src/
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   └── core/            # Shared utilities library
+│       ├── src/
+│       ├── Dockerfile
+│       └── package.json
+├── nginx/               # Reverse proxy configuration
+├── docker-compose.yml   # Production orchestration
+├── docker-compose.dev.yml # Development orchestration
+└── package.json         # Workspace configuration
+🚀 Quick Start
+Prerequisites
+Node.js 20+
+Docker & Docker Compose
+npm 9+
+Development Setup
+Clone and install dependencies:
+
+git clone <repository-url>
+cd monorepo-poc
+npm install
+Start development servers:
+
+npm run dev
+Access the application:
+
+Frontend: http://localhost:3000
+Backend API: http://localhost:3001
+Docker Development
+Start all services in development mode:
+
+docker-compose -f docker-compose.dev.yml up
+Build and start production containers:
+
+docker-compose up --build
+Access via reverse proxy:
+
+Application: http://localhost
+API: http://localhost/api
+🐳 Docker Orchestration
+Service Architecture
+
+Container Services
+Service	Port	Purpose	Health Check
+nginx	80, 443	Reverse proxy & load balancer	/health
+client	3000 → 80	React frontend application	HTTP response
+server	3001	Express.js API backend	/api/health
+core	N/A	Shared utilities library	Build status
+Docker Commands
+# Development workflow
+docker-compose -f docker-compose.dev.yml up -d
+
+# Production deployment
+docker-compose up -d
+
+# Scale specific services
+docker-compose up --scale server=3
+
+# View logs
+docker-compose logs -f server
+
+# Rebuild and restart
+docker-compose up --build --force-recreate
+
+# Clean up
+docker-compose down -v --remove-orphans
+🛠️ Development Workflow
+NPM Workspace Commands
+# Install dependencies for all packages
+npm install
+
+# Run development servers for all packages
+npm run dev
+
+# Build all packages for production
+npm run build
+
+# Test all packages
+npm run test
+
+# Work with specific packages
+npm run dev --workspace=@poc/client
+npm run build --workspace=@poc/server
+npm run test --workspace=@poc/core
+Package-Specific Development
+# Client development
+cd packages/client
+npm run dev
+
+# Server development
+cd packages/server
+npm run dev
+
+# Core library development
+cd packages/core
+npm run dev
+📁 Package Details
+@poc/client
+Technologies: React 18, Vite, TypeScript, Tailwind CSS
+
+Features:
+
+Modern React hooks and components
+GitHub-inspired UI design
+Interactive monorepo visualization
+Hot module replacement in development
+Optimized production builds with Nginx
+Docker Features:
+
+Multi-stage build for optimized production image
+Nginx reverse proxy with compression
+Static asset caching and security headers
+@poc/server
+Technologies: Express.js, TypeScript, CORS
+
+Features:
+
+RESTful API endpoints
+Shared utility integration
+Environment-based configuration
+Health check endpoints
+Production-ready error handling
+Docker Features:
+
+Non-root user security
+Health checks for container orchestration
+Environment variable configuration
+Optimized for horizontal scaling
+@poc/core
+Technologies: TypeScript, ES6 Modules
+
+Features:
+
+Shared type definitions
+Common utility functions
+API response formatting
+Request validation helpers
+Cross-package compatibility
+Docker Features:
+
+Lightweight build container
+Shared volume for package distribution
+Build artifact optimization
+🔧 Configuration
+Environment Variables
+Copy .env.example to .env and configure:
+
+# Server Configuration
+NODE_ENV=development
+PORT=3001
+
+# Client Configuration
+VITE_API_URL=http://localhost:3001
+
+# Docker Configuration
+COMPOSE_PROJECT_NAME=monorepo-poc
+Nginx Configuration
+The reverse proxy provides:
+
+Rate limiting (10 req/s for API, 50 req/s for static)
+Security headers (XSS protection, content type validation)
+GZIP compression
+Static asset caching
+Health check endpoints
+🚢 Deployment
+Production Deployment
+# Build and start all services
+docker-compose up -d
+
+# Check service health
+docker-compose ps
+docker-compose logs
+
+# Scale backend services
+docker-compose up --scale server=3 -d
+CI/CD Integration
+# Example GitHub Actions workflow
+name: Build and Deploy
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build images
+        run: docker-compose build
+      - name: Run tests
+        run: docker-compose run --rm server npm test
+      - name: Deploy
+        run: docker-compose up -d
+🔍 Monitoring & Health Checks
+Health Endpoints
+Application Health: GET /health
+API Health: GET /api/health
+Service Status: GET /api/packages
+Container Health Checks
+# Check container health
+docker-compose ps
+
+# View health check logs
+docker inspect poc-server | grep -A 10 "Health"
+
+# Manual health check
+curl http://localhost/api/health
