@@ -24,6 +24,11 @@ app.get('/api/health', (req, res) => {
 app.use('/api/diagrams', diagramRoutes);
 app.use('/api/node-types', nodeTypeRoutes);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);

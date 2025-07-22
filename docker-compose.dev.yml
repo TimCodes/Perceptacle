@@ -1,0 +1,48 @@
+
+version: '3.8'
+
+services:
+  # Client service (development)
+  client:
+    build:
+      context: .
+      dockerfile: packages/client/Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./packages/client/src:/app/packages/client/src
+      - ./packages/core/src:/app/packages/core/src
+      - node_modules_client:/app/packages/client/node_modules
+      - node_modules_core:/app/packages/core/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3001
+    networks:
+      - dev-network
+
+  # Server service (development)
+  server:
+    build:
+      context: .
+      dockerfile: packages/server/Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./packages/server/src:/app/packages/server/src
+      - ./packages/core/src:/app/packages/core/src
+      - node_modules_server:/app/packages/server/node_modules
+      - node_modules_core:/app/packages/core/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge
+
+volumes:
+  node_modules_client:
+  node_modules_server:
+  node_modules_core:
