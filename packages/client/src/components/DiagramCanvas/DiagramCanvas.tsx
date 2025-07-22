@@ -247,8 +247,9 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
   );
 
   return (
-    <div className="h-full w-full bg-background">
+    <div className="diagram-canvas w-full h-full">
       <ReactFlow
+        style={{ width: '100%', height: '100%' }}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
