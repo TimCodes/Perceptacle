@@ -1,0 +1,65 @@
+
+> github-manager-monorepo@1.0.0 build:core
+> npm run build --workspace=@github-manager/core
+
+
+> @github-manager/core@1.0.0 build
+> tsc
+
+src/index.ts:6:1 - error TS2308: Module './types/index.js' has already exported a member named 'ComponentType'. Consider explicitly re-exporting to resolve the ambiguity.
+
+6 export * from './schemas/index.js';
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/index.ts:6:1 - error TS2308: Module './types/index.js' has already exported a member named 'CustomField'. Consider explicitly re-exporting to resolve the ambiguity.
+
+6 export * from './schemas/index.js';
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/index.ts:6:1 - error TS2308: Module './types/index.js' has already exported a member named 'Diagram'. Consider explicitly re-exporting to resolve the ambiguity.
+
+6 export * from './schemas/index.js';
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/index.ts:6:1 - error TS2308: Module './types/index.js' has already exported a member named 'DiagramEdge'. Consider explicitly re-exporting to resolve the ambiguity.
+
+6 export * from './schemas/index.js';
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/index.ts:6:1 - error TS2308: Module './types/index.js' has already exported a member named 'DiagramNode'. Consider explicitly re-exporting to resolve the ambiguity.
+
+6 export * from './schemas/index.js';
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/utils/index.ts:68:20 - error TS2304: Cannot find name 'localStorage'.
+
+68       const item = localStorage.getItem(key);
+                      ~~~~~~~~~~~~
+
+src/utils/index.ts:77:7 - error TS2304: Cannot find name 'localStorage'.
+
+77       localStorage.setItem(key, JSON.stringify(value));
+         ~~~~~~~~~~~~
+
+src/utils/index.ts:85:7 - error TS2304: Cannot find name 'localStorage'.
+
+85       localStorage.removeItem(key);
+         ~~~~~~~~~~~~
+
+src/utils/index.ts:102:3 - error TS2322: Type 'unknown' is not assignable to type 'T'.
+  'T' could be instantiated with an arbitrary type which could be unrelated to 'unknown'.
+
+102   return response.json();
+      ~~~~~~
+
+
+Found 9 errors in 2 files.
+
+Errors  Files
+     5  src/index.ts:6
+     4  src/utils/index.ts:68
+npm error Lifecycle script `build` failed with error:
+npm error code 2
+npm error path /home/runner/workspace/packages/core
+npm error workspace @github-manager/core@1.0.0
+npm error location /home/runner/workspace/packages/core

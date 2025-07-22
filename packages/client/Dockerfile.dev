@@ -1,0 +1,25 @@
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY packages/core/package.json ./packages/core/
+COPY packages/client/package.json ./packages/client/
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY packages/core ./packages/core
+COPY packages/client ./packages/client
+
+# Build core package
+RUN npm run build --workspace=@github-manager/core
+
+WORKDIR /app/packages/client
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
