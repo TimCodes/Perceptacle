@@ -1,7 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import DiagramCanvas from "@/components//DiagramCanvas/DiagramCanvas";
 import DropDown from "@/components/NodeTypeDropdown/DropDown";
-import { ReactFlowProvider } from "reactflow";
+import { ReactFlowProvider } from "@xyflow/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";

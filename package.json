@@ -23,5 +23,10 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
+    "@replit/vite-plugin-shadcn-theme-json": "^0.0.4",
+    "framer-motion": "^12.23.6"
   }
 }

@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
-import ReactFlow, {
+import React, { useCallback, useState } from "react";
+import {
+  ReactFlow,
   Controls,
   Background,
   useNodesState,
@@ -13,8 +14,8 @@ import ReactFlow, {
   Position,
   ConnectionLineType,
   MarkerType,
-} from "reactflow";
-import "reactflow/dist/style.css";
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import { useDiagramStore } from "@/utils/diagram-store";
 import { getCloudComponents } from "@/utils/cloudComponents";
 
@@ -185,7 +186,7 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
       );
 
       const customFields =
-        componentDefinition?.fields?.map((field) => ({
+        componentDefinition?.fields?.map((field: any) => ({
           ...field,
           value: field.defaultValue || "",
         })) || [];

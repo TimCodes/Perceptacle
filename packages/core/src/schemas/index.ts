@@ -67,12 +67,7 @@ export const createDiagramSchema = z.object({
 
 export const updateDiagramSchema = createDiagramSchema.partial();
 
-// Type exports
-export type CustomField = z.infer<typeof customFieldSchema>;
-export type ComponentType = z.infer<typeof componentTypeSchema>;
-export type DiagramNode = z.infer<typeof diagramNodeSchema>;
-export type DiagramEdge = z.infer<typeof diagramEdgeSchema>;
-export type Diagram = z.infer<typeof diagramSchema>;
+// Schema-specific type exports (avoiding conflicts with types/index.ts)
 export type CreateComponentType = z.infer<typeof createComponentTypeSchema>;
 export type UpdateComponentType = z.infer<typeof updateComponentTypeSchema>;
 export type CreateDiagram = z.infer<typeof createDiagramSchema>;

@@ -64,6 +64,9 @@ export function throttle<T extends (...args: any[]) => any>(
 // Local storage helpers
 export const storage = {
   get: <T>(key: string, defaultValue?: T): T | null => {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return defaultValue ?? null;
+    }
     try {
       const item = localStorage.getItem(key);
       return item ? JSON.parse(item) : defaultValue ?? null;
@@ -73,6 +76,9 @@ export const storage = {
   },
   
   set: <T>(key: string, value: T): void => {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return;
+    }
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
@@ -81,6 +87,9 @@ export const storage = {
   },
   
   remove: (key: string): void => {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return;
+    }
     try {
       localStorage.removeItem(key);
     } catch (error) {
@@ -99,7 +108,7 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
     const error = await response.text();
     throw new Error(`${response.status}: ${error}`);
   }
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 // Component helpers

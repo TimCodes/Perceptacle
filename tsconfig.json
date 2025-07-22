@@ -1,5 +1,5 @@
 {
-  "include": ["client/src/**/*", "db/**/*", "server/**/*"],
+  "include": ["packages/client/src/**/*", "packages/server/src/**/*", "packages/core/src/**/*", "db/**/*"],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
     "incremental": true,
@@ -18,7 +18,9 @@
     "paths": {
       "@db": ["./db/index.ts"],
       "@db/*": ["./db/*"],
-      "@/*": ["./client/src/*"]
+      "@/*": ["./packages/client/src/*"],
+      "@github-manager/core": ["./packages/core/src/index.ts"],
+      "@github-manager/core/*": ["./packages/core/src/*"]
     }
   }
 }

@@ -1,3 +1,4 @@
+import React from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "@/utils/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
