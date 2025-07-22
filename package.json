@@ -27,6 +27,7 @@
   "dependencies": {
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@replit/vite-plugin-shadcn-theme-json": "^0.0.4",
+    "cmdk": "^1.1.1",
     "framer-motion": "^12.23.6"
   }
 }

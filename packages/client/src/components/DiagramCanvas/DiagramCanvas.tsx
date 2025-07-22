@@ -14,6 +14,8 @@ import {
   Position,
   ConnectionLineType,
   MarkerType,
+  OnNodesChange,
+  OnEdgesChange,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useDiagramStore } from "@/utils/diagram-store";
@@ -130,8 +132,8 @@ const defaultEdgeOptions = {
 };
 
 export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
   const { setSelectedNode } = useDiagramStore();
 
@@ -142,21 +144,19 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
         return;
       }
 
-      setEdges((eds) =>
-        addEdge(
-          {
-            ...params,
-            type: "smoothstep",
-            animated: true,
-            style: { stroke: "hsl(var(--primary))" },
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color: "hsl(var(--primary))",
-            },
-          },
-          eds,
-        ),
-      );
+      const newEdge: Edge = {
+        ...params,
+        id: `e${params.source}-${params.target}`,
+        type: "smoothstep",
+        animated: true,
+        style: { stroke: "hsl(var(--primary))" },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: "hsl(var(--primary))",
+        },
+      };
+
+      setEdges((eds) => addEdge(newEdge, eds));
     },
     [setEdges],
   );
