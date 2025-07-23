@@ -1,19 +1,31 @@
 
 {
   "compilerOptions": {
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "strict": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "types": ["node"]
+    "paths": {
+      "@/*": ["./client/src/*"],
+      "@/components/*": ["./client/src/components/*"],
+      "@/utils/*": ["./client/src/utils/*"],
+      "@/hooks/*": ["./client/src/hooks/*"],
+      "@/services/*": ["./client/src/services/*"],
+      "@/pages/*": ["./client/src/pages/*"]
+    }
   },
-  "references": [
-    { "path": "./packages/client" },
-    { "path": "./packages/server" }
-  ],
-  "files": []
+  "include": ["client/src", "server"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
