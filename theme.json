@@ -49,20 +49,3 @@
     }
   }
 }
-{
-  "style": "default",
-  "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "client/src/index.css",
-    "baseColor": "slate",
-    "cssVariables": true
-  },
-  "rsc": false,
-  "tsx": true,
-  "aliases": {
-    "utils": "client/src/utils",
-    "components": "client/src/components",
-    "hooks": "client/src/hooks",
-    "ui": "client/src/components/ui"
-  }
-}
