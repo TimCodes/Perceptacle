@@ -1,4 +1,3 @@
-run
 {
   "name": "gcp-diagram-builder",
   "private": true,
