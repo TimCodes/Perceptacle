@@ -1,42 +1,14 @@
+
 {
-  "name": "gcp-diagram-builder-monorepo",
-  "version": "1.0.0",
+  "name": "@repo/client",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
-  "license": "MIT",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
-    "dev:client": "npm run dev --workspace=@repo/client",
-    "dev:server": "npm run dev --workspace=@repo/server",
-    "build": "npm run build --workspaces --if-present",
-    "build:client": "npm run build --workspace=@repo/client",
-    "build:server": "npm run build --workspace=@repo/server",
-    "start": "npm run start --workspace=@repo/server",
-    "check": "tsc --noEmit --workspace=@repo/client && tsc --noEmit --workspace=@repo/server",
-    "clean": "rm -rf packages/*/dist packages/*/node_modules/.cache",
-    "install:all": "npm install"
-  },
-  "devDependencies": {
-    "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/express": "4.17.21",
-    "@types/express-session": "^1.18.0",
-    "@types/node": "20.16.11",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.1",
-    "@types/ws": "^8.5.13",
-    "@vitejs/plugin-react": "^4.3.2",
-    "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.27.1",
-    "esbuild": "^0.24.0",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.14",
-    "tsx": "^4.19.1",
-    "typescript": "5.6.3",
-    "vite": "^5.4.9"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -77,20 +49,14 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
-    "drizzle-orm": "^0.38.2",
-    "drizzle-zod": "^0.6.0",
     "embla-carousel-react": "^8.5.2",
-    "express": "^4.21.2",
-    "express-session": "^1.18.1",
     "framer-motion": "^6.5.1",
     "fuse.js": "^7.1.0",
     "input-otp": "^1.2.4",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lucide-react": "^0.453.0",
-    "memorystore": "^1.6.7",
     "next-themes": "^0.4.4",
-    "openai": "^4.83.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -105,11 +71,20 @@
     "ts-node": "^10.9.2",
     "vaul": "^1.1.0",
     "wouter": "^3.3.5",
-    "ws": "^8.18.0",
     "zod": "^3.23.8",
     "zustand": "^5.0.3"
   },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.8"
+  "devDependencies": {
+    "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.19.1",
+    "typescript": "5.6.3",
+    "vite": "^5.4.9"
   }
 }
