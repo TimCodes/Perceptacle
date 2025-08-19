@@ -16,7 +16,16 @@
     "test:server": "cd server && npm run test",
     "test:client": "cd client && npm run test",
     "db:push": "cd server && npm run db:push",
-    "db:studio": "cd server && npm run db:studio"
+    "db:studio": "cd server && npm run db:studio",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml --env-file .env.development up --build",
+    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:prod": "docker-compose --env-file .env.production up --build -d",
+    "docker:prod:down": "docker-compose down",
+    "docker:clean": "docker-compose down -v --rmi all",
+    "docker:logs": "docker-compose logs -f",
+    "docker:logs:server": "docker-compose logs -f server",
+    "docker:logs:client": "docker-compose logs -f client",
+    "docker:logs:db": "docker-compose logs -f postgres"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

@@ -57,6 +57,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check endpoint
+app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    service: 'perceptacle-server' 
+  });
+});
+
 (async () => {
   const server = registerRoutes(app);
 
@@ -68,8 +77,8 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // ALWAYS serve the API on port 5000
-  const PORT = Number(process.env.PORT) || 5000;
+  // Use PORT from environment or default to 3000 for Docker compatibility
+  const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, "0.0.0.0", () => {
     log(`API server running on port ${PORT}`);
   });

@@ -14,18 +14,48 @@ This project has been restructured as a monorepo with separated client and serve
 │   ├── routes.ts         # API routes
 │   ├── package.json      # Server dependencies
 │   └── ...
+├── db/                    # Database schema and migrations
+├── scripts/               # Helper scripts for development
+├── docker-compose.yml     # Production Docker setup
+├── docker-compose.dev.yml # Development Docker setup
 └── package.json          # Root monorepo scripts
 ```
 
 ## Development Setup
 
-### Prerequisites
-- Node.js 18+ 
-- npm
+Choose one of the following development approaches:
 
-### Getting Started
+### Option 1: Docker Development (Recommended)
 
-1. **Install dependencies** for both client and server:
+Docker provides a consistent development environment and is the easiest way to get started.
+
+1. **Prerequisites**:
+   - Docker Desktop
+   - Git
+
+2. **Quick start**:
+   ```bash
+   git clone <repository-url>
+   cd Perceptacle
+   cp .env.example .env
+   npm run docker:dev
+   ```
+
+3. **Access the application**:
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:3000
+   - Database: localhost:5432
+
+For detailed Docker instructions, see [DOCKER.md](./DOCKER.md).
+
+### Option 2: Traditional Development
+
+If you prefer to run services locally without Docker:
+
+1. **Prerequisites**:
+   - Node.js 18+
+   - PostgreSQL
+   - npm
    ```bash
    # Install root dependencies
    npm install
