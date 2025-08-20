@@ -26,7 +26,7 @@ services:
   # Backend Server
   server:
     build:
-      context: ./server
+      context: ./packages/server
       target: production
     container_name: perceptacle-server
     restart: unless-stopped
@@ -51,7 +51,7 @@ services:
   # Frontend Client
   client:
     build:
-      context: ./client
+      context: ./packages/client
       target: production
     container_name: perceptacle-client
     restart: unless-stopped

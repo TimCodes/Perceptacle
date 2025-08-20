@@ -5,20 +5,21 @@ This project has been restructured as a monorepo with separated client and serve
 ## Project Structure
 
 ```
-├── client/                 # React frontend application
-│   ├── src/               # Client source code
-│   ├── package.json       # Client dependencies
-│   └── ...
-├── server/                # Express backend API
-│   ├── index.ts          # Server entry point
-│   ├── routes.ts         # API routes
-│   ├── package.json      # Server dependencies
-│   └── ...
-├── db/                    # Database schema and migrations
-├── scripts/               # Helper scripts for development
-├── docker-compose.yml     # Production Docker setup
+├── packages/              # Monorepo packages
+│   ├── client/            # React frontend application
+│   │   ├── src/          # Client source code
+│   │   ├── package.json  # Client dependencies
+│   │   └── ...
+│   └── server/           # Express backend API
+│       ├── index.ts      # Server entry point
+│       ├── routes.ts     # API routes
+│       ├── package.json  # Server dependencies
+│       └── ...
+├── db/                   # Database schema and migrations
+├── scripts/              # Helper scripts for development
+├── docker-compose.yml    # Production Docker setup
 ├── docker-compose.dev.yml # Development Docker setup
-└── package.json          # Root monorepo scripts
+└── package.json         # Root monorepo scripts
 ```
 
 ## Development Setup

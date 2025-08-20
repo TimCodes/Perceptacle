@@ -26,7 +26,7 @@ services:
   # Backend Server (Development)
   server:
     build:
-      context: ./server
+      context: ./packages/server
       target: development
     container_name: perceptacle-server-dev
     restart: unless-stopped
@@ -39,7 +39,7 @@ services:
       - "${SERVER_PORT:-3000}:3000"
     volumes:
       # Mount source code for hot reload
-      - ./server:/app
+      - ./packages/server:/app
       - /app/node_modules
     depends_on:
       postgres:
@@ -50,7 +50,7 @@ services:
   # Frontend Client (Development)
   client:
     build:
-      context: ./client
+      context: ./packages/client
       target: development
     container_name: perceptacle-client-dev
     restart: unless-stopped
@@ -61,7 +61,7 @@ services:
       - "${CLIENT_PORT:-5173}:5173"
     volumes:
       # Mount source code for hot reload
-      - ./client:/app
+      - ./packages/client:/app
       - /app/node_modules
     depends_on:
       - server
