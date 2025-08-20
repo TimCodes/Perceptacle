@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (same as production)
+  postgres:
+    image: postgres:15-alpine
+    container_name: perceptacle-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-perceptacle_dev}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-perceptacle_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - perceptacle-dev-network
+
+  # Backend Server (Development)
+  server:
+    build:
+      context: ./packages/server
+      target: development
+    container_name: perceptacle-server-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-perceptacle_dev}
+      CLIENT_URL: http://localhost:${CLIENT_PORT:-5173}
+      PORT: 3000
+    ports:
+      - "${SERVER_PORT:-3000}:3000"
+    volumes:
+      # Mount source code for hot reload
+      - ./packages/server:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - perceptacle-dev-network
+
+  # Frontend Client (Development)
+  client:
+    build:
+      context: ./packages/client
+      target: development
+    container_name: perceptacle-client-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      VITE_API_URL: http://localhost:${SERVER_PORT:-3000}
+    ports:
+      - "${CLIENT_PORT:-5173}:5173"
+    volumes:
+      # Mount source code for hot reload
+      - ./packages/client:/app
+      - /app/node_modules
+    depends_on:
+      - server
+    networks:
+      - perceptacle-dev-network
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  perceptacle-dev-network:
+    driver: bridge
