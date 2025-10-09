@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { cloudComponents } from "@/utils/cloudComponents";
+import { getCloudComponents } from "@/utils/cloudComponents";
 
 interface CloudComponent {
   type: string;
@@ -31,6 +31,8 @@ function DropDown({ onComponentSelect }: DropDownProps) {
   const [open, setOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] =
     useState<CloudComponent | null>(null);
+
+  const cloudComponents = getCloudComponents();
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData("application/reactflow", nodeType);

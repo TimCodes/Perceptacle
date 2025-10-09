@@ -10,6 +10,8 @@ import {
   Shield,
   LayoutGrid
 } from 'lucide-react';
+import { AzureComponents, azureIconMap } from './azure-components';
+import { KubernetesComponents, kubernetesIconMap } from './kubernetes-components';
 
 export const iconMap = {
   Server,
@@ -21,10 +23,13 @@ export const iconMap = {
   Cpu,
   Globe,
   Shield,
-  LayoutGrid
+  LayoutGrid,
+  ...azureIconMap,
+  ...kubernetesIconMap
 };
 
 const predefinedComponents = [
+  // GCP Components
   {
     type: 'compute-engine',
     label: 'Compute Engine',
@@ -78,7 +83,17 @@ const predefinedComponents = [
     label: 'App Engine',
     icon: LayoutGrid,
     category: 'Compute',
-  }
+  },
+  // Azure Components
+  ...AzureComponents.map(comp => ({
+    ...comp,
+    label: comp.name
+  })),
+  // Kubernetes Components
+  ...KubernetesComponents.map(comp => ({
+    ...comp,
+    label: comp.name
+  }))
 ];
 
 // Function to get all components including custom ones
@@ -87,9 +102,9 @@ export const getCloudComponents = () => {
   const customComponents = saved ? JSON.parse(saved) : [];
 
   // Map custom components to include Box as default icon if not specified
-  const mappedCustomComponents = customComponents.map(comp => ({
+  const mappedCustomComponents = customComponents.map((comp: any) => ({
     ...comp,
-    icon: iconMap[comp.icon] || Box
+    icon: iconMap[comp.icon as keyof typeof iconMap] || Box
   }));
 
   return [...predefinedComponents, ...mappedCustomComponents];
