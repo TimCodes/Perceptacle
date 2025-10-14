@@ -5,18 +5,6 @@ describe('KubernetesService', () => {
 
   describe('Class Structure', () => {
     beforeEach(() => {
-      // Mock the kubeconfig loading to avoid requiring actual cluster access
-      jest.mock('@kubernetes/client-node', () => ({
-        KubeConfig: jest.fn().mockImplementation(() => ({
-          loadFromDefault: jest.fn(),
-          makeApiClient: jest.fn().mockReturnValue({}),
-          setCurrentContext: jest.fn()
-        })),
-        CoreV1Api: jest.fn(),
-        AppsV1Api: jest.fn(),
-        Metrics: jest.fn().mockImplementation(() => ({}))
-      }));
-
       try {
         kubernetesService = new KubernetesService();
       } catch (error) {

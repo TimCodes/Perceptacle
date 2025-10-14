@@ -137,3 +137,14 @@ jest.mock('@azure/arm-servicebus', () => ({
     }
   }))
 }));
+
+jest.mock('@kubernetes/client-node', () => ({
+  KubeConfig: jest.fn().mockImplementation(() => ({
+    loadFromDefault: jest.fn(),
+    makeApiClient: jest.fn().mockReturnValue({}),
+    setCurrentContext: jest.fn()
+  })),
+  CoreV1Api: jest.fn(),
+  AppsV1Api: jest.fn(),
+  Metrics: jest.fn().mockImplementation(() => ({}))
+}));
