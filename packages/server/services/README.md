@@ -1,14 +1,60 @@
-# Azure Proxy Service
+# Perceptacle Services
+
+This directory contains services for interacting with cloud infrastructure and orchestration platforms.
+
+## Available Services
+
+### Azure Proxy Service
 
 This service provides an API to interact with Azure resources, allowing you to retrieve metrics and logs from Azure Monitor and Log Analytics.
 
-## Features
+#### Features
 
 - **Resource Management**: List and retrieve Azure resources
-- **Metrics Collection**: Fetch metrics for Azure resources
+- **Metrics Collection**: Fetch metrics for Azure resources  
 - **Log Querying**: Query logs using KQL (Kusto Query Language)
 - **Metric Definitions**: Get available metrics for resources
 - **Diagnostic Settings**: Retrieve diagnostic configuration
+
+### Kubernetes Service
+
+This service provides a comprehensive API to interact with Kubernetes clusters, allowing you to retrieve logs, metrics, and cluster information.
+
+#### Features
+
+- **Cluster Management**: Get cluster info, nodes, and namespaces
+- **Pod Operations**: List pods, get details, and retrieve logs
+- **Service Discovery**: List services with endpoint information
+- **Metrics Collection**: Real-time CPU and memory usage for pods
+- **Deployment Monitoring**: Track deployment status and replica health
+- **Resource Analytics**: Namespace-level resource usage summaries
+- **Log Streaming**: Real-time log streaming using Server-Sent Events
+
+## Quick Start
+
+### Azure Service
+```bash
+curl "http://localhost:3000/api/azure/health"
+curl "http://localhost:3000/api/azure/resources"
+```
+
+### Kubernetes Service  
+```bash
+curl "http://localhost:3000/api/kubernetes/health"
+curl "http://localhost:3000/api/kubernetes/cluster"
+curl "http://localhost:3000/api/kubernetes/pods"
+```
+
+## Documentation
+
+- **Azure Service**: See [AZURE_SERVICE.md](../AZURE_SERVICE.md) for detailed Azure service documentation
+- **Kubernetes Service**: See [KUBERNETES_SERVICE.md](../KUBERNETES_SERVICE.md) for detailed Kubernetes service documentation
+
+---
+
+# Azure Proxy Service (Legacy Documentation)
+
+This section contains the original Azure service documentation.
 
 ## Setup
 
