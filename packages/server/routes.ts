@@ -1,9 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import azureRoutes from "./routes/azure";
 
 export function registerRoutes(app: Express): Server {
-  // put application routes here
-  // prefix all routes with /api
+  // Register Azure routes
+  app.use("/api/azure", azureRoutes);
 
   const httpServer = createServer(app);
 
