@@ -4,7 +4,7 @@ This directory contains services for interacting with cloud infrastructure and o
 
 ## Available Services
 
-### Azure Proxy Service
+### Azure Service & Mock Azure Service
 
 This service provides an API to interact with Azure resources, allowing you to retrieve metrics and logs from Azure Monitor and Log Analytics.
 
@@ -15,8 +15,10 @@ This service provides an API to interact with Azure resources, allowing you to r
 - **Log Querying**: Query logs using KQL (Kusto Query Language)
 - **Metric Definitions**: Get available metrics for resources
 - **Diagnostic Settings**: Retrieve diagnostic configuration
+- **Service Bus Integration**: Monitor queues, topics, and subscriptions
+- **Mock Implementation**: Full mock service for development and testing
 
-### Kubernetes Service
+### Kubernetes Service & Mock Kubernetes Service
 
 This service provides a comprehensive API to interact with Kubernetes clusters, allowing you to retrieve logs, metrics, and cluster information.
 
@@ -28,6 +30,60 @@ This service provides a comprehensive API to interact with Kubernetes clusters, 
 - **Metrics Collection**: Real-time CPU and memory usage for pods
 - **Deployment Monitoring**: Track deployment status and replica health
 - **Resource Analytics**: Namespace-level resource usage summaries
+- **Mock Implementation**: Full mock service for development and testing
+
+### Service Factory
+
+The service factory provides a unified way to create and manage service instances, allowing easy switching between real and mock implementations.
+
+#### Usage
+
+```typescript
+import { serviceFactory, createServiceFactoryFromEnv } from './service-factory';
+
+// Use the default factory (configured from environment variables)
+const kubernetesService = serviceFactory.createKubernetesService();
+const azureService = serviceFactory.createAzureService();
+
+// Create a custom factory
+const customFactory = new ServiceFactory({
+  useMocks: true,
+  azure: {
+    subscriptionId: 'your-subscription-id'
+  }
+});
+
+const mockAzureService = customFactory.createAzureService();
+```
+
+#### Environment Variables
+
+- `USE_MOCK_SERVICES`: Set to 'true' to use mock services
+- `NODE_ENV`: When set to 'development', mock services are used by default
+- `AZURE_SUBSCRIPTION_ID`: Azure subscription ID
+- `AZURE_CLIENT_ID`: Azure service principal client ID
+- `AZURE_CLIENT_SECRET`: Azure service principal secret
+- `AZURE_TENANT_ID`: Azure tenant ID
+- `KUBECONFIG`: Path to Kubernetes configuration file
+- `KUBE_CONTEXT`: Kubernetes context to use
+
+## Mock Services
+
+Both Azure and Kubernetes services have comprehensive mock implementations that:
+
+- Return realistic sample data
+- Simulate API response delays
+- Support all the same methods as the real services
+- Generate random but consistent metrics and logs
+- Provide comprehensive test data for UI development
+
+### Benefits of Mock Services
+
+1. **Development**: No need for real cloud resources during development
+2. **Testing**: Consistent, predictable data for testing
+3. **Demos**: Rich sample data for demonstrations
+4. **Offline Work**: Work without internet connectivity
+5. **Cost Savings**: No cloud resource costs during development
 - **Log Streaming**: Real-time log streaming using Server-Sent Events
 
 ## Quick Start

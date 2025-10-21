@@ -1,22 +1,25 @@
 import { Router, Request, Response } from 'express';
-import { KubernetesService } from '../services/kubernetes';
+import { serviceFactory } from '../services/service-factory';
+import { KubernetesService, MockKubernetesService } from '../services';
 
 const router = Router();
 
 // Global variable to store the Kubernetes service instance
-let k8sService: KubernetesService | null = null;
+let k8sService: KubernetesService | MockKubernetesService | null = null;
 
 // Middleware to ensure Kubernetes service is initialized
 const ensureKubernetesService = (req: Request, res: Response, next: any) => {
   if (!k8sService) {
     try {
-      k8sService = KubernetesService.fromDefaultConfig();
-      console.log('Kubernetes service initialized successfully');
+      k8sService = serviceFactory.createKubernetesService();
+      console.log(`Kubernetes service initialized (using ${serviceFactory.isUsingMocks() ? 'mock' : 'real'} implementation)`);
     } catch (error: any) {
       console.error('Failed to initialize Kubernetes service:', error.message);
       return res.status(500).json({ 
         error: 'Kubernetes service not available',
-        details: 'Could not connect to Kubernetes cluster. Ensure kubectl is configured properly.',
+        details: serviceFactory.isUsingMocks() 
+          ? 'Failed to initialize mock Kubernetes service'
+          : 'Could not connect to Kubernetes cluster. Ensure kubectl is configured properly.',
         message: error.message
       });
     }

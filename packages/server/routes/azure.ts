@@ -1,41 +1,24 @@
 import { Router, type Request, Response } from "express";
-import { AzureService } from "../services/azure";
+import { serviceFactory } from "../services/service-factory";
+import { AzureService, MockAzureService } from "../services";
 
 const router = Router();
 
-// Initialize Azure service - this would typically come from environment variables
-let azureService: AzureService | null = null;
+// Get Azure service instance (real or mock based on configuration)
+let azureService: AzureService | MockAzureService | null = null;
 
 // Middleware to ensure Azure service is initialized
 const ensureAzureService = (req: Request, res: Response, next: any) => {
   if (!azureService) {
-    const subscriptionId = process.env.AZURE_SUBSCRIPTION_ID;
-    
-    if (!subscriptionId) {
-      return res.status(500).json({ 
-        error: 'Azure subscription ID not configured' 
-      });
-    }
-
     try {
-      // Try to use default credentials first (managed identity, Azure CLI, etc.)
-      azureService = AzureService.fromDefaultCredentials(subscriptionId);
+      azureService = serviceFactory.createAzureService();
+      console.log(`Azure service initialized (using ${serviceFactory.isUsingMocks() ? 'mock' : 'real'} implementation)`);
     } catch (error) {
-      // Fallback to service principal credentials
-      const clientId = process.env.AZURE_CLIENT_ID;
-      const clientSecret = process.env.AZURE_CLIENT_SECRET;
-      const tenantId = process.env.AZURE_TENANT_ID;
-
-      if (!clientId || !clientSecret || !tenantId) {
-        return res.status(500).json({ 
-          error: 'Azure credentials not configured. Set AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, and AZURE_TENANT_ID environment variables.' 
-        });
-      }
-
-      azureService = AzureService.fromCredentials(
-        { clientId, clientSecret, tenantId },
-        subscriptionId
-      );
+      console.error('Failed to initialize Azure service:', error);
+      return res.status(500).json({ 
+        error: 'Failed to initialize Azure service. Check your configuration.',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   }
   
