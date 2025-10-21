@@ -190,6 +190,54 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
           value: field.defaultValue || "",
         })) || [];
 
+      // Initialize Azure-specific fields for Azure nodes
+      const isAzureNode = type.startsWith('azure-');
+      const azureFields = isAzureNode ? {
+        subscriptionId: '',
+        resourceGroup: '',
+        resourceName: '',
+        location: '',
+        workspaceId: '',
+        instrumentationKey: ''
+      } : {};
+
+      // Initialize Kubernetes-specific fields for Kubernetes nodes
+      const isKubernetesNode = type.startsWith('k8s-');
+      const kubernetesFields = isKubernetesNode ? {
+        namespace: 'default',
+        resourceName: '',
+        clusterName: '',
+        clusterEndpoint: '',
+        serviceAccount: '',
+        containerName: ''
+      } : {};
+
+      // Initialize Kafka-specific fields for Kafka nodes
+      const isKafkaNode = type.startsWith('kafka-');
+      const kafkaFields = isKafkaNode ? {
+        brokerList: '',
+        topicName: '',
+        consumerGroup: '',
+        securityProtocol: 'PLAINTEXT'
+      } : {};
+
+      // Initialize GCP-specific fields for GCP nodes
+      const gcpComponentTypes = [
+        'compute-engine', 'cloud-storage', 'cloud-sql', 'kubernetes-engine',
+        'cloud-functions', 'cloud-run', 'load-balancer', 'cloud-armor', 
+        'app-engine', 'vpc-network'
+      ];
+      const isGCPNode = gcpComponentTypes.includes(type);
+      const gcpFields = isGCPNode ? {
+        projectId: '',
+        resourceName: '',
+        zone: '',
+        region: '',
+        serviceAccount: '',
+        monitoringLabels: '',
+        logType: 'system-event'
+      } : {};
+
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
         type: "default",
@@ -208,6 +256,10 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
             componentDefinition?.consoleUrl ||
             "https://console.cloud.google.com/home/dashboard",
           customFields,
+          ...azureFields, // Spread Azure fields for Azure nodes
+          ...kubernetesFields, // Spread Kubernetes fields for Kubernetes nodes  
+          ...kafkaFields, // Spread Kafka fields for Kafka nodes
+          ...gcpFields, // Spread GCP fields for GCP nodes
           metrics: {
             cpu: Math.floor(Math.random() * 100),
             memory: Math.floor(Math.random() * 100),
