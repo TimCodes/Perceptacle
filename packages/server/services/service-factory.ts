@@ -121,17 +121,17 @@ export const serviceFactory = createServiceFactoryFromEnv();
 
 // Type guard functions to help with TypeScript type checking
 export function isKubernetesService(service: KubernetesService | MockKubernetesService): service is KubernetesService {
-  return !serviceFactory.isUsingMocks();
+  return service instanceof KubernetesService;
 }
 
 export function isMockKubernetesService(service: KubernetesService | MockKubernetesService): service is MockKubernetesService {
-  return serviceFactory.isUsingMocks();
+  return service instanceof MockKubernetesService;
 }
 
 export function isAzureService(service: AzureService | MockAzureService): service is AzureService {
-  return !serviceFactory.isUsingMocks();
+  return service instanceof AzureService;
 }
 
 export function isMockAzureService(service: AzureService | MockAzureService): service is MockAzureService {
-  return serviceFactory.isUsingMocks();
+  return service instanceof MockAzureService;
 }
