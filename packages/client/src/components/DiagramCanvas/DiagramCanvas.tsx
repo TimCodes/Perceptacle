@@ -17,6 +17,13 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useDiagramStore } from "@/utils/diagram-store";
 import { getCloudComponents } from "@/utils/cloudComponents";
+import { SaveMapDialog } from "@/components/SaveMapDialog";
+import { TelemetryMapsLibrary } from "@/components/TelemetryMapsLibrary";
+import { TelemetryMapService } from "@/services/telemetryMapService";
+import { TelemetryMap, ReactFlowNode, ReactFlowEdge } from "@/types/telemetryMap";
+import { Button } from "@/components/ui/button";
+import { Save, FolderOpen } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
 const customComponents = [
@@ -133,6 +140,110 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
   const { setSelectedNode } = useDiagramStore();
+  
+  // Save/Load state
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showLibraryDialog, setShowLibraryDialog] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentUserId] = useState('user123'); // Replace with actual user authentication
+  
+  const { toast } = useToast();
+
+  // Save map handler
+  const handleSaveMap = async (data: {
+    name: string;
+    description?: string;
+    isPublic: boolean;
+    tags: string[];
+  }) => {
+    setIsSaving(true);
+    try {
+      const mapData = {
+        ...data,
+        nodes: nodes.map(node => ({
+          nodeId: node.id,
+          nodeType: node.type || node.data.type || 'default',
+          label: node.data.label || 'Untitled Node',
+          status: node.data.status || 'active',
+          description: node.data.description,
+          positionX: node.position.x,
+          positionY: node.position.y,
+          config: {
+            ...node.data,
+            // Remove non-config properties
+            label: undefined,
+            status: undefined,
+            description: undefined,
+          },
+        })),
+        connections: edges.map(edge => ({
+          sourceNodeId: edge.source,
+          targetNodeId: edge.target,
+          connectionType: edge.type || 'default',
+        })),
+      };
+
+      await TelemetryMapService.createTelemetryMap(mapData, currentUserId);
+      setShowSaveDialog(false);
+      toast({
+        title: 'Success',
+        description: 'Telemetry map saved successfully!',
+      });
+    } catch (error) {
+      console.error('Failed to save map:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save telemetry map. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Load map handler
+  const handleLoadMap = (map: TelemetryMap) => {
+    // Convert TelemetryMap to React Flow nodes and edges
+    const loadedNodes: Node[] = map.nodes.map(node => ({
+      id: node.nodeId,
+      type: 'default',
+      position: { x: node.positionX, y: node.positionY },
+      data: {
+        label: node.label,
+        type: node.nodeType,
+        status: node.status,
+        description: node.description,
+        ...node.config,
+      },
+      className: "dark:bg-background dark:text-foreground",
+      style: {
+        border: `2px solid ${getStatusColor(node.status)}`,
+        borderRadius: "8px",
+        minWidth: 180,
+      },
+    }));
+
+    const loadedEdges: Edge[] = map.connections.map(connection => ({
+      id: `${connection.sourceNodeId}-${connection.targetNodeId}`,
+      source: connection.sourceNodeId,
+      target: connection.targetNodeId,
+      type: connection.connectionType,
+      animated: true,
+      style: { stroke: "hsl(var(--primary))" },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: "hsl(var(--primary))",
+      },
+    }));
+
+    setNodes(loadedNodes);
+    setEdges(loadedEdges);
+    
+    toast({
+      title: 'Success',
+      description: `Loaded telemetry map: ${map.name}`,
+    });
+  };
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -185,7 +296,7 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
       );
 
       const customFields =
-        componentDefinition?.fields?.map((field) => ({
+        componentDefinition?.fields?.map((field: any) => ({
           ...field,
           value: field.defaultValue || "",
         })) || [];
@@ -298,7 +409,28 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
   );
 
   return (
-    <div className="h-full w-full bg-background">
+    <div className="h-full w-full bg-background relative">
+      {/* Save/Load Buttons */}
+      <div className="absolute top-4 right-4 z-10 flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowLibraryDialog(true)}
+        >
+          <FolderOpen className="h-4 w-4 mr-2" />
+          Load Map
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowSaveDialog(true)}
+          disabled={nodes.length === 0}
+        >
+          <Save className="h-4 w-4 mr-2" />
+          Save Map
+        </Button>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -320,6 +452,23 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
           <Controls className="dark:bg-background dark:border-border" />
         </div>
       </ReactFlow>
+
+      {/* Dialogs */}
+      <SaveMapDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        onSave={handleSaveMap}
+        nodes={nodes as ReactFlowNode[]}
+        edges={edges as ReactFlowEdge[]}
+        isLoading={isSaving}
+      />
+
+      <TelemetryMapsLibrary
+        isOpen={showLibraryDialog}
+        onClose={() => setShowLibraryDialog(false)}
+        onLoadMap={handleLoadMap}
+        userId={currentUserId}
+      />
     </div>
   );
 }
