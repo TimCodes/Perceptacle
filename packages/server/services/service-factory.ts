@@ -95,7 +95,7 @@ export class ServiceFactory {
 
 // Environment-based factory creation
 export function createServiceFactoryFromEnv(): ServiceFactory {
-  const useMocks = process.env.USE_MOCK_SERVICES === 'true' || process.env.NODE_ENV === 'development';
+  const useMocks = process.env.USE_MOCK_SERVICES === 'true' || (process.env.NODE_ENV === 'development' && process.env.USE_MOCK_SERVICES !== 'false');
   
   const config: ServiceFactoryConfig = {
     useMocks,
