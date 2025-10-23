@@ -5,7 +5,6 @@ import { ReactFlowProvider } from "reactflow";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
 import { cn } from "@/utils/cn";
 
 import NodeInfoSideBar from "@/components/NodeInfoSideBar/NodeInfoSideBar";
@@ -15,7 +14,8 @@ const MotionDiv = motion.div;
 
 export default function Home() {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
-  const { theme } = useTheme();
+  const [saveTriggered, setSaveTriggered] = useState(false);
+  const [loadTriggered, setLoadTriggered] = useState(false);
 
   const handleNodeSelected = () => {
     setIsConfigPanelOpen(true);
@@ -23,6 +23,22 @@ export default function Home() {
 
   const handleComponentSelect = (component: any) => {
     console.log("Selected component:", component);
+  };
+
+  const triggerSave = () => {
+    setSaveTriggered(true);
+  };
+
+  const onSaveComplete = () => {
+    setSaveTriggered(false);
+  };
+
+  const triggerLoad = () => {
+    setLoadTriggered(true);
+  };
+
+  const onLoadComplete = () => {
+    setLoadTriggered(false);
   };
 
   return (
@@ -37,10 +53,16 @@ export default function Home() {
             <div className="absolute top-6 left-6 z-10">
               <DropDown onComponentSelect={handleComponentSelect} />
             </div>
-            <DiagramCanvas onNodeSelected={handleNodeSelected} />
+            <DiagramCanvas 
+              onNodeSelected={handleNodeSelected} 
+              saveTriggered={saveTriggered}
+              onSaveComplete={onSaveComplete}
+              loadTriggered={loadTriggered}
+              onLoadComplete={onLoadComplete}
+            />
           </div>
-          <DiagramToolbar />
-          <AnimatePresence initial={false} mode="wait">
+          <DiagramToolbar onSaveMap={triggerSave} onLoadMap={triggerLoad} />
+          <AnimatePresence initial={false}>
             {isConfigPanelOpen ? (
               <MotionDiv
                 key="config-panel"

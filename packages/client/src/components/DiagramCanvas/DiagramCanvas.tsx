@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -21,8 +21,6 @@ import { SaveMapDialog } from "@/components/SaveMapDialog";
 import { TelemetryMapsLibrary } from "@/components/TelemetryMapsLibrary";
 import { TelemetryMapService } from "@/services/telemetryMapService";
 import { TelemetryMap, ReactFlowNode, ReactFlowEdge } from "@/types/telemetryMap";
-import { Button } from "@/components/ui/button";
-import { Save, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
@@ -46,6 +44,10 @@ const customComponents = [
 
 interface DiagramCanvasProps {
   onNodeSelected?: () => void;
+  saveTriggered?: boolean;
+  onSaveComplete?: () => void;
+  loadTriggered?: boolean;
+  onLoadComplete?: () => void;
 }
 
 const getStatusColor = (status: string) => {
@@ -135,11 +137,11 @@ const defaultEdgeOptions = {
   },
 };
 
-export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
+export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveComplete, loadTriggered, onLoadComplete }: DiagramCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
-  const { setSelectedNode } = useDiagramStore();
+  const { setSelectedNode, setNodes: setStoreNodes, setEdges: setStoreEdges } = useDiagramStore();
   
   // Save/Load state
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -148,6 +150,31 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
   const [currentUserId] = useState('user123'); // Replace with actual user authentication
   
   const { toast } = useToast();
+
+  // Handle external save trigger
+  useEffect(() => {
+    if (saveTriggered) {
+      setShowSaveDialog(true);
+      onSaveComplete?.();
+    }
+  }, [saveTriggered, onSaveComplete]);
+
+  // Handle external load trigger
+  useEffect(() => {
+    if (loadTriggered) {
+      setShowLibraryDialog(true);
+      onLoadComplete?.();
+    }
+  }, [loadTriggered, onLoadComplete]);
+
+  // Sync local state with store
+  useEffect(() => {
+    setStoreNodes(nodes);
+  }, [nodes, setStoreNodes]);
+
+  useEffect(() => {
+    setStoreEdges(edges);
+  }, [edges, setStoreEdges]);
 
   // Save map handler
   const handleSaveMap = async (data: {
@@ -410,27 +437,6 @@ export default function DiagramCanvas({ onNodeSelected }: DiagramCanvasProps) {
 
   return (
     <div className="h-full w-full bg-background relative">
-      {/* Save/Load Buttons */}
-      <div className="absolute top-4 right-4 z-10 flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowLibraryDialog(true)}
-        >
-          <FolderOpen className="h-4 w-4 mr-2" />
-          Load Map
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowSaveDialog(true)}
-          disabled={nodes.length === 0}
-        >
-          <Save className="h-4 w-4 mr-2" />
-          Save Map
-        </Button>
-      </div>
-
       <ReactFlow
         nodes={nodes}
         edges={edges}
