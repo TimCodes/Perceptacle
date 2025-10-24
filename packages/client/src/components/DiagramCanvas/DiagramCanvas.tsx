@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -149,6 +149,9 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   const [isSaving, setIsSaving] = useState(false);
   const [currentUserId] = useState('user123'); // Replace with actual user authentication
   
+  // Use ref to prevent infinite loops during rapid updates
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const { toast } = useToast();
 
   // Handle external save trigger
@@ -167,14 +170,32 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
     }
   }, [loadTriggered, onLoadComplete]);
 
-  // Sync local state with store
+  // Sync local state with store - debounced to prevent infinite loops during drag
   useEffect(() => {
-    setStoreNodes(nodes);
-  }, [nodes, setStoreNodes]);
+    // Clear any pending sync
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+    
+    // Debounce the sync operation to avoid rapid updates during drag
+    syncTimeoutRef.current = setTimeout(() => {
+      if (nodes.length >= 0) { // Allow empty arrays too
+        setStoreNodes(nodes);
+      }
+    }, 50); // 50ms debounce
+    
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, [nodes]); // Remove setStoreNodes from deps to prevent infinite loop
 
   useEffect(() => {
-    setStoreEdges(edges);
-  }, [edges, setStoreEdges]);
+    if (edges.length >= 0) { // Allow empty arrays too
+      setStoreEdges(edges);
+    }
+  }, [edges]); // Remove setStoreEdges from deps to prevent infinite loop
 
   // Save map handler
   const handleSaveMap = async (data: {

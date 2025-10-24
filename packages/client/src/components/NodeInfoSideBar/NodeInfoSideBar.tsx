@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -27,9 +27,13 @@ export default function NodeInfoSideBar() {
   const [hasChanges, setHasChanges] = useState(false);
   const [currentTab, setCurrentTab] = useState("configuration");
   const { toast } = useToast();
+  const prevSelectedNodeIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (selectedNode) {
+    // Only update editedNode if the selected node ID actually changed
+    // This prevents infinite loops when the node object reference changes but the ID is the same
+    if (selectedNode && selectedNode.id !== prevSelectedNodeIdRef.current) {
+      prevSelectedNodeIdRef.current = selectedNode.id;
       setEditedNode({
         ...selectedNode,
         data: {
@@ -94,7 +98,8 @@ export default function NodeInfoSideBar() {
         },
       });
       setHasChanges(false);
-    } else {
+    } else if (!selectedNode) {
+      prevSelectedNodeIdRef.current = null;
       setEditedNode(null);
     }
   }, [selectedNode]);
