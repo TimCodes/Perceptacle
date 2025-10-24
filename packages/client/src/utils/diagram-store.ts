@@ -38,6 +38,12 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     const { nodes, selectedNode } = get();
     if (!selectedNode) return;
 
+    // Only update if the node actually changed
+    const existingNode = nodes.find(n => n.id === selectedNode.id);
+    if (existingNode && JSON.stringify(existingNode) === JSON.stringify(node)) {
+      return; // No actual changes, skip update to prevent infinite loops
+    }
+
     const updatedNodes = nodes.map((n) =>
       n.id === selectedNode.id ? node : n
     );
