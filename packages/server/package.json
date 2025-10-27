@@ -27,6 +27,7 @@
     "@azure/monitor-query-metrics": "^1.0.0",
     "@azure/service-bus": "^7.9.5",
     "@kubernetes/client-node": "^1.4.0",
+    "@octokit/rest": "^21.1.1",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
