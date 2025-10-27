@@ -3,6 +3,8 @@ import { KubernetesService, KubernetesConfig } from './kubernetes';
 import { MockKubernetesService } from './kubernetes.mock';
 import { AzureService, AzureCredentials } from './azure';
 import { MockAzureService } from './azure.mock';
+import { GitHubService, GitHubCredentials } from './github';
+import { MockGitHubService } from './github.mock';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
@@ -12,6 +14,9 @@ export interface ServiceFactoryConfig {
     credentials?: AzureCredentials;
   };
   kubernetes?: KubernetesConfig;
+  github?: {
+    token: string;
+  };
 }
 
 export class ServiceFactory {
@@ -72,6 +77,25 @@ export class ServiceFactory {
   }
 
   /**
+   * Create GitHub service instance (real or mock based on configuration)
+   */
+  createGitHubService(): GitHubService | MockGitHubService {
+    if (!this.config.github?.token) {
+      throw new Error('GitHub token is required');
+    }
+
+    const credentials: GitHubCredentials = {
+      token: this.config.github.token
+    };
+
+    if (this.config.useMocks) {
+      return new MockGitHubService(credentials);
+    } else {
+      return new GitHubService(credentials);
+    }
+  }
+
+  /**
    * Check if the factory is configured to use mock services
    */
   isUsingMocks(): boolean {
@@ -110,6 +134,9 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
     kubernetes: {
       kubeconfig: process.env.KUBECONFIG,
       context: process.env.KUBE_CONTEXT
+    },
+    github: {
+      token: process.env.GITHUB_TOKEN || 'mock-github-token'
     }
   };
 
@@ -134,4 +161,12 @@ export function isAzureService(service: AzureService | MockAzureService): servic
 
 export function isMockAzureService(service: AzureService | MockAzureService): service is MockAzureService {
   return service instanceof MockAzureService;
+}
+
+export function isGitHubService(service: GitHubService | MockGitHubService): service is GitHubService {
+  return service instanceof GitHubService;
+}
+
+export function isMockGitHubService(service: GitHubService | MockGitHubService): service is MockGitHubService {
+  return service instanceof MockGitHubService;
 }
