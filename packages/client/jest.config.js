@@ -1,13 +1,16 @@
+/** @type {import('jest').Config} */
 export default {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  roots: ['<rootDir>/src'],
-  testMatch: [
-    '**/__tests__/**/*.+(ts|tsx|js)',
-    '**/?(*.)+(spec|test).+(ts|tsx|js)'
-  ],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
+    '^.+\\.tsx?$': ['ts-jest', {
+      useESM: true,
       tsconfig: {
         jsx: 'react-jsx',
         esModuleInterop: true,
@@ -15,26 +18,19 @@ export default {
       },
     }],
   },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '\\.(css|less|scss|sass)$': '<rootDir>/src/__mocks__/styleMock.js',
-  },
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+  testMatch: [
+    '**/__tests__/**/*.test.ts',
+    '**/__tests__/**/*.test.tsx',
+    '**/*.test.ts',
+    '**/*.test.tsx',
+  ],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/main.tsx',
     '!src/vite-env.d.ts',
-    '!src/**/*.stories.{ts,tsx}',
+    '!**/node_modules/**',
   ],
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-    '/__mocks__/',
-  ],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
-  transformIgnorePatterns: [
-    'node_modules/(?!(wouter|@tanstack|react-icons)/)',
-  ],
 };
