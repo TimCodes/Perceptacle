@@ -4,6 +4,31 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import type { BaseMessage } from "@langchain/core/messages";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
+// Internal types for handling langchain response metadata
+interface OpenAIUsage {
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  total_tokens?: number;
+}
+
+interface AnthropicUsage {
+  input_tokens?: number;
+  output_tokens?: number;
+}
+
+interface GeminiUsage {
+  prompt_token_count?: number;
+  candidates_token_count?: number;
+  total_token_count?: number;
+}
+
+interface LangChainResponse {
+  content: string;
+  response_metadata?: {
+    usage?: OpenAIUsage | AnthropicUsage | GeminiUsage;
+  };
+}
+
 // Types for the service
 export interface AIChatCredentials {
   openaiApiKey?: string;
@@ -86,16 +111,16 @@ export class AIChatService {
     });
 
     const messages = this.buildMessages(request);
-    const response = await model.invoke(messages);
+    const response = await model.invoke(messages) as unknown as LangChainResponse;
 
     return {
       content: response.content as string,
       model: "openai",
       usage: response.response_metadata?.usage
         ? {
-            promptTokens: (response.response_metadata.usage as any).prompt_tokens,
-            completionTokens: (response.response_metadata.usage as any).completion_tokens,
-            totalTokens: (response.response_metadata.usage as any).total_tokens,
+            promptTokens: (response.response_metadata.usage as OpenAIUsage).prompt_tokens,
+            completionTokens: (response.response_metadata.usage as OpenAIUsage).completion_tokens,
+            totalTokens: (response.response_metadata.usage as OpenAIUsage).total_tokens,
           }
         : undefined,
     };
@@ -114,21 +139,21 @@ export class AIChatService {
       model: "claude-3-5-sonnet-20241022",
       temperature: request.temperature ?? 0.7,
       maxTokens: request.maxTokens ?? 4096,
-    });
+    }) as any; // Type assertion needed due to langchain type version mismatch
 
     const messages = this.buildMessages(request);
-    const response = await (model as any).invoke(messages);
+    const response = await model.invoke(messages) as unknown as LangChainResponse;
 
     return {
       content: response.content as string,
       model: "claude",
       usage: response.response_metadata?.usage
         ? {
-            promptTokens: response.response_metadata.usage.input_tokens,
-            completionTokens: response.response_metadata.usage.output_tokens,
+            promptTokens: (response.response_metadata.usage as AnthropicUsage).input_tokens,
+            completionTokens: (response.response_metadata.usage as AnthropicUsage).output_tokens,
             totalTokens:
-              response.response_metadata.usage.input_tokens +
-              response.response_metadata.usage.output_tokens,
+              ((response.response_metadata.usage as AnthropicUsage).input_tokens || 0) +
+              ((response.response_metadata.usage as AnthropicUsage).output_tokens || 0),
           }
         : undefined,
     };
@@ -147,19 +172,19 @@ export class AIChatService {
       model: "gemini-1.5-pro",
       temperature: request.temperature ?? 0.7,
       maxOutputTokens: request.maxTokens,
-    });
+    }) as any; // Type assertion needed due to langchain type version mismatch
 
     const messages = this.buildMessages(request);
-    const response = await (model as any).invoke(messages);
+    const response = await model.invoke(messages) as unknown as LangChainResponse;
 
     return {
       content: response.content as string,
       model: "gemini",
       usage: response.response_metadata?.usage
         ? {
-            promptTokens: response.response_metadata.usage.prompt_token_count,
-            completionTokens: response.response_metadata.usage.candidates_token_count,
-            totalTokens: response.response_metadata.usage.total_token_count,
+            promptTokens: (response.response_metadata.usage as GeminiUsage).prompt_token_count,
+            completionTokens: (response.response_metadata.usage as GeminiUsage).candidates_token_count,
+            totalTokens: (response.response_metadata.usage as GeminiUsage).total_token_count,
           }
         : undefined,
     };
@@ -184,16 +209,16 @@ export class AIChatService {
     });
 
     const messages = this.buildMessages(request);
-    const response = await model.invoke(messages);
+    const response = await model.invoke(messages) as unknown as LangChainResponse;
 
     return {
       content: response.content as string,
       model: "deepseek",
       usage: response.response_metadata?.usage
         ? {
-            promptTokens: (response.response_metadata.usage as any).prompt_tokens,
-            completionTokens: (response.response_metadata.usage as any).completion_tokens,
-            totalTokens: (response.response_metadata.usage as any).total_tokens,
+            promptTokens: (response.response_metadata.usage as OpenAIUsage).prompt_tokens,
+            completionTokens: (response.response_metadata.usage as OpenAIUsage).completion_tokens,
+            totalTokens: (response.response_metadata.usage as OpenAIUsage).total_tokens,
           }
         : undefined,
     };
@@ -201,6 +226,8 @@ export class AIChatService {
 
   /**
    * Build messages array from request
+   * Note: Context is added as a separate SystemMessage. If you need context
+   * to be part of the main system prompt, combine them before calling this method.
    */
   private buildMessages(request: ChatRequest): BaseMessage[] {
     const messages: BaseMessage[] = [];
@@ -210,7 +237,7 @@ export class AIChatService {
       messages.push(new SystemMessage(request.systemPrompt));
     }
 
-    // Add context if provided
+    // Add context if provided (as a separate system message)
     if (request.context) {
       const contextMessage = `Context:\n${request.context}\n\n`;
       messages.push(new SystemMessage(contextMessage));
@@ -223,15 +250,22 @@ export class AIChatService {
   }
 
   /**
-   * Stream chat responses (for future implementation)
-   * This is a placeholder for streaming support
+   * Stream chat responses (PLACEHOLDER: Currently returns full response)
+   * 
+   * Note: This is a placeholder implementation that returns the complete response at once.
+   * Proper streaming support will be added in a future update. The onChunk callback
+   * is called once with the full response content.
+   * 
+   * @param request - The chat request
+   * @param onChunk - Callback function called with response chunks
+   * @returns The complete chat response
    */
   async streamChat(
     request: ChatRequest,
     onChunk: (chunk: string) => void
   ): Promise<ChatResponse> {
     // For now, just call regular chat and return the full response
-    // Streaming can be implemented later with proper stream handling
+    // TODO: Implement proper streaming support using langchain's streaming capabilities
     const response = await this.chat(request);
     onChunk(response.content);
     return response;
