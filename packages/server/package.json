@@ -14,7 +14,8 @@
     "db:studio": "drizzle-kit studio",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:mocks": "USE_MOCK_SERVICES=true tsx test-mocked-services.ts"
+    "test:mocks": "USE_MOCK_SERVICES=true tsx test-mocked-services.ts",
+    "demo:aichat": "USE_MOCK_SERVICES=true tsx aichat-demo.ts"
   },
   "dependencies": {
     "@azure/arm-monitor": "^7.0.0",
