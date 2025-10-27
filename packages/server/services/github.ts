@@ -385,7 +385,7 @@ export class GitHubService {
         page: params.page || 1,
       });
 
-      return data.map((branch: any) => ({
+      return data.map((branch: Octokit.ReposListBranchesResponseData[number]) => ({
         name: branch.name,
         commit: {
           sha: branch.commit.sha,
