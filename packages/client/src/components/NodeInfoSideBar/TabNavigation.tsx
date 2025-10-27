@@ -13,19 +13,6 @@ export const TabNavigation = () => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <TabsTrigger value="configuration" className="p-2">
-            <Settings className="h-4 w-4" />
-          </TabsTrigger>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Configuration</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
           <TabsTrigger value="cicd" className="p-2">
             <GitBranch className="h-4 w-4" />
           </TabsTrigger>
@@ -58,6 +45,19 @@ export const TabNavigation = () => (
         </TooltipTrigger>
         <TooltipContent>
           <p>Tickets</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <TabsTrigger value="configuration" className="p-2">
+            <Settings className="h-4 w-4" />
+          </TabsTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Configuration</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -30,6 +30,13 @@ export const DEFAULT_FIELDS: ConfigField[] = [
     label: 'Description',
     type: 'textarea',
     placeholder: 'Enter description'
+  },
+  {
+    name: 'githubUrl',
+    label: 'GitHub URL',
+    type: 'url',
+    placeholder: 'https://github.com/username/repository',
+    description: 'Link to the GitHub repository for this component'
   }
 ];
 
