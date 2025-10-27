@@ -148,3 +148,26 @@ jest.mock('@kubernetes/client-node', () => ({
   AppsV1Api: jest.fn(),
   Metrics: jest.fn().mockImplementation(() => ({}))
 }));
+
+jest.mock('@octokit/rest', () => ({
+  Octokit: jest.fn().mockImplementation(() => ({
+    pulls: {
+      list: jest.fn(),
+      get: jest.fn()
+    },
+    actions: {
+      listWorkflowRuns: jest.fn(),
+      listWorkflowRunsForRepo: jest.fn(),
+      getWorkflowRun: jest.fn()
+    },
+    repos: {
+      listBranches: jest.fn(),
+      getBranch: jest.fn()
+    },
+    issues: {
+      listForRepo: jest.fn(),
+      get: jest.fn(),
+      create: jest.fn()
+    }
+  }))
+}));
