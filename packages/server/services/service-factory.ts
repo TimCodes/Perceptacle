@@ -5,6 +5,8 @@ import { AzureService, AzureCredentials } from './azure';
 import { MockAzureService } from './azure.mock';
 import { GitHubService, GitHubCredentials } from './github';
 import { MockGitHubService } from './github.mock';
+import { AIChatService, AIChatCredentials } from './aichat';
+import { MockAIChatService } from './aichat.mock';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
@@ -16,6 +18,12 @@ export interface ServiceFactoryConfig {
   kubernetes?: KubernetesConfig;
   github?: {
     token: string;
+  };
+  aichat?: {
+    openaiApiKey?: string;
+    anthropicApiKey?: string;
+    geminiApiKey?: string;
+    deepseekApiKey?: string;
   };
 }
 
@@ -96,6 +104,24 @@ export class ServiceFactory {
   }
 
   /**
+   * Create AIChat service instance (real or mock based on configuration)
+   */
+  createAIChatService(): AIChatService | MockAIChatService {
+    const credentials: AIChatCredentials = {
+      openaiApiKey: this.config.aichat?.openaiApiKey,
+      anthropicApiKey: this.config.aichat?.anthropicApiKey,
+      geminiApiKey: this.config.aichat?.geminiApiKey,
+      deepseekApiKey: this.config.aichat?.deepseekApiKey,
+    };
+
+    if (this.config.useMocks) {
+      return new MockAIChatService(credentials);
+    } else {
+      return new AIChatService(credentials);
+    }
+  }
+
+  /**
    * Check if the factory is configured to use mock services
    */
   isUsingMocks(): boolean {
@@ -137,6 +163,12 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
     },
     github: {
       token: process.env.GITHUB_TOKEN || 'mock-github-token'
+    },
+    aichat: {
+      openaiApiKey: process.env.OPENAI_API_KEY,
+      anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+      geminiApiKey: process.env.GEMINI_API_KEY,
+      deepseekApiKey: process.env.DEEPSEEK_API_KEY,
     }
   };
 
@@ -169,4 +201,12 @@ export function isGitHubService(service: GitHubService | MockGitHubService): ser
 
 export function isMockGitHubService(service: GitHubService | MockGitHubService): service is MockGitHubService {
   return service instanceof MockGitHubService;
+}
+
+export function isAIChatService(service: AIChatService | MockAIChatService): service is AIChatService {
+  return service instanceof AIChatService;
+}
+
+export function isMockAIChatService(service: AIChatService | MockAIChatService): service is MockAIChatService {
+  return service instanceof MockAIChatService;
 }

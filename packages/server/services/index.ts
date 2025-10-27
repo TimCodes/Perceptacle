@@ -5,6 +5,8 @@ export * from './kubernetes';
 export * from './kubernetes.mock';
 export * from './github';
 export * from './github.mock';
+export * from './aichat';
+export * from './aichat.mock';
 export * from './service-factory';
 
 // Re-export commonly used types and classes
@@ -14,6 +16,8 @@ export { KubernetesService } from './kubernetes';
 export { MockKubernetesService } from './kubernetes.mock';
 export { GitHubService } from './github';
 export { MockGitHubService } from './github.mock';
+export { AIChatService } from './aichat';
+export { MockAIChatService } from './aichat.mock';
 export { ServiceFactory, serviceFactory, createServiceFactoryFromEnv } from './service-factory';
 
 // Type helpers
@@ -63,6 +67,14 @@ export type {
   Branch,
   Issue
 } from './github';
+
+export type {
+  // AIChat types
+  AIChatCredentials,
+  ChatMessage,
+  ChatRequest,
+  ChatResponse
+} from './aichat';
 
 export type {
   // Service factory types
