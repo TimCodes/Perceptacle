@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Save } from "lucide-react";
+import { Save, Settings } from "lucide-react";
 import { useDiagramStore } from "@/utils/diagram-store";
 import { useToast } from "@/hooks/use-toast";
 import { TabNavigation } from "./TabNavigation";
@@ -14,8 +14,7 @@ import TicketsTab from "@/components/NodeInfoSideBar/TicketsTab";
 import EmptyPanel from "@/components/NodeInfoSideBar/EmptyPanel";
 import { getStatusColor } from "@/utils/helpers";
 
-const tabNames = {
-  configuration: "Configuration",
+const tabNames: Record<string, string> = {
   cicd: "CI/CD",
   observability: "Observability",
   tickets: "Tickets",
@@ -25,7 +24,8 @@ export default function NodeInfoSideBar() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
   const [editedNode, setEditedNode] = useState(selectedNode);
   const [hasChanges, setHasChanges] = useState(false);
-  const [currentTab, setCurrentTab] = useState("configuration");
+  const [currentTab, setCurrentTab] = useState("cicd");
+  const [showConfiguration, setShowConfiguration] = useState(false);
   const { toast } = useToast();
   const prevSelectedNodeIdRef = useRef<string | null>(null);
 
@@ -108,7 +108,7 @@ export default function NodeInfoSideBar() {
     return <EmptyPanel />;
   }
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: string, value: string) => {
     setEditedNode((prev) => {
       if (!prev) return prev;
       return {
@@ -129,14 +129,14 @@ export default function NodeInfoSideBar() {
     setHasChanges(true);
   };
 
-  const handleCustomFieldChange = (fieldName, value) => {
+  const handleCustomFieldChange = (fieldName: string, value: string) => {
     setEditedNode((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
         data: {
           ...prev.data,
-          customFields: prev.data.customFields.map((field) =>
+          customFields: prev.data.customFields.map((field: any) =>
             field.name === fieldName ? { ...field, value } : field,
           ),
         },
@@ -158,41 +158,53 @@ export default function NodeInfoSideBar() {
 
   return (
     <div className="w-[375px] border-l bg-background overflow-hidden flex flex-col h-full">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">Node {tabNames[currentTab]}</h2>
+      <div className="p-4 border-b flex items-center justify-between">
+        <h2 className="text-lg font-semibold">
+          {showConfiguration ? "Node Configuration" : `Node ${tabNames[currentTab] || "Info"}`}
+        </h2>
+        <Button
+          variant={showConfiguration ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowConfiguration(!showConfiguration)}
+          className={showConfiguration ? "bg-green-600 hover:bg-green-700" : ""}
+        >
+          <Settings className="h-4 w-4" />
+        </Button>
       </div>
 
       <ScrollArea className="flex-1">
         <div className="p-4">
-          <Tabs
-            defaultValue="configuration"
-            className="space-y-4"
-            onValueChange={setCurrentTab}
-          >
-            <TabNavigation />
-
+          {showConfiguration ? (
             <div className="space-y-4">
-              <TabsContent value="configuration" className="space-y-4">
-                <ConfigurationTab
-                  editedNode={editedNode}
-                  handleChange={handleChange}
-                  handleCustomFieldChange={handleCustomFieldChange}
-                />
-              </TabsContent>
-
-              <TabsContent value="cicd" className="space-y-4">
-                <CICDTab editedNode={editedNode} handleChange={handleChange} />
-              </TabsContent>
-
-              <TabsContent value="observability" className="space-y-4">
-                <ObservabilityTab editedNode={editedNode} />
-              </TabsContent>
-
-              <TabsContent value="tickets" className="space-y-4">
-                <TicketsTab editedNode={editedNode} />
-              </TabsContent>
+              <ConfigurationTab
+                editedNode={editedNode}
+                handleChange={handleChange}
+                handleCustomFieldChange={handleCustomFieldChange}
+              />
             </div>
-          </Tabs>
+          ) : (
+            <Tabs
+              defaultValue="cicd"
+              className="space-y-4"
+              onValueChange={setCurrentTab}
+            >
+              <TabNavigation />
+
+              <div className="space-y-4">
+                <TabsContent value="cicd" className="space-y-4">
+                  <CICDTab editedNode={editedNode} handleChange={handleChange} />
+                </TabsContent>
+
+                <TabsContent value="observability" className="space-y-4">
+                  <ObservabilityTab editedNode={editedNode} />
+                </TabsContent>
+
+                <TabsContent value="tickets" className="space-y-4">
+                  <TicketsTab editedNode={editedNode} />
+                </TabsContent>
+              </div>
+            </Tabs>
+          )}
         </div>
       </ScrollArea>
 
