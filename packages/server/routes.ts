@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import azureRoutes from "./routes/azure";
 import kubernetesRoutes from "./routes/kubernetes";
 import githubRoutes from "./routes/github";
+import oracleRoutes from "./routes/oracle";
 import telemetryMapsRoutes from "./routes/telemetryMaps";
 
 export function registerRoutes(app: Express): Server {
@@ -14,6 +15,9 @@ export function registerRoutes(app: Express): Server {
   
   // Register GitHub routes
   app.use("/api/github", githubRoutes);
+  
+  // Register Oracle routes
+  app.use("/api/oracle", oracleRoutes);
   
   // Register Telemetry Maps routes
   app.use("/api/telemetry-maps", telemetryMapsRoutes);

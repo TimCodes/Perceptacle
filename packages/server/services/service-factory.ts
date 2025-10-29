@@ -5,6 +5,8 @@ import { AzureService, AzureCredentials } from './azure';
 import { MockAzureService } from './azure.mock';
 import { GitHubService, GitHubCredentials } from './github';
 import { MockGitHubService } from './github.mock';
+import { OracleService, OracleCredentials } from './oracle';
+import { MockOracleService } from './oracle.mock';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
@@ -16,6 +18,9 @@ export interface ServiceFactoryConfig {
   kubernetes?: KubernetesConfig;
   github?: {
     token: string;
+  };
+  oracle?: {
+    credentials?: OracleCredentials;
   };
 }
 
@@ -96,6 +101,23 @@ export class ServiceFactory {
   }
 
   /**
+   * Create Oracle service instance (real or mock based on configuration)
+   */
+  createOracleService(): OracleService | MockOracleService {
+    if (!this.config.oracle?.credentials) {
+      throw new Error('Oracle credentials are required');
+    }
+
+    const credentials = this.config.oracle.credentials;
+
+    if (this.config.useMocks) {
+      return MockOracleService.fromCredentials(credentials);
+    } else {
+      return OracleService.fromCredentials(credentials);
+    }
+  }
+
+  /**
    * Check if the factory is configured to use mock services
    */
   isUsingMocks(): boolean {
@@ -137,6 +159,21 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
     },
     github: {
       token: process.env.GITHUB_TOKEN || 'mock-github-token'
+    },
+    oracle: {
+      credentials: process.env.ORACLE_TENANCY && process.env.ORACLE_USER && process.env.ORACLE_FINGERPRINT && process.env.ORACLE_PRIVATE_KEY && process.env.ORACLE_REGION ? {
+        tenancy: process.env.ORACLE_TENANCY,
+        user: process.env.ORACLE_USER,
+        fingerprint: process.env.ORACLE_FINGERPRINT,
+        privateKey: process.env.ORACLE_PRIVATE_KEY,
+        region: process.env.ORACLE_REGION
+      } : {
+        tenancy: 'ocid1.tenancy.oc1..mock',
+        user: 'ocid1.user.oc1..mock',
+        fingerprint: 'mock:fingerprint',
+        privateKey: 'mock-private-key',
+        region: 'us-phoenix-1'
+      }
     }
   };
 
@@ -169,4 +206,12 @@ export function isGitHubService(service: GitHubService | MockGitHubService): ser
 
 export function isMockGitHubService(service: GitHubService | MockGitHubService): service is MockGitHubService {
   return service instanceof MockGitHubService;
+}
+
+export function isOracleService(service: OracleService | MockOracleService): service is OracleService {
+  return service instanceof OracleService;
+}
+
+export function isMockOracleService(service: OracleService | MockOracleService): service is MockOracleService {
+  return service instanceof MockOracleService;
 }

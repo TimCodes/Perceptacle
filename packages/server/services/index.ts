@@ -5,6 +5,8 @@ export * from './kubernetes';
 export * from './kubernetes.mock';
 export * from './github';
 export * from './github.mock';
+export * from './oracle';
+export * from './oracle.mock';
 export * from './service-factory';
 
 // Re-export commonly used types and classes
@@ -14,6 +16,8 @@ export { KubernetesService } from './kubernetes';
 export { MockKubernetesService } from './kubernetes.mock';
 export { GitHubService } from './github';
 export { MockGitHubService } from './github.mock';
+export { OracleService } from './oracle';
+export { MockOracleService } from './oracle.mock';
 export { ServiceFactory, serviceFactory, createServiceFactoryFromEnv } from './service-factory';
 
 // Type helpers
@@ -63,6 +67,22 @@ export type {
   Branch,
   Issue
 } from './github';
+
+export type {
+  // Oracle types
+  OracleCredentials,
+  ComputeInstanceParams,
+  VolumeParams,
+  VcnParams,
+  DatabaseParams,
+  MetricParams,
+  ComputeInstance,
+  Volume,
+  Vcn,
+  DatabaseSystem,
+  MetricData,
+  Compartment
+} from './oracle';
 
 export type {
   // Service factory types
