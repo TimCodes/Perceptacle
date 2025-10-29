@@ -5,6 +5,8 @@ export * from './kubernetes';
 export * from './kubernetes.mock';
 export * from './github';
 export * from './github.mock';
+export * from './oracle';
+export * from './oracle.mock';
 export * from './aichat';
 export * from './aichat.mock';
 export * from './service-factory';
@@ -16,6 +18,8 @@ export { KubernetesService } from './kubernetes';
 export { MockKubernetesService } from './kubernetes.mock';
 export { GitHubService } from './github';
 export { MockGitHubService } from './github.mock';
+export { OracleService } from './oracle';
+export { MockOracleService } from './oracle.mock';
 export { AIChatService } from './aichat';
 export { MockAIChatService } from './aichat.mock';
 export { ServiceFactory, serviceFactory, createServiceFactoryFromEnv } from './service-factory';
@@ -69,6 +73,20 @@ export type {
 } from './github';
 
 export type {
+  // Oracle types
+  OracleCredentials,
+  ComputeInstanceParams,
+  VolumeParams,
+  VcnParams,
+  DatabaseParams,
+  MetricParams,
+  ComputeInstance,
+  Volume,
+  Vcn,
+  DatabaseSystem,
+  MetricData,
+  Compartment
+} from './oracle';
   // AIChat types
   AIChatCredentials,
   ChatMessage,

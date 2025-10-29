@@ -5,6 +5,8 @@ import { AzureService, AzureCredentials } from './azure';
 import { MockAzureService } from './azure.mock';
 import { GitHubService, GitHubCredentials } from './github';
 import { MockGitHubService } from './github.mock';
+import { OracleService, OracleCredentials } from './oracle';
+import { MockOracleService } from './oracle.mock';
 import { AIChatService, AIChatCredentials } from './aichat';
 import { MockAIChatService } from './aichat.mock';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
@@ -19,6 +21,8 @@ export interface ServiceFactoryConfig {
   github?: {
     token: string;
   };
+  oracle?: {
+    credentials?: OracleCredentials;
   aichat?: {
     openaiApiKey?: string;
     anthropicApiKey?: string;
@@ -104,6 +108,19 @@ export class ServiceFactory {
   }
 
   /**
+   * Create Oracle service instance (real or mock based on configuration)
+   */
+  createOracleService(): OracleService | MockOracleService {
+    if (!this.config.oracle?.credentials) {
+      throw new Error('Oracle credentials are required');
+    }
+
+    const credentials = this.config.oracle.credentials;
+
+    if (this.config.useMocks) {
+      return MockOracleService.fromCredentials(credentials);
+    } else {
+      return OracleService.fromCredentials(credentials);
    * Create AIChat service instance (real or mock based on configuration)
    */
   createAIChatService(): AIChatService | MockAIChatService {
@@ -164,6 +181,20 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
     github: {
       token: process.env.GITHUB_TOKEN || 'mock-github-token'
     },
+    oracle: {
+      credentials: process.env.ORACLE_TENANCY && process.env.ORACLE_USER && process.env.ORACLE_FINGERPRINT && process.env.ORACLE_PRIVATE_KEY && process.env.ORACLE_REGION ? {
+        tenancy: process.env.ORACLE_TENANCY,
+        user: process.env.ORACLE_USER,
+        fingerprint: process.env.ORACLE_FINGERPRINT,
+        privateKey: process.env.ORACLE_PRIVATE_KEY,
+        region: process.env.ORACLE_REGION
+      } : {
+        tenancy: 'ocid1.tenancy.oc1..mock',
+        user: 'ocid1.user.oc1..mock',
+        fingerprint: 'mock:fingerprint',
+        privateKey: 'mock-private-key',
+        region: 'us-phoenix-1'
+      }
     aichat: {
       openaiApiKey: process.env.OPENAI_API_KEY,
       anthropicApiKey: process.env.ANTHROPIC_API_KEY,
@@ -203,6 +234,12 @@ export function isMockGitHubService(service: GitHubService | MockGitHubService):
   return service instanceof MockGitHubService;
 }
 
+export function isOracleService(service: OracleService | MockOracleService): service is OracleService {
+  return service instanceof OracleService;
+}
+
+export function isMockOracleService(service: OracleService | MockOracleService): service is MockOracleService {
+  return service instanceof MockOracleService;
 export function isAIChatService(service: AIChatService | MockAIChatService): service is AIChatService {
   return service instanceof AIChatService;
 }
