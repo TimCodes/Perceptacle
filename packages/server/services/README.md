@@ -119,7 +119,6 @@ All services (Azure, Kubernetes, GitHub, and Oracle) have comprehensive mock imp
 3. **Demos**: Rich sample data for demonstrations
 4. **Offline Work**: Work without internet connectivity
 5. **Cost Savings**: No cloud resource costs during development
-- **Log Streaming**: Real-time log streaming using Server-Sent Events
 
 ## Quick Start
 
@@ -145,8 +144,8 @@ curl "http://localhost:3000/api/github/repos/owner/repo/pulls"
 ### Oracle Service
 ```bash
 curl "http://localhost:3000/api/oracle/health"
-curl "http://localhost:3000/api/oracle/compartments?tenancyId=ocid1.tenancy.oc1..mock"
-curl "http://localhost:3000/api/oracle/compute/instances?compartmentId=ocid1.compartment.oc1..aaaaaaaa1"
+curl "http://localhost:3000/api/oracle/compartments?tenancyId=ocid1.tenancy.oc1..aaaaaaaa123456789abcdef"
+curl "http://localhost:3000/api/oracle/compute/instances?compartmentId=ocid1.compartment.oc1..aaaaaaaa123456789"
 ```
 
 ## Documentation
