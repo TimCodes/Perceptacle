@@ -7,6 +7,8 @@ import { GitHubService, GitHubCredentials } from './github';
 import { MockGitHubService } from './github.mock';
 import { OracleService, OracleCredentials } from './oracle';
 import { MockOracleService } from './oracle.mock';
+import { AIChatService, AIChatCredentials } from './aichat';
+import { MockAIChatService } from './aichat.mock';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
@@ -21,6 +23,11 @@ export interface ServiceFactoryConfig {
   };
   oracle?: {
     credentials?: OracleCredentials;
+  aichat?: {
+    openaiApiKey?: string;
+    anthropicApiKey?: string;
+    geminiApiKey?: string;
+    deepseekApiKey?: string;
   };
 }
 
@@ -114,6 +121,20 @@ export class ServiceFactory {
       return MockOracleService.fromCredentials(credentials);
     } else {
       return OracleService.fromCredentials(credentials);
+   * Create AIChat service instance (real or mock based on configuration)
+   */
+  createAIChatService(): AIChatService | MockAIChatService {
+    const credentials: AIChatCredentials = {
+      openaiApiKey: this.config.aichat?.openaiApiKey,
+      anthropicApiKey: this.config.aichat?.anthropicApiKey,
+      geminiApiKey: this.config.aichat?.geminiApiKey,
+      deepseekApiKey: this.config.aichat?.deepseekApiKey,
+    };
+
+    if (this.config.useMocks) {
+      return new MockAIChatService(credentials);
+    } else {
+      return new AIChatService(credentials);
     }
   }
 
@@ -174,6 +195,11 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
         privateKey: 'mock-private-key',
         region: 'us-phoenix-1'
       }
+    aichat: {
+      openaiApiKey: process.env.OPENAI_API_KEY,
+      anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+      geminiApiKey: process.env.GEMINI_API_KEY,
+      deepseekApiKey: process.env.DEEPSEEK_API_KEY,
     }
   };
 
@@ -214,4 +240,10 @@ export function isOracleService(service: OracleService | MockOracleService): ser
 
 export function isMockOracleService(service: OracleService | MockOracleService): service is MockOracleService {
   return service instanceof MockOracleService;
+export function isAIChatService(service: AIChatService | MockAIChatService): service is AIChatService {
+  return service instanceof AIChatService;
+}
+
+export function isMockAIChatService(service: AIChatService | MockAIChatService): service is MockAIChatService {
+  return service instanceof MockAIChatService;
 }

@@ -4,6 +4,64 @@ This directory contains services for interacting with cloud infrastructure and o
 
 ## Available Services
 
+### AIChat Service & Mock AIChat Service
+
+This service provides a unified API to interact with multiple AI chat models using langchain.js, supporting OpenAI, Claude (Anthropic), Gemini (Google), and Deepseek.
+
+#### Features
+
+- **Multi-Model Support**: Chat with OpenAI, Claude, Gemini, and Deepseek using a single interface
+- **Context & System Prompts**: Include context and system prompts in requests
+- **Configurable Parameters**: Control temperature and max tokens
+- **Token Usage Tracking**: Get prompt, completion, and total token counts
+- **Mock Implementation**: Full mock service for development and testing without API keys
+- **Streaming Support**: Placeholder for future streaming implementation
+
+#### Usage Example
+
+```typescript
+import { serviceFactory } from './service-factory';
+
+// Create AIChat service
+const aiChatService = serviceFactory.createAIChatService();
+
+// Chat with OpenAI
+const response = await aiChatService.chat({
+  model: 'openai',
+  query: 'What is TypeScript?',
+  systemPrompt: 'You are a helpful programming assistant.',
+  context: 'The user is learning web development.',
+  temperature: 0.7,
+  maxTokens: 500
+});
+
+console.log(response.content);
+console.log('Tokens used:', response.usage);
+
+// Chat with other models
+const claudeResponse = await aiChatService.chat({
+  model: 'claude',
+  query: 'Explain async/await in JavaScript'
+});
+
+const geminiResponse = await aiChatService.chat({
+  model: 'gemini',
+  query: 'What are the benefits of React?'
+});
+
+const deepseekResponse = await aiChatService.chat({
+  model: 'deepseek',
+  query: 'How do I optimize database queries?'
+});
+```
+
+#### Supported Models
+
+- **openai**: GPT-4 (default model)
+- **claude**: Claude 3.5 Sonnet (default model)
+- **gemini**: Gemini 1.5 Pro (default model)
+- **deepseek**: Deepseek Chat (via OpenAI-compatible API)
+
 ### Azure Service & Mock Azure Service
 
 This service provides an API to interact with Azure resources, allowing you to retrieve metrics and logs from Azure Monitor and Log Analytics.
@@ -73,26 +131,37 @@ const kubernetesService = serviceFactory.createKubernetesService();
 const azureService = serviceFactory.createAzureService();
 const githubService = serviceFactory.createGitHubService();
 const oracleService = serviceFactory.createOracleService();
+const aiChatService = serviceFactory.createAIChatService();
 
 // Create a custom factory
 const customFactory = new ServiceFactory({
   useMocks: true,
   azure: {
     subscriptionId: 'your-subscription-id'
+  },
+  aichat: {
+    openaiApiKey: 'your-openai-key',
+    anthropicApiKey: 'your-anthropic-key'
   }
 });
 
 const mockAzureService = customFactory.createAzureService();
+const mockAIChatService = customFactory.createAIChatService();
 ```
 
 #### Environment Variables
 
 - `USE_MOCK_SERVICES`: Set to 'true' to use mock services
 - `NODE_ENV`: When set to 'development', mock services are used by default
+- `OPENAI_API_KEY`: OpenAI API key for GPT models
+- `ANTHROPIC_API_KEY`: Anthropic API key for Claude models
+- `GEMINI_API_KEY`: Google API key for Gemini models
+- `DEEPSEEK_API_KEY`: Deepseek API key for Deepseek models
 - `AZURE_SUBSCRIPTION_ID`: Azure subscription ID
 - `AZURE_CLIENT_ID`: Azure service principal client ID
 - `AZURE_CLIENT_SECRET`: Azure service principal secret
 - `AZURE_TENANT_ID`: Azure tenant ID
+- `GITHUB_TOKEN`: GitHub personal access token
 - `KUBECONFIG`: Path to Kubernetes configuration file
 - `KUBE_CONTEXT`: Kubernetes context to use
 - `GITHUB_TOKEN`: GitHub personal access token
@@ -104,7 +173,7 @@ const mockAzureService = customFactory.createAzureService();
 
 ## Mock Services
 
-All services (Azure, Kubernetes, GitHub, and Oracle) have comprehensive mock implementations that:
+All services (Azure, Kubernetes, GitHub, AIChat, and Oracle) have comprehensive mock implementations that:
 
 - Return realistic sample data
 - Simulate API response delays
@@ -114,11 +183,13 @@ All services (Azure, Kubernetes, GitHub, and Oracle) have comprehensive mock imp
 
 ### Benefits of Mock Services
 
-1. **Development**: No need for real cloud resources during development
+1. **Development**: No need for real cloud resources or API keys during development
 2. **Testing**: Consistent, predictable data for testing
 3. **Demos**: Rich sample data for demonstrations
 4. **Offline Work**: Work without internet connectivity
-5. **Cost Savings**: No cloud resource costs during development
+5. **Cost Savings**: No cloud resource costs or AI API usage during development
+- **Log Streaming**: Real-time log streaming using Server-Sent Events
+
 
 ## Quick Start
 
