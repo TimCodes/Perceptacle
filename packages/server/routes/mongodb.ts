@@ -7,6 +7,64 @@ const router = Router();
 // Get MongoDB service instance (real or mock based on configuration)
 let mongoDBService: MongoDBService | MockMongoDBService | null = null;
 
+/**
+ * Validate and sanitize collection name to prevent injection attacks
+ * MongoDB collection names must follow certain rules
+ */
+const validateCollectionName = (name: string): boolean => {
+  // Collection names must be strings, non-empty, and follow MongoDB naming rules
+  if (!name || typeof name !== 'string') return false;
+  
+  // MongoDB collection names cannot:
+  // - Be empty
+  // - Contain null character
+  // - Start with "system."
+  // - Contain $
+  if (name.length === 0 || 
+      name.includes('\0') || 
+      name.startsWith('system.') ||
+      name.includes('$')) {
+    return false;
+  }
+  
+  // Additional security: only allow alphanumeric, underscore, and hyphen
+  // This is more restrictive than MongoDB but safer
+  const safeNamePattern = /^[a-zA-Z0-9_-]+$/;
+  return safeNamePattern.test(name);
+};
+
+/**
+ * Basic validation for filter objects to prevent NoSQL injection
+ * This is a conservative approach - reject filters with suspicious operators
+ */
+const validateFilter = (filter: any): boolean => {
+  if (!filter || typeof filter !== 'object') return true; // Empty filter is OK
+  
+  // Check for potentially dangerous operators at root level
+  // We allow standard MongoDB query operators but want to ensure they're used properly
+  const dangerousPatterns = ['$where', '$function', '$accumulator'];
+  
+  const checkObject = (obj: any, depth: number = 0): boolean => {
+    // Prevent extremely deep nesting (potential DoS)
+    if (depth > 10) return false;
+    
+    for (const key of Object.keys(obj)) {
+      // Check for dangerous operators
+      if (dangerousPatterns.some(pattern => key.includes(pattern))) {
+        return false;
+      }
+      
+      // Recursively check nested objects
+      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        if (!checkObject(obj[key], depth + 1)) return false;
+      }
+    }
+    return true;
+  };
+  
+  return checkObject(filter);
+};
+
 // Middleware to ensure MongoDB service is initialized
 const ensureMongoDBService = (req: Request, res: Response, next: any) => {
   if (!mongoDBService) {
@@ -86,7 +144,11 @@ router.post("/collections", ensureMongoDBService, async (req: Request, res: Resp
     const { name } = req.body;
 
     if (!name) {
-      return res.status(400).json({ error: 'Collection name is required' });
+      return res.status(400).json({ error: 'Invalid collection name' });
+    }
+
+    if (!validateCollectionName(name)) {
+      return res.status(400).json({ error: 'Invalid collection name. Use only alphanumeric characters, underscores, and hyphens.' });
     }
 
     await mongoDBService!.createCollection(name);
@@ -108,8 +170,12 @@ router.delete("/collections/:collectionName", ensureMongoDBService, async (req: 
   try {
     const { collectionName } = req.params;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
+    }
+
+    if (!validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     const result = await mongoDBService!.dropCollection(collectionName);
@@ -131,8 +197,8 @@ router.get("/collections/:collectionName/exists", ensureMongoDBService, async (r
   try {
     const { collectionName } = req.params;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     const exists = await mongoDBService!.collectionExists(collectionName);
@@ -156,8 +222,12 @@ router.post("/collections/:collectionName/find", ensureMongoDBService, async (re
     const { collectionName } = req.params;
     const { filter, limit, skip, sort } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
+    }
+
+    if (filter && !validateFilter(filter)) {
+      return res.status(400).json({ error: 'Invalid filter. Dangerous operators are not allowed.' });
     }
 
     const documents = await mongoDBService!.find(collectionName, {
@@ -187,8 +257,12 @@ router.post("/collections/:collectionName/findOne", ensureMongoDBService, async 
     const { collectionName } = req.params;
     const { filter } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
+    }
+
+    if (filter && !validateFilter(filter)) {
+      return res.status(400).json({ error: 'Invalid filter. Dangerous operators are not allowed.' });
     }
 
     const document = await mongoDBService!.findOne(collectionName, filter || {});
@@ -212,8 +286,8 @@ router.post("/collections/:collectionName/insertOne", ensureMongoDBService, asyn
     const { collectionName } = req.params;
     const { document } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     if (!document) {
@@ -241,8 +315,8 @@ router.post("/collections/:collectionName/insertMany", ensureMongoDBService, asy
     const { collectionName } = req.params;
     const { documents } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     if (!documents || !Array.isArray(documents)) {
@@ -270,12 +344,16 @@ router.patch("/collections/:collectionName/updateOne", ensureMongoDBService, asy
     const { collectionName } = req.params;
     const { filter, update } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     if (!filter) {
       return res.status(400).json({ error: 'Filter is required' });
+    }
+
+    if (filter && !validateFilter(filter)) {
+      return res.status(400).json({ error: 'Invalid filter. Dangerous operators are not allowed.' });
     }
 
     if (!update) {
@@ -303,12 +381,16 @@ router.patch("/collections/:collectionName/updateMany", ensureMongoDBService, as
     const { collectionName } = req.params;
     const { filter, update } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     if (!filter) {
       return res.status(400).json({ error: 'Filter is required' });
+    }
+
+    if (filter && !validateFilter(filter)) {
+      return res.status(400).json({ error: 'Invalid filter. Dangerous operators are not allowed.' });
     }
 
     if (!update) {
@@ -336,12 +418,16 @@ router.delete("/collections/:collectionName/deleteOne", ensureMongoDBService, as
     const { collectionName } = req.params;
     const { filter } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     if (!filter) {
       return res.status(400).json({ error: 'Filter is required' });
+    }
+
+    if (filter && !validateFilter(filter)) {
+      return res.status(400).json({ error: 'Invalid filter. Dangerous operators are not allowed.' });
     }
 
     const result = await mongoDBService!.deleteOne(collectionName, filter);
@@ -365,12 +451,16 @@ router.delete("/collections/:collectionName/deleteMany", ensureMongoDBService, a
     const { collectionName } = req.params;
     const { filter } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     if (!filter) {
       return res.status(400).json({ error: 'Filter is required' });
+    }
+
+    if (filter && !validateFilter(filter)) {
+      return res.status(400).json({ error: 'Invalid filter. Dangerous operators are not allowed.' });
     }
 
     const result = await mongoDBService!.deleteMany(collectionName, filter);
@@ -394,8 +484,12 @@ router.post("/collections/:collectionName/count", ensureMongoDBService, async (r
     const { collectionName } = req.params;
     const { filter } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
+    }
+
+    if (filter && !validateFilter(filter)) {
+      return res.status(400).json({ error: 'Invalid filter. Dangerous operators are not allowed.' });
     }
 
     const count = await mongoDBService!.countDocuments(collectionName, filter || {});
@@ -419,8 +513,8 @@ router.post("/collections/:collectionName/aggregate", ensureMongoDBService, asyn
     const { collectionName } = req.params;
     const { pipeline } = req.body;
 
-    if (!collectionName) {
-      return res.status(400).json({ error: 'Collection name is required' });
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
     }
 
     if (!pipeline || !Array.isArray(pipeline)) {
