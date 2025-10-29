@@ -14,7 +14,8 @@
     "db:studio": "drizzle-kit studio",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:mocks": "USE_MOCK_SERVICES=true tsx test-mocked-services.ts"
+    "test:mocks": "USE_MOCK_SERVICES=true tsx test-mocked-services.ts",
+    "demo:aichat": "USE_MOCK_SERVICES=true tsx aichat-demo.ts"
   },
   "dependencies": {
     "@azure/arm-monitor": "^7.0.0",
@@ -27,6 +28,11 @@
     "@azure/monitor-query-metrics": "^1.0.0",
     "@azure/service-bus": "^7.9.5",
     "@kubernetes/client-node": "^1.4.0",
+    "@langchain/anthropic": "^0.3.33",
+    "@langchain/community": "^1.0.0",
+    "@langchain/core": "^1.0.2",
+    "@langchain/google-genai": "^1.0.0",
+    "@langchain/openai": "^1.0.0",
     "@octokit/rest": "^21.1.1",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
