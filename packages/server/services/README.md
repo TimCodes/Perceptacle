@@ -32,6 +32,33 @@ This service provides a comprehensive API to interact with Kubernetes clusters, 
 - **Resource Analytics**: Namespace-level resource usage summaries
 - **Mock Implementation**: Full mock service for development and testing
 
+### GitHub Service & Mock GitHub Service
+
+This service provides a comprehensive API to interact with GitHub repositories, allowing you to retrieve pull requests, workflow runs, and repository information.
+
+#### Features
+
+- **Repository Management**: List and retrieve repository information
+- **Pull Requests**: Get pull requests, comments, and reviews
+- **Workflow Runs**: Monitor GitHub Actions workflow runs
+- **Issues**: List and manage repository issues
+- **Branches**: List and retrieve branch information
+- **Mock Implementation**: Full mock service for development and testing
+
+### Oracle Service & Mock Oracle Service
+
+This service provides a comprehensive API to interact with Oracle Cloud Infrastructure (OCI) resources.
+
+#### Features
+
+- **Compartment Management**: List compartments in your tenancy
+- **Compute Instances**: List and retrieve compute instance details
+- **Block Storage**: Manage and monitor block volumes
+- **Networking**: List Virtual Cloud Networks (VCNs) and networking resources
+- **Database Systems**: Monitor Oracle database systems
+- **Metrics Collection**: Retrieve performance metrics for resources
+- **Mock Implementation**: Full mock service for development and testing
+
 ### Service Factory
 
 The service factory provides a unified way to create and manage service instances, allowing easy switching between real and mock implementations.
@@ -44,6 +71,8 @@ import { serviceFactory, createServiceFactoryFromEnv } from './service-factory';
 // Use the default factory (configured from environment variables)
 const kubernetesService = serviceFactory.createKubernetesService();
 const azureService = serviceFactory.createAzureService();
+const githubService = serviceFactory.createGitHubService();
+const oracleService = serviceFactory.createOracleService();
 
 // Create a custom factory
 const customFactory = new ServiceFactory({
@@ -66,10 +95,16 @@ const mockAzureService = customFactory.createAzureService();
 - `AZURE_TENANT_ID`: Azure tenant ID
 - `KUBECONFIG`: Path to Kubernetes configuration file
 - `KUBE_CONTEXT`: Kubernetes context to use
+- `GITHUB_TOKEN`: GitHub personal access token
+- `ORACLE_TENANCY`: Oracle Cloud tenancy OCID
+- `ORACLE_USER`: Oracle Cloud user OCID
+- `ORACLE_FINGERPRINT`: Oracle API key fingerprint
+- `ORACLE_PRIVATE_KEY`: Oracle API private key
+- `ORACLE_REGION`: Oracle Cloud region (e.g., us-phoenix-1)
 
 ## Mock Services
 
-Both Azure and Kubernetes services have comprehensive mock implementations that:
+All services (Azure, Kubernetes, GitHub, and Oracle) have comprehensive mock implementations that:
 
 - Return realistic sample data
 - Simulate API response delays
@@ -99,6 +134,19 @@ curl "http://localhost:3000/api/azure/resources"
 curl "http://localhost:3000/api/kubernetes/health"
 curl "http://localhost:3000/api/kubernetes/cluster"
 curl "http://localhost:3000/api/kubernetes/pods"
+```
+
+### GitHub Service
+```bash
+curl "http://localhost:3000/api/github/health"
+curl "http://localhost:3000/api/github/repos/owner/repo/pulls"
+```
+
+### Oracle Service
+```bash
+curl "http://localhost:3000/api/oracle/health"
+curl "http://localhost:3000/api/oracle/compartments?tenancyId=ocid1.tenancy.oc1..mock"
+curl "http://localhost:3000/api/oracle/compute/instances?compartmentId=ocid1.compartment.oc1..aaaaaaaa1"
 ```
 
 ## Documentation
