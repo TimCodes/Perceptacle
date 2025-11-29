@@ -9,6 +9,8 @@ import { OracleService, OracleCredentials } from './oracle';
 import { MockOracleService } from './oracle.mock';
 import { AIChatService, AIChatCredentials } from './aichat';
 import { MockAIChatService } from './aichat.mock';
+import { MongoDBService, MongoDBCredentials } from './mongodb';
+import { MockMongoDBService } from './mongodb.mock';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
@@ -23,11 +25,15 @@ export interface ServiceFactoryConfig {
   };
   oracle?: {
     credentials?: OracleCredentials;
+  };
   aichat?: {
     openaiApiKey?: string;
     anthropicApiKey?: string;
     geminiApiKey?: string;
     deepseekApiKey?: string;
+  };
+  mongodb?: {
+    credentials?: MongoDBCredentials;
   };
 }
 
@@ -121,6 +127,10 @@ export class ServiceFactory {
       return MockOracleService.fromCredentials(credentials);
     } else {
       return OracleService.fromCredentials(credentials);
+    }
+  }
+
+  /**
    * Create AIChat service instance (real or mock based on configuration)
    */
   createAIChatService(): AIChatService | MockAIChatService {
@@ -135,6 +145,23 @@ export class ServiceFactory {
       return new MockAIChatService(credentials);
     } else {
       return new AIChatService(credentials);
+    }
+  }
+
+  /**
+   * Create MongoDB service instance (real or mock based on configuration)
+   */
+  createMongoDBService(): MongoDBService | MockMongoDBService {
+    if (!this.config.mongodb?.credentials) {
+      throw new Error('MongoDB credentials are required');
+    }
+
+    const credentials = this.config.mongodb.credentials;
+
+    if (this.config.useMocks) {
+      return MockMongoDBService.fromCredentials(credentials);
+    } else {
+      return MongoDBService.fromCredentials(credentials);
     }
   }
 
@@ -195,11 +222,21 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
         privateKey: 'mock-private-key',
         region: 'us-phoenix-1'
       }
+    },
     aichat: {
       openaiApiKey: process.env.OPENAI_API_KEY,
       anthropicApiKey: process.env.ANTHROPIC_API_KEY,
       geminiApiKey: process.env.GEMINI_API_KEY,
       deepseekApiKey: process.env.DEEPSEEK_API_KEY,
+    },
+    mongodb: {
+      credentials: process.env.MONGODB_CONNECTION_STRING && process.env.MONGODB_DATABASE_NAME ? {
+        connectionString: process.env.MONGODB_CONNECTION_STRING,
+        databaseName: process.env.MONGODB_DATABASE_NAME
+      } : {
+        connectionString: 'mongodb://localhost:27017',
+        databaseName: 'perceptacle'
+      }
     }
   };
 
@@ -240,10 +277,20 @@ export function isOracleService(service: OracleService | MockOracleService): ser
 
 export function isMockOracleService(service: OracleService | MockOracleService): service is MockOracleService {
   return service instanceof MockOracleService;
+}
+
 export function isAIChatService(service: AIChatService | MockAIChatService): service is AIChatService {
   return service instanceof AIChatService;
 }
 
 export function isMockAIChatService(service: AIChatService | MockAIChatService): service is MockAIChatService {
   return service instanceof MockAIChatService;
+}
+
+export function isMongoDBService(service: MongoDBService | MockMongoDBService): service is MongoDBService {
+  return service instanceof MongoDBService;
+}
+
+export function isMockMongoDBService(service: MongoDBService | MockMongoDBService): service is MockMongoDBService {
+  return service instanceof MockMongoDBService;
 }
