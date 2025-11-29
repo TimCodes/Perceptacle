@@ -9,6 +9,7 @@ export * from './oracle';
 export * from './oracle.mock';
 export * from './aichat';
 export * from './aichat.mock';
+export * from './agents';
 export * from './service-factory';
 
 // Re-export commonly used types and classes
@@ -22,7 +23,8 @@ export { OracleService } from './oracle';
 export { MockOracleService } from './oracle.mock';
 export { AIChatService } from './aichat';
 export { MockAIChatService } from './aichat.mock';
-export { ServiceFactory, serviceFactory, createServiceFactoryFromEnv } from './service-factory';
+export { AgentsService, agentsService } from './agents';
+export { ServiceFactory } from './service-factory';
 
 // Type helpers
 export type {
@@ -87,12 +89,22 @@ export type {
   MetricData,
   Compartment
 } from './oracle';
+
+export type {
   // AIChat types
   AIChatCredentials,
   ChatMessage,
   ChatRequest,
   ChatResponse
 } from './aichat';
+
+export type {
+  // Agents types
+  AgentHealthResponse,
+  AgentStatusResponse,
+  ChatRequest as AgentChatRequest,
+  ChatResponse as AgentChatResponse
+} from './agents';
 
 export type {
   // Service factory types

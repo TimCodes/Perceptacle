@@ -1,6 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
+import { config } from "dotenv";
 import { registerRoutes } from "./routes";
+
+// Load environment variables from .env file
+config();
 
 const app = express();
 
@@ -59,10 +63,10 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (_req: Request, res: Response) => {
-  res.status(200).json({ 
-    status: 'ok', 
+  res.status(200).json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'perceptacle-server' 
+    service: 'perceptacle-server'
   });
 });
 

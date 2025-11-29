@@ -67,6 +67,27 @@ services:
       timeout: 10s
       retries: 3
 
+  # Python Agents Service
+  agents:
+    build:
+      context: ./packages/agents
+      target: production
+    container_name: perceptacle-agents
+    restart: unless-stopped
+    environment:
+      ENVIRONMENT: production
+      PORT: 8000
+      LOG_LEVEL: INFO
+    ports:
+      - "${AGENTS_PORT:-8000}:8000"
+    networks:
+      - perceptacle-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   postgres_data:
     driver: local

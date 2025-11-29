@@ -4,21 +4,25 @@ import azureRoutes from "./routes/azure";
 import kubernetesRoutes from "./routes/kubernetes";
 import githubRoutes from "./routes/github";
 import oracleRoutes from "./routes/oracle";
+import agentsRoutes from "./routes/agents";
 import telemetryMapsRoutes from "./routes/telemetryMaps";
 
 export function registerRoutes(app: Express): Server {
   // Register Azure routes
   app.use("/api/azure", azureRoutes);
-  
+
   // Register Kubernetes routes
   app.use("/api/kubernetes", kubernetesRoutes);
-  
+
   // Register GitHub routes
   app.use("/api/github", githubRoutes);
-  
+
   // Register Oracle routes
   app.use("/api/oracle", oracleRoutes);
-  
+
+  // Register Agents routes
+  app.use("/api/agents", agentsRoutes);
+
   // Register Telemetry Maps routes
   app.use("/api/telemetry-maps", telemetryMapsRoutes);
 
