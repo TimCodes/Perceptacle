@@ -28,11 +28,11 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 **1.1 Python Agents Package Setup**
 - **Story Points**: 5
 - **Description**: As a developer, I need a Python-based microservice/package to host LangGraph agents, as the current Node.js backend is insufficient for advanced agentic workflows.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Create `packages/agents` (Python/FastAPI or Flask).
-  - [ ] Configure Docker container for the Python service.
-  - [ ] Establish communication between Node.js server and Python agents service.
+  - [x] Create `packages/agents` (Python/FastAPI or Flask).
+  - [x] Configure Docker container for the Python service.
+  - [x] Establish communication between Node.js server and Python agents service.
 
 **1.2 RAG Service Integration (External)**
 - **Story Points**: 5
