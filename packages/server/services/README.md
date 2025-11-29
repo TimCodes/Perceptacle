@@ -1,8 +1,101 @@
 # Perceptacle Services
 
-This directory contains services for interacting with cloud infrastructure and orchestration platforms.
+This directory contains services for interacting with cloud infrastructure, orchestration platforms, and databases.
 
 ## Available Services
+
+### MongoDB Service & Mock MongoDB Service
+
+This service provides a comprehensive API to interact with MongoDB databases, allowing you to perform CRUD operations, manage collections, and execute aggregation queries.
+
+#### Features
+
+- **Connection Management**: Connect and disconnect from MongoDB
+- **Database Operations**: List databases and collections
+- **CRUD Operations**: Create, read, update, and delete documents
+- **Query Support**: Filter, sort, skip, and limit documents
+- **Aggregation Pipeline**: Execute complex aggregation queries
+- **Collection Management**: Create, drop, and check collection existence
+- **Health Check**: Monitor database connectivity
+- **Mock Implementation**: Full mock service for development and testing
+
+#### Usage Example
+
+```typescript
+import { serviceFactory } from './service-factory';
+
+// Create MongoDB service
+const mongoService = serviceFactory.createMongoDBService();
+
+// Connect to MongoDB
+await mongoService.connect();
+
+// List all collections
+const collections = await mongoService.listCollections();
+console.log('Collections:', collections);
+
+// Insert a document
+const insertResult = await mongoService.insertOne('users', {
+  name: 'John Doe',
+  email: 'john@example.com',
+  age: 30
+});
+console.log('Inserted ID:', insertResult.insertedId);
+
+// Find documents
+const users = await mongoService.find('users', {
+  filter: { age: { $gte: 25 } },
+  limit: 10,
+  sort: { name: 1 }
+});
+console.log('Users:', users);
+
+// Update a document
+const updateResult = await mongoService.updateOne(
+  'users',
+  { email: 'john@example.com' },
+  { $set: { age: 31 } }
+);
+console.log('Modified count:', updateResult.modifiedCount);
+
+// Delete a document
+const deleteResult = await mongoService.deleteOne('users', {
+  email: 'john@example.com'
+});
+console.log('Deleted count:', deleteResult.deletedCount);
+
+// Aggregate documents
+const aggregateResult = await mongoService.aggregate('orders', [
+  { $match: { status: 'completed' } },
+  { $group: { _id: '$userId', total: { $sum: '$amount' } } },
+  { $sort: { total: -1 } }
+]);
+console.log('Aggregation result:', aggregateResult);
+
+// Disconnect
+await mongoService.disconnect();
+```
+
+#### API Endpoints
+
+All MongoDB routes are prefixed with `/api/mongodb`:
+
+- `GET /health` - Health check
+- `GET /databases` - List all databases
+- `GET /collections` - List all collections
+- `POST /collections` - Create a new collection
+- `DELETE /collections/:collectionName` - Drop a collection
+- `GET /collections/:collectionName/exists` - Check if collection exists
+- `POST /collections/:collectionName/find` - Find documents
+- `POST /collections/:collectionName/findOne` - Find one document
+- `POST /collections/:collectionName/insertOne` - Insert one document
+- `POST /collections/:collectionName/insertMany` - Insert multiple documents
+- `PATCH /collections/:collectionName/updateOne` - Update one document
+- `PATCH /collections/:collectionName/updateMany` - Update multiple documents
+- `DELETE /collections/:collectionName/deleteOne` - Delete one document
+- `DELETE /collections/:collectionName/deleteMany` - Delete multiple documents
+- `POST /collections/:collectionName/count` - Count documents
+- `POST /collections/:collectionName/aggregate` - Aggregate documents
 
 ### AIChat Service & Mock AIChat Service
 
@@ -132,6 +225,7 @@ const azureService = serviceFactory.createAzureService();
 const githubService = serviceFactory.createGitHubService();
 const oracleService = serviceFactory.createOracleService();
 const aiChatService = serviceFactory.createAIChatService();
+const mongoDBService = serviceFactory.createMongoDBService();
 
 // Create a custom factory
 const customFactory = new ServiceFactory({
@@ -142,17 +236,26 @@ const customFactory = new ServiceFactory({
   aichat: {
     openaiApiKey: 'your-openai-key',
     anthropicApiKey: 'your-anthropic-key'
+  },
+  mongodb: {
+    credentials: {
+      connectionString: 'mongodb://localhost:27017',
+      databaseName: 'mydb'
+    }
   }
 });
 
 const mockAzureService = customFactory.createAzureService();
 const mockAIChatService = customFactory.createAIChatService();
+const mockMongoDBService = customFactory.createMongoDBService();
 ```
 
 #### Environment Variables
 
 - `USE_MOCK_SERVICES`: Set to 'true' to use mock services
 - `NODE_ENV`: When set to 'development', mock services are used by default
+- `MONGODB_CONNECTION_STRING`: MongoDB connection string (e.g., 'mongodb://localhost:27017')
+- `MONGODB_DATABASE_NAME`: MongoDB database name
 - `OPENAI_API_KEY`: OpenAI API key for GPT models
 - `ANTHROPIC_API_KEY`: Anthropic API key for Claude models
 - `GEMINI_API_KEY`: Google API key for Gemini models
@@ -173,7 +276,7 @@ const mockAIChatService = customFactory.createAIChatService();
 
 ## Mock Services
 
-All services (Azure, Kubernetes, GitHub, AIChat, and Oracle) have comprehensive mock implementations that:
+All services (Azure, Kubernetes, GitHub, AIChat, Oracle, and MongoDB) have comprehensive mock implementations that:
 
 - Return realistic sample data
 - Simulate API response delays
@@ -192,6 +295,15 @@ All services (Azure, Kubernetes, GitHub, AIChat, and Oracle) have comprehensive 
 
 
 ## Quick Start
+
+### MongoDB Service
+```bash
+curl "http://localhost:3000/api/mongodb/health"
+curl "http://localhost:3000/api/mongodb/collections"
+curl "http://localhost:3000/api/mongodb/collections/users/find" \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"filter": {}, "limit": 10}'
+```
 
 ### Azure Service
 ```bash
