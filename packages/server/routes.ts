@@ -6,6 +6,7 @@ import githubRoutes from "./routes/github";
 import oracleRoutes from "./routes/oracle";
 import agentsRoutes from "./routes/agents";
 import mongodbRoutes from "./routes/mongodb";
+import ragRoutes from "./routes/rag";
 import telemetryMapsRoutes from "./routes/telemetryMaps";
 
 export function registerRoutes(app: Express): Server {
@@ -26,6 +27,9 @@ export function registerRoutes(app: Express): Server {
 
   // Register MongoDB routes
   app.use("/api/mongodb", mongodbRoutes);
+
+  // Register RAG routes
+  app.use("/api/rag", ragRoutes);
 
   // Register Telemetry Maps routes
   app.use("/api/telemetry-maps", telemetryMapsRoutes);

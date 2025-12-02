@@ -5,8 +5,8 @@
 Perceptacle is a hybrid observability, data visualization, and troubleshooting platform designed to assist on-call engineers. While the project has a solid foundation with a React-based diagramming UI and initial Node.js backend integrations for Azure, Kubernetes, and GitHub, it currently lacks the core "intelligent" features that differentiate it. Specifically, the AI agentic capabilities, comprehensive data ingestion, and active remediation are missing or incomplete.
 
 ### Critical Gaps:
-- ❌ **No Agentic Capabilities**: Missing Python/LangGraph agents package.
-- ❌ **No RAG Integration**: Application is not connected to the external RAG service.
+- 🚧 **Agentic Capabilities**: Python/LangGraph agents package created, needs agent implementation.
+- ✅ **RAG Integration**: Application is now connected to the external RAG service with mock support.
 - ❌ **Incomplete Data Connections**: Oracle service is a skeleton; Mongo is missing.
 - ❌ **No Log Ingestion**: Current integrations fetch resources/metrics, not logs.
 - ❌ **No Action/Reposting**: Cannot send messages to Kafka/Service Bus/HTTP.
@@ -37,11 +37,11 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 **1.2 RAG Service Integration (External)**
 - **Story Points**: 5
 - **Description**: As an engineer, I need the system to connect to our existing external RAG service via REST so the AI can answer context-aware questions using documentation and historical logs.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Implement `RagService` in `packages/server` to consume the external REST API.
-  - [ ] Add configuration for RAG service URL and Authentication.
-  - [ ] Create retrieval tools/functions for the AI Assistant to query the RAG service.
+  - [x] Implement `RagService` in `packages/server` to consume the external REST API.
+  - [x] Add configuration for RAG service URL and Authentication.
+  - [x] Create retrieval tools/functions for the AI Assistant to query the RAG service.
 
 **1.3 LangGraph Agent Implementation**
 - **Story Points**: 13

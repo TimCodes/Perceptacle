@@ -1,5 +1,5 @@
 import { Node } from 'reactflow';
-import { cloudComponents } from './cloudComponents';
+import { cloudComponents } from './cloudComponents.tsx';
 
 interface Suggestion {
   type: string;
@@ -74,7 +74,7 @@ export async function getComponentSuggestions(nodes: Node[]): Promise<Array<{ ty
     const suggestions = findMissingCommonComponents(nodes);
 
     // Filter suggestions to only include valid component types
-    return suggestions.filter(suggestion => 
+    return suggestions.filter(suggestion =>
       cloudComponents.some(component => component.type === suggestion.type)
     );
   } catch (error) {

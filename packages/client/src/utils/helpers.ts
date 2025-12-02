@@ -1,4 +1,4 @@
-export const getStatusColor = (status) => {
+export const getStatusColor = (status: string): string => {
   switch (status) {
     case "active":
       return "hsl(var(--success))";
@@ -13,7 +13,7 @@ export const getStatusColor = (status) => {
   }
 };
 
-export const getPriorityColor = (priority) => {
+export const getPriorityColor = (priority: string): string => {
   switch (priority.toLowerCase()) {
     case "high":
       return "text-destructive";
@@ -26,7 +26,7 @@ export const getPriorityColor = (priority) => {
   }
 };
 
-export const getStatusBadgeVariant = (status) => {
+export const getStatusBadgeVariant = (status: string): string => {
   switch (status.toLowerCase()) {
     case "open":
       return "destructive";

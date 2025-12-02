@@ -11,6 +11,8 @@ import { AIChatService, AIChatCredentials } from './aichat';
 import { MockAIChatService } from './aichat.mock';
 import { MongoDBService, MongoDBCredentials } from './mongodb';
 import { MockMongoDBService } from './mongodb.mock';
+import { RagService, RagCredentials } from './rag';
+import { MockRagService } from './rag.mock';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
@@ -34,6 +36,10 @@ export interface ServiceFactoryConfig {
   };
   mongodb?: {
     credentials?: MongoDBCredentials;
+  };
+  rag?: {
+    baseUrl?: string;
+    credentials?: RagCredentials;
   };
 }
 
@@ -166,6 +172,20 @@ export class ServiceFactory {
   }
 
   /**
+   * Create RAG service instance (real or mock based on configuration)
+   */
+  createRagService(): RagService | MockRagService {
+    const baseUrl = this.config.rag?.baseUrl;
+    const credentials = this.config.rag?.credentials;
+
+    if (this.config.useMocks) {
+      return new MockRagService(baseUrl, credentials);
+    } else {
+      return new RagService(baseUrl, credentials);
+    }
+  }
+
+  /**
    * Check if the factory is configured to use mock services
    */
   isUsingMocks(): boolean {
@@ -190,7 +210,7 @@ export class ServiceFactory {
 // Environment-based factory creation
 export function createServiceFactoryFromEnv(): ServiceFactory {
   const useMocks = process.env.USE_MOCK_SERVICES === 'true' || (process.env.NODE_ENV === 'development' && process.env.USE_MOCK_SERVICES !== 'false');
-  
+
   const config: ServiceFactoryConfig = {
     useMocks,
     azure: {
@@ -237,6 +257,12 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
         connectionString: 'mongodb://localhost:27017',
         databaseName: 'perceptacle'
       }
+    },
+    rag: {
+      baseUrl: process.env.RAG_SERVICE_URL,
+      credentials: process.env.RAG_SERVICE_API_KEY ? {
+        apiKey: process.env.RAG_SERVICE_API_KEY
+      } : undefined
     }
   };
 
@@ -293,4 +319,12 @@ export function isMongoDBService(service: MongoDBService | MockMongoDBService): 
 
 export function isMockMongoDBService(service: MongoDBService | MockMongoDBService): service is MockMongoDBService {
   return service instanceof MockMongoDBService;
+}
+
+export function isRagService(service: RagService | MockRagService): service is RagService {
+  return service instanceof RagService;
+}
+
+export function isMockRagService(service: RagService | MockRagService): service is MockRagService {
+  return service instanceof MockRagService;
 }

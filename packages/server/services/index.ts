@@ -12,6 +12,8 @@ export * from './aichat.mock';
 export * from './agents';
 export * from './mongodb';
 export * from './mongodb.mock';
+export * from './rag';
+export * from './rag.mock';
 export * from './service-factory';
 
 // Re-export commonly used types and classes
@@ -28,6 +30,8 @@ export { MockAIChatService } from './aichat.mock';
 export { AgentsService, agentsService } from './agents';
 export { MongoDBService } from './mongodb';
 export { MockMongoDBService } from './mongodb.mock';
+export { RagService } from './rag';
+export { MockRagService } from './rag.mock';
 export { ServiceFactory, serviceFactory, createServiceFactoryFromEnv } from './service-factory';
 
 // Type helpers
@@ -121,6 +125,18 @@ export type {
   DatabaseInfo,
   CollectionInfo
 } from './mongodb';
+
+export type {
+  // RAG types
+  RagCredentials,
+  RagQueryParams,
+  RagDocument,
+  RagQueryResponse,
+  RagRetrievalParams,
+  RagRetrievalResponse,
+  RagHealthResponse,
+  RagIndexStats
+} from './rag';
 
 export type {
   // Service factory types

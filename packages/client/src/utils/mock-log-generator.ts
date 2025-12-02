@@ -1,6 +1,13 @@
 import { useDiagramStore } from './diagram-store';
 
-const mockLogMessages = {
+interface LogMessage {
+  message: string;
+  level: 'info' | 'warning' | 'error';
+}
+
+type ComponentType = 'compute-engine' | 'cloud-storage' | 'cloud-sql';
+
+const mockLogMessages: Record<ComponentType, LogMessage[]> = {
   'compute-engine': [
     { message: 'Instance started successfully', level: 'info' },
     { message: 'High CPU usage detected: 85%', level: 'warning' },
@@ -23,13 +30,13 @@ const mockLogMessages = {
 
 export function startMockLogGenerator() {
   const { nodes, addNodeLog } = useDiagramStore.getState();
-  
+
   const generateLog = () => {
     nodes.forEach(node => {
-      const componentType = node.data.type || 'compute-engine';
+      const componentType = (node.data.type || 'compute-engine') as ComponentType;
       const logs = mockLogMessages[componentType] || mockLogMessages['compute-engine'];
       const randomLog = logs[Math.floor(Math.random() * logs.length)];
-      
+
       // 30% chance to generate a log for each component
       if (Math.random() < 0.3) {
         addNodeLog(node.id, randomLog.message, randomLog.level);
@@ -39,7 +46,7 @@ export function startMockLogGenerator() {
 
   // Generate logs every 5 seconds
   const intervalId = setInterval(generateLog, 5000);
-  
+
   // Return cleanup function
   return () => clearInterval(intervalId);
 }

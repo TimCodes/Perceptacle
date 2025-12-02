@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,10 +9,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface CustomField {
+  name: string;
+  type: string;
+  value?: string | number;
+  placeholder?: string;
+  options?: string[];
+}
+
+interface CustomFieldsSectionProps {
+  customFields: CustomField[];
+  handleCustomFieldChange: (name: string, value: string) => void;
+}
+
 export const CustomFieldsSection = ({
   customFields,
   handleCustomFieldChange,
-}) => (
+}: CustomFieldsSectionProps) => (
   <div className="space-y-4">
     <h3 className="font-medium">Custom Fields</h3>
     <div className="space-y-4">
@@ -21,7 +34,7 @@ export const CustomFieldsSection = ({
           <Label>{field.name}</Label>
           {field.type === "select" ? (
             <Select
-              value={field.value || ""}
+              value={field.value?.toString() || ""}
               onValueChange={(value) =>
                 handleCustomFieldChange(field.name, value)
               }
@@ -40,7 +53,7 @@ export const CustomFieldsSection = ({
           ) : (
             <Input
               type={field.type === "number" ? "number" : "text"}
-              value={field.value || ""}
+              value={field.value?.toString() || ""}
               onChange={(e) =>
                 handleCustomFieldChange(field.name, e.target.value)
               }

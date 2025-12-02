@@ -33,6 +33,8 @@ class Settings:
     
     # External Services
     RAG_SERVICE_URL: Optional[str] = os.getenv("RAG_SERVICE_URL")
+    RAG_SERVICE_API_KEY: Optional[str] = os.getenv("RAG_SERVICE_API_KEY")
+    RAG_SERVICE_TIMEOUT: int = int(os.getenv("RAG_SERVICE_TIMEOUT", "30000"))
     
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
