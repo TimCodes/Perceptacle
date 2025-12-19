@@ -14,21 +14,22 @@ let mongoDBService: MongoDBService | MockMongoDBService | null = null;
 const validateCollectionName = (name: string): boolean => {
   // Collection names must be strings, non-empty, and follow MongoDB naming rules
   if (!name || typeof name !== 'string') return false;
-  
+
   // MongoDB collection names cannot:
   // - Be empty
   // - Contain null character
-  // - Start with "system."
+  // - Start with "system." (EXCEPT for system.profile which we allow for logs)
   // - Contain $
-  if (name.length === 0 || 
-      name.includes('\0') || 
-      name.startsWith('system.') ||
-      name.includes('$')) {
+  if (name.length === 0 ||
+    name.includes('\0') ||
+    (name.startsWith('system.') && name !== 'system.profile') ||
+    name.includes('$')) {
     return false;
   }
-  
-  // Additional security: only allow alphanumeric, underscore, and hyphen
-  // This is more restrictive than MongoDB but safer
+
+  // Additional security: only allow alphanumeric, underscore, and hyphen (and dot for system.profile)
+  if (name === 'system.profile') return true;
+
   const safeNamePattern = /^[a-zA-Z0-9_-]+$/;
   return safeNamePattern.test(name);
 };
@@ -39,21 +40,21 @@ const validateCollectionName = (name: string): boolean => {
  */
 const validateFilter = (filter: any): boolean => {
   if (!filter || typeof filter !== 'object') return true; // Empty filter is OK
-  
+
   // Check for potentially dangerous operators at root level
   // We allow standard MongoDB query operators but want to ensure they're used properly
   const dangerousPatterns = ['$where', '$function', '$accumulator'];
-  
+
   const checkObject = (obj: any, depth: number = 0): boolean => {
     // Prevent extremely deep nesting (potential DoS)
     if (depth > 10) return false;
-    
+
     for (const key of Object.keys(obj)) {
       // Check for dangerous operators
       if (dangerousPatterns.some(pattern => key.includes(pattern))) {
         return false;
       }
-      
+
       // Recursively check nested objects
       if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
         if (!checkObject(obj[key], depth + 1)) return false;
@@ -61,7 +62,7 @@ const validateFilter = (filter: any): boolean => {
     }
     return true;
   };
-  
+
   return checkObject(filter);
 };
 
@@ -73,13 +74,13 @@ const ensureMongoDBService = (req: Request, res: Response, next: any) => {
       console.log(`MongoDB service initialized (using ${serviceFactory.isUsingMocks() ? 'mock' : 'real'} implementation)`);
     } catch (error) {
       console.error('Failed to initialize MongoDB service:', error);
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'Failed to initialize MongoDB service. Check your configuration.',
         details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
-  
+
   next();
 };
 
@@ -93,9 +94,9 @@ router.get("/health", ensureMongoDBService, async (req: Request, res: Response) 
     res.json(health);
   } catch (error: any) {
     console.error('Health check failed:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Health check failed',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -110,9 +111,9 @@ router.get("/databases", ensureMongoDBService, async (req: Request, res: Respons
     res.json(databases);
   } catch (error: any) {
     console.error('Error listing databases:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to list databases',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -127,9 +128,9 @@ router.get("/collections", ensureMongoDBService, async (req: Request, res: Respo
     res.json(collections);
   } catch (error: any) {
     console.error('Error listing collections:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to list collections',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -155,9 +156,9 @@ router.post("/collections", ensureMongoDBService, async (req: Request, res: Resp
     res.json({ success: true, message: `Collection '${name}' created successfully` });
   } catch (error: any) {
     console.error('Error creating collection:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to create collection',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -182,9 +183,9 @@ router.delete("/collections/:collectionName", ensureMongoDBService, async (req: 
     res.json({ success: result, message: result ? `Collection '${collectionName}' dropped successfully` : `Collection '${collectionName}' not found` });
   } catch (error: any) {
     console.error('Error dropping collection:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to drop collection',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -205,9 +206,9 @@ router.get("/collections/:collectionName/exists", ensureMongoDBService, async (r
     res.json({ exists });
   } catch (error: any) {
     console.error('Error checking collection existence:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to check collection existence',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -240,9 +241,9 @@ router.post("/collections/:collectionName/find", ensureMongoDBService, async (re
     res.json(documents);
   } catch (error: any) {
     console.error('Error finding documents:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to find documents',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -269,9 +270,9 @@ router.post("/collections/:collectionName/findOne", ensureMongoDBService, async 
     res.json(document);
   } catch (error: any) {
     console.error('Error finding document:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to find document',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -298,9 +299,9 @@ router.post("/collections/:collectionName/insertOne", ensureMongoDBService, asyn
     res.json(result);
   } catch (error: any) {
     console.error('Error inserting document:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to insert document',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -327,9 +328,9 @@ router.post("/collections/:collectionName/insertMany", ensureMongoDBService, asy
     res.json(result);
   } catch (error: any) {
     console.error('Error inserting documents:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to insert documents',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -364,9 +365,9 @@ router.patch("/collections/:collectionName/updateOne", ensureMongoDBService, asy
     res.json(result);
   } catch (error: any) {
     console.error('Error updating document:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to update document',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -401,9 +402,9 @@ router.patch("/collections/:collectionName/updateMany", ensureMongoDBService, as
     res.json(result);
   } catch (error: any) {
     console.error('Error updating documents:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to update documents',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -434,9 +435,9 @@ router.delete("/collections/:collectionName/deleteOne", ensureMongoDBService, as
     res.json(result);
   } catch (error: any) {
     console.error('Error deleting document:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to delete document',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -467,9 +468,9 @@ router.delete("/collections/:collectionName/deleteMany", ensureMongoDBService, a
     res.json(result);
   } catch (error: any) {
     console.error('Error deleting documents:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to delete documents',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -496,9 +497,9 @@ router.post("/collections/:collectionName/count", ensureMongoDBService, async (r
     res.json({ count });
   } catch (error: any) {
     console.error('Error counting documents:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to count documents',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -525,9 +526,55 @@ router.post("/collections/:collectionName/aggregate", ensureMongoDBService, asyn
     res.json(result);
   } catch (error: any) {
     console.error('Error aggregating documents:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to aggregate documents',
-      details: error.message 
+      details: error.message
+    });
+  }
+});
+
+
+/**
+ * Get collection statistics
+ * GET /api/mongodb/collections/:collectionName/stats
+ */
+router.get("/collections/:collectionName/stats", ensureMongoDBService, async (req: Request, res: Response) => {
+  try {
+    const { collectionName } = req.params;
+
+    if (!collectionName || !validateCollectionName(collectionName)) {
+      return res.status(400).json({ error: 'Invalid collection name' });
+    }
+
+    const stats = await mongoDBService!.getCollectionStats(collectionName);
+    res.json(stats);
+  } catch (error: any) {
+    console.error('Error getting collection stats:', error);
+    res.status(500).json({
+      error: 'Failed to get collection stats',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Get slow query logs
+ * GET /api/mongodb/logs/slow-queries
+ */
+router.get("/logs/slow-queries", ensureMongoDBService, async (req: Request, res: Response) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+
+    // Cap limit to prevent massive responses
+    const safeLimit = Math.min(Math.max(limit, 1), 1000);
+
+    const logs = await mongoDBService!.getSlowQueryLogs(safeLimit);
+    res.json(logs);
+  } catch (error: any) {
+    console.error('Error fetching slow query logs:', error);
+    res.status(500).json({
+      error: 'Failed to fetch slow query logs',
+      details: error.message
     });
   }
 });

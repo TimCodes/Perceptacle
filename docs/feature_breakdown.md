@@ -46,11 +46,11 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 **1.3 LangGraph Agent Implementation**
 - **Story Points**: 13
 - **Description**: As a user, I need an autonomous agent that can plan and execute troubleshooting steps, not just answer chat questions.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Implement a Supervisor Agent using LangGraph.
-  - [ ] Create tools for the agent (Query Logs, Check Metrics, Search Docs via RAG).
-  - [ ] Integrate agent with the Chat UI.
+  - [x] Implement a Supervisor Agent using LangGraph.
+  - [x] Create tools for the agent (Query Logs, Check Metrics, Search Docs via RAG).
+  - [x] Integrate agent with the Chat UI.
 
 ### Epic 2: Data Connectors & Ingestion
 **Business Value**: HIGH | **Technical Complexity**: MEDIUM | **Estimated Effort**: 2 weeks

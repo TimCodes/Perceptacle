@@ -1,3 +1,4 @@
-"""Agents package initialization (placeholder for Feature 1.3)."""
+"""Agents package initialization."""
+from .supervisor import SupervisorAgent, get_agent
 
-__all__ = []
+__all__ = ["SupervisorAgent", "get_agent"]

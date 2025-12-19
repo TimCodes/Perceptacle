@@ -481,4 +481,51 @@ export class MongoDBService {
       };
     }
   }
+
+  /**
+   * Get collection statistics
+   */
+  async getCollectionStats(collectionName: string): Promise<Document> {
+    if (!this.connected) {
+      await this.connect();
+    }
+
+    const db = this.getDatabase();
+
+    try {
+      return await db.command({ collStats: collectionName });
+    } catch (error) {
+      throw new Error(`Failed to get collection stats: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Get slow query logs from system.profile
+   */
+  async getSlowQueryLogs(limit: number = 50): Promise<Document[]> {
+    if (!this.connected) {
+      await this.connect();
+    }
+
+    const db = this.getDatabase();
+    
+    try {
+      // Check if profiling is enabled, if not we might want to warn or returns empty
+      // For now, we attempt to read system.profile
+      const profileCollection = db.collection('system.profile');
+      
+      // We'll return the most recent slow queries
+      // Usually profile entries have 'millis' field indicating duration
+      // We can sort by timestamp (ts) descending
+      return await profileCollection
+        .find({})
+        .sort({ ts: -1 })
+        .limit(limit)
+        .toArray();
+    } catch (error) {
+       // system.profile might not exist or be accessible
+       console.warn('Failed to fetch slow query logs:', error);
+       return [];
+    }
+  }
 }
