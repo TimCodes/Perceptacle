@@ -175,10 +175,6 @@ router.delete("/collections/:collectionName", ensureMongoDBService, async (req: 
       return res.status(400).json({ error: 'Invalid collection name' });
     }
 
-    if (!validateCollectionName(collectionName)) {
-      return res.status(400).json({ error: 'Invalid collection name' });
-    }
-
     const result = await mongoDBService!.dropCollection(collectionName);
     res.json({ success: result, message: result ? `Collection '${collectionName}' dropped successfully` : `Collection '${collectionName}' not found` });
   } catch (error: any) {

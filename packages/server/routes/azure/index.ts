@@ -29,6 +29,9 @@ const ensureAzureService = (req: Request, res: Response, next: any) => {
   next();
 };
 
+// Apply middleware globally
+router.use(ensureAzureService);
+
 // Health check endpoint
 router.get("/health", (req: Request, res: Response) => {
   res.json({ 
@@ -39,33 +42,56 @@ router.get("/health", (req: Request, res: Response) => {
   });
 });
 
-// Mount sub-routers with middleware
-router.use("/resources", ensureAzureService, (req, res, next) => {
-  if (!azureService) {
-    return res.status(500).json({ error: 'Azure service not initialized' });
+// Lazy initialization wrapper that creates routers on first request
+const getResourcesRouter = () => {
+  if (!azureService) throw new Error('Azure service not initialized');
+  return createResourcesRouter(azureService);
+};
+
+const getMetricsRouter = () => {
+  if (!azureService) throw new Error('Azure service not initialized');
+  return createMetricsRouter(azureService);
+};
+
+const getLogsRouter = () => {
+  if (!azureService) throw new Error('Azure service not initialized');
+  return createLogsRouter(azureService);
+};
+
+const getServiceBusRouter = () => {
+  if (!azureService) throw new Error('Azure service not initialized');
+  return createServiceBusRouter(azureService);
+};
+
+// Mount sub-routers - resources, metrics, and logs all share /resources path
+router.use("/resources", (req, res, next) => {
+  try {
+    const resourcesRouter = getResourcesRouter();
+    const metricsRouter = getMetricsRouter();
+    const logsRouter = getLogsRouter();
+    
+    // Try each router in sequence until one handles the request
+    resourcesRouter(req, res, (err?: any) => {
+      if (err) return next(err);
+      if (res.headersSent) return;
+      metricsRouter(req, res, (err?: any) => {
+        if (err) return next(err);
+        if (res.headersSent) return;
+        logsRouter(req, res, next);
+      });
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
-  createResourcesRouter(azureService)(req, res, next);
 });
 
-router.use("/resources", ensureAzureService, (req, res, next) => {
-  if (!azureService) {
-    return res.status(500).json({ error: 'Azure service not initialized' });
+router.use("/service-bus", (req, res, next) => {
+  try {
+    const serviceBusRouter = getServiceBusRouter();
+    serviceBusRouter(req, res, next);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
-  createMetricsRouter(azureService)(req, res, next);
-});
-
-router.use("/resources", ensureAzureService, (req, res, next) => {
-  if (!azureService) {
-    return res.status(500).json({ error: 'Azure service not initialized' });
-  }
-  createLogsRouter(azureService)(req, res, next);
-});
-
-router.use("/service-bus", ensureAzureService, (req, res, next) => {
-  if (!azureService) {
-    return res.status(500).json({ error: 'Azure service not initialized' });
-  }
-  createServiceBusRouter(azureService)(req, res, next);
 });
 
 export default router;

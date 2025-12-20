@@ -29,29 +29,55 @@ const ensureGitHubService = (req: Request, res: Response, next: any) => {
   next();
 };
 
-// Mount sub-routers with middleware
-router.use(ensureGitHubService, (req, res, next) => {
-  if (!githubService) {
-    return res.status(500).json({ error: 'GitHub service not initialized' });
-  }
-  
-  // Combine all routers
-  const pullRequestsRouter = createPullRequestsRouter(githubService);
-  const workflowsRouter = createWorkflowsRouter(githubService);
-  const branchesRouter = createBranchesRouter(githubService);
-  const issuesRouter = createIssuesRouter(githubService);
-  
-  // Try each router in sequence
-  pullRequestsRouter(req, res, (err?: any) => {
-    if (err) return next(err);
-    workflowsRouter(req, res, (err?: any) => {
+// Apply middleware globally
+router.use(ensureGitHubService);
+
+// Lazy initialization wrapper
+const getPullRequestsRouter = () => {
+  if (!githubService) throw new Error('GitHub service not initialized');
+  return createPullRequestsRouter(githubService);
+};
+
+const getWorkflowsRouter = () => {
+  if (!githubService) throw new Error('GitHub service not initialized');
+  return createWorkflowsRouter(githubService);
+};
+
+const getBranchesRouter = () => {
+  if (!githubService) throw new Error('GitHub service not initialized');
+  return createBranchesRouter(githubService);
+};
+
+const getIssuesRouter = () => {
+  if (!githubService) throw new Error('GitHub service not initialized');
+  return createIssuesRouter(githubService);
+};
+
+// Mount all routers at root level - they each define their own paths
+router.use((req, res, next) => {
+  try {
+    const pullRequestsRouter = getPullRequestsRouter();
+    const workflowsRouter = getWorkflowsRouter();
+    const branchesRouter = getBranchesRouter();
+    const issuesRouter = getIssuesRouter();
+    
+    // Try each router in sequence until one handles the request
+    pullRequestsRouter(req, res, (err?: any) => {
       if (err) return next(err);
-      branchesRouter(req, res, (err?: any) => {
+      if (res.headersSent) return;
+      workflowsRouter(req, res, (err?: any) => {
         if (err) return next(err);
-        issuesRouter(req, res, next);
+        if (res.headersSent) return;
+        branchesRouter(req, res, (err?: any) => {
+          if (err) return next(err);
+          if (res.headersSent) return;
+          issuesRouter(req, res, next);
+        });
       });
     });
-  });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 export default router;
