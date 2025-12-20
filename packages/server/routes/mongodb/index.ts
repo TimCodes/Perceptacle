@@ -1,6 +1,6 @@
 import { Router, type Request, Response } from "express";
-import { serviceFactory } from "../services/service-factory";
-import { MongoDBService, MockMongoDBService } from "../services";
+import { serviceFactory } from "../../services/service-factory";
+import { MongoDBService, MockMongoDBService } from "../../services";
 
 const router = Router();
 
@@ -172,10 +172,6 @@ router.delete("/collections/:collectionName", ensureMongoDBService, async (req: 
     const { collectionName } = req.params;
 
     if (!collectionName || !validateCollectionName(collectionName)) {
-      return res.status(400).json({ error: 'Invalid collection name' });
-    }
-
-    if (!validateCollectionName(collectionName)) {
       return res.status(400).json({ error: 'Invalid collection name' });
     }
 

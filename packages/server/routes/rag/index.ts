@@ -5,7 +5,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { RagService, MockRagService } from '../services';
+import { RagService, MockRagService } from '../../services';
 
 const router = Router();
 

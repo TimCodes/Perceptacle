@@ -1,6 +1,6 @@
 import { Router, type Request, Response } from "express";
-import { serviceFactory } from "../services/service-factory";
-import { OracleService, MockOracleService } from "../services";
+import { serviceFactory } from "../../services/service-factory";
+import { OracleService, MockOracleService } from "../../services";
 
 const router = Router();
 
