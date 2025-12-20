@@ -1,5 +1,5 @@
 import { Router, type Request, Response } from "express";
-import { TelemetryMap } from "../types/telemetryMap.js";
+import { TelemetryMap } from "../../types/telemetryMap.js";
 
 const router = Router();
 

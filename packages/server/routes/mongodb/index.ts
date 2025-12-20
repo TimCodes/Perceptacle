@@ -1,6 +1,6 @@
 import { Router, type Request, Response } from "express";
-import { serviceFactory } from "../services/service-factory";
-import { MongoDBService, MockMongoDBService } from "../services";
+import { serviceFactory } from "../../services/service-factory";
+import { MongoDBService, MockMongoDBService } from "../../services";
 
 const router = Router();
 

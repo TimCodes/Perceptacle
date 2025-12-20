@@ -2,7 +2,7 @@
  * Routes for interacting with the Python agents service
  */
 import { Router, Request, Response } from 'express';
-import { agentsService } from '../services/agents';
+import { agentsService } from '../../services/agents';
 
 const router = Router();
 
