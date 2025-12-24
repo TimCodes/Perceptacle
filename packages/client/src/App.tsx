@@ -7,12 +7,15 @@ import Settings from "@/pages/settings";
 import NodeTypes from "@/pages/node-types";
 import { ThemeProvider } from "./utils/theme-provider";
 
+import DashboardData from "@/pages/dashboard";
+
 import Navbar from "@/components/NavBar/NavBar";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/dashboard" component={DashboardData} />
       <Route path="/settings" component={Settings} />
       <Route path="/node-types" component={NodeTypes} />
       <Route component={NotFound} />

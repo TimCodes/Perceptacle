@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -9,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Info } from "lucide-react";
+import { Info, Plus, Trash2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -21,7 +22,7 @@ import { getConfigFieldsForNodeType, ConfigField } from "@/utils/nodeConfigField
 
 interface ConfigurationTabProps {
   editedNode: any;
-  handleChange: (field: string, value: string) => void;
+  handleChange: (field: string, value: any) => void;
   handleCustomFieldChange: (fieldName: string, value: string) => void;
 }
 
@@ -34,11 +35,11 @@ export const ConfigurationTab = ({
   const isAzureNode = editedNode.data.type?.startsWith('azure-');
   const isKubernetesNode = editedNode.data.type?.startsWith('k8s-');
   const isKafkaNode = editedNode.data.type?.startsWith('kafka-');
-  
+
   // Check if it's a GCP node by checking against known GCP component types
   const gcpComponentTypes = [
     'compute-engine', 'cloud-storage', 'cloud-sql', 'kubernetes-engine',
-    'cloud-functions', 'cloud-run', 'load-balancer', 'cloud-armor', 
+    'cloud-functions', 'cloud-run', 'load-balancer', 'cloud-armor',
     'app-engine', 'vpc-network'
   ];
   const isGCPNode = gcpComponentTypes.includes(editedNode.data.type || '');
@@ -66,7 +67,7 @@ export const ConfigurationTab = ({
             </TooltipProvider>
           )}
         </div>
-        
+
         {field.type === 'select' && field.options ? (
           <Select
             value={value}
@@ -104,7 +105,7 @@ export const ConfigurationTab = ({
 
   const getBadgeInfo = () => {
     if (isAzureNode) {
-      return { 
+      return {
         text: 'Azure Resource',
         className: 'bg-blue-100 text-blue-800',
         description: 'Additional fields for Azure metrics and logs'
@@ -148,7 +149,7 @@ export const ConfigurationTab = ({
           </span>
         </div>
       )}
-      
+
       {configFields.map(renderField)}
 
       {editedNode.data.customFields &&
@@ -158,6 +159,113 @@ export const ConfigurationTab = ({
             handleCustomFieldChange={handleCustomFieldChange}
           />
         )}
+
+      {/* Custom Actions Section */}
+      <div className="pt-4 border-t">
+        <h3 className="text-sm font-medium mb-4">Custom Actions</h3>
+        <div className="space-y-4">
+          {(editedNode.data.customActions || []).map((action: any, index: number) => (
+            <div key={index} className="p-3 border rounded-md space-y-3 bg-muted/10 relative group">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => {
+                  const newActions = [...(editedNode.data.customActions || [])];
+                  newActions.splice(index, 1);
+                  handleChange('customActions', newActions);
+                }}
+              >
+                <Trash2 className="h-3 w-3 text-destructive" />
+              </Button>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Action Name</Label>
+                  <Input
+                    value={action.name}
+                    onChange={(e) => {
+                      const newActions = [...(editedNode.data.customActions || [])];
+                      newActions[index].name = e.target.value;
+                      handleChange('customActions', newActions);
+                    }}
+                    placeholder="e.g. Trigger Backup"
+                    className="h-8 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Method</Label>
+                  <Select
+                    value={action.method}
+                    onValueChange={(value) => {
+                      const newActions = [...(editedNode.data.customActions || [])];
+                      newActions[index].method = value;
+                      handleChange('customActions', newActions);
+                    }}
+                  >
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="Method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((m) => (
+                        <SelectItem key={m} value={m}>{m}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">URL</Label>
+                <Input
+                  value={action.url}
+                  onChange={(e) => {
+                    const newActions = [...(editedNode.data.customActions || [])];
+                    newActions[index].url = e.target.value;
+                    handleChange('customActions', newActions);
+                  }}
+                  placeholder="https://api.example.com/webhook"
+                  className="h-8 text-xs font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Body (JSON)</Label>
+                <Textarea
+                  value={typeof action.body === 'string' ? action.body : JSON.stringify(action.body, null, 2)}
+                  onChange={(e) => {
+                    const newActions = [...(editedNode.data.customActions || [])];
+                    // Keeps as string in UI, parsed on execution
+                    newActions[index].body = e.target.value;
+                    handleChange('customActions', newActions);
+                  }}
+                  placeholder='{"key": "value"}'
+                  className="min-h-[60px] text-xs font-mono h-auto"
+                />
+              </div>
+            </div>
+          ))}
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-2 border-dashed"
+            onClick={() => {
+              const newActions = [...(editedNode.data.customActions || []), {
+                name: 'New Action',
+                method: 'POST',
+                url: '',
+                headers: {},
+                body: '{}'
+              }];
+              handleChange('customActions', newActions);
+            }}
+          >
+            <Plus className="h-3 w-3" />
+            Add Action
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

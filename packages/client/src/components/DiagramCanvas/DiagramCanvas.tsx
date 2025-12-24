@@ -24,23 +24,6 @@ import { TelemetryMap, ReactFlowNode, ReactFlowEdge } from "@/types/telemetryMap
 import { useToast } from "@/hooks/use-toast";
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
-const customComponents = [
-  {
-    type: "custom_component_1",
-    label: "Custom Component 1",
-    icon: () => <div>Custom Icon 1</div>,
-    fields: [
-      {
-        name: "field1",
-        label: "Field 1",
-        type: "text",
-        defaultValue: "default value 1",
-      },
-      { name: "field2", label: "Field 2", type: "number", defaultValue: 0 },
-    ],
-  },
-  // Add more custom components here...
-];
 
 interface DiagramCanvasProps {
   onNodeSelected?: () => void;
@@ -141,18 +124,41 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
-  const { setSelectedNode, setNodes: setStoreNodes, setEdges: setStoreEdges } = useDiagramStore();
-  
+  const { setSelectedNode, setNodes: setStoreNodes, setEdges: setStoreEdges, ownerFilter } = useDiagramStore();
+
   // Save/Load state
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLibraryDialog, setShowLibraryDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentUserId] = useState('user123'); // Replace with actual user authentication
-  
+
   // Use ref to prevent infinite loops during rapid updates
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const { toast } = useToast();
+
+  // Apply filter to nodes visibility
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        const nodeOwner = node.data.owner;
+        // Also hide if filter is active but node has no owner (unassigned)
+        // Adjust logic as needed: e.g. show unassigned if filter is 'Unassigned'
+        const shouldHide = ownerFilter && ownerFilter !== 'all'
+          ? (nodeOwner !== ownerFilter)
+          : false;
+
+        return {
+          ...node,
+          hidden: shouldHide,
+          style: {
+            ...node.style,
+            opacity: shouldHide ? 0.2 : 1, // Dim instead of fully hidden for better UX, or use hidden: true
+          }
+        };
+      })
+    );
+  }, [ownerFilter, setNodes]);
 
   // Handle external save trigger
   useEffect(() => {
@@ -176,14 +182,14 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
     if (syncTimeoutRef.current) {
       clearTimeout(syncTimeoutRef.current);
     }
-    
+
     // Debounce the sync operation to avoid rapid updates during drag
     syncTimeoutRef.current = setTimeout(() => {
       if (nodes.length >= 0) { // Allow empty arrays too
         setStoreNodes(nodes);
       }
     }, 50); // 50ms debounce
-    
+
     return () => {
       if (syncTimeoutRef.current) {
         clearTimeout(syncTimeoutRef.current);
@@ -286,7 +292,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
 
     setNodes(loadedNodes);
     setEdges(loadedEdges);
-    
+
     toast({
       title: 'Success',
       description: `Loaded telemetry map: ${map.name}`,
@@ -383,7 +389,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       // Initialize GCP-specific fields for GCP nodes
       const gcpComponentTypes = [
         'compute-engine', 'cloud-storage', 'cloud-sql', 'kubernetes-engine',
-        'cloud-functions', 'cloud-run', 'load-balancer', 'cloud-armor', 
+        'cloud-functions', 'cloud-run', 'load-balancer', 'cloud-armor',
         'app-engine', 'vpc-network'
       ];
       const isGCPNode = gcpComponentTypes.includes(type);

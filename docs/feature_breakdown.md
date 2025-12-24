@@ -103,18 +103,18 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 **3.2 Azure Service Bus Sender**
 - **Story Points**: 5
 - **Description**: As an engineer, I need to send messages to Azure Service Bus queues/topics.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Implement send capability in `AzureService`.
-  - [ ] Add UI action for Service Bus nodes.
+  - [x] Implement send capability in `AzureService`.
+  - [x] Add UI action for Service Bus nodes.
 
 **3.3 HTTP Webhook/Action Sender**
 - **Story Points**: 3
 - **Description**: As an engineer, I need to trigger external webhooks (e.g., PagerDuty ack, Jenkins job) from the UI.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Create generic HTTP action handler.
-  - [ ] Allow users to define custom HTTP actions on nodes.
+  - [x] Create generic HTTP action handler.
+  - [x] Allow users to define custom HTTP actions on nodes.
 
 ### Epic 4: Dashboard & Visualization
 **Business Value**: MEDIUM | **Technical Complexity**: MEDIUM | **Estimated Effort**: 1 week

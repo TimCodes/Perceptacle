@@ -9,6 +9,7 @@ import mongodbRoutes from "./routes/mongodb";
 import ragRoutes from "./routes/rag";
 import telemetryMapsRoutes from "./routes/telemetryMaps";
 import kafkaRoutes from "./routes/kafka";
+import httpActionRoutes from "./routes/http-action";
 
 export function registerRoutes(app: Express): Server {
   // Register Azure routes
@@ -37,6 +38,9 @@ export function registerRoutes(app: Express): Server {
 
   // Register Kafka routes
   app.use("/api/kafka", kafkaRoutes);
+
+  // Register HTTP action routes
+  app.use("/api/actions/http", httpActionRoutes);
 
   const httpServer = createServer(app);
 

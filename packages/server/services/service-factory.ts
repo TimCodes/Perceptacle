@@ -14,6 +14,7 @@ import { MockMongoDBService } from './mongodb.mock';
 import { RagService, RagCredentials } from './rag';
 import { MockRagService } from './rag.mock';
 import { KafkaService, KafkaConfig } from './kafka';
+import { HttpActionService } from './http-action';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
@@ -206,6 +207,13 @@ export class ServiceFactory {
     };
 
     return new KafkaService(config);
+  }
+
+  /**
+   * Create HTTP Action service instance
+   */
+  createHttpActionService(): HttpActionService {
+    return new HttpActionService();
   }
 
   /**

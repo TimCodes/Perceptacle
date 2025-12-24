@@ -1,21 +1,17 @@
 import { create } from 'zustand';
 import { Node, Edge, ReactFlowInstance } from 'reactflow';
 
-interface LogEntry {
-  timestamp: string;
-  message: string;
-  level: 'info' | 'warning' | 'error';
-}
-
 interface DiagramState {
   nodes: Node[];
   edges: Edge[];
   selectedNode: Node | null;
   rfInstance: ReactFlowInstance | null;
+  ownerFilter: string | null;
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setSelectedNode: (node: Node | null) => void;
   setRfInstance: (instance: ReactFlowInstance) => void;
+  setOwnerFilter: (filter: string | null) => void;
   updateSelectedNode: (node: Node) => void;
   saveDiagram: () => void;
   loadDiagram: () => void;
@@ -28,11 +24,13 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
   edges: [],
   selectedNode: null,
   rfInstance: null,
+  ownerFilter: null,
 
   setNodes: (nodes) => set({ nodes }),
   setEdges: (edges) => set({ edges }),
   setSelectedNode: (node) => set({ selectedNode: node }),
   setRfInstance: (instance) => set({ rfInstance: instance }),
+  setOwnerFilter: (filter) => set({ ownerFilter: filter }),
 
   updateSelectedNode: (node) => {
     const { nodes, selectedNode } = get();

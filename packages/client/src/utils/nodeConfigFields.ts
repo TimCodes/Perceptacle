@@ -37,6 +37,14 @@ export const DEFAULT_FIELDS: ConfigField[] = [
     type: 'url',
     placeholder: 'https://github.com/username/repository',
     description: 'Link to the GitHub repository for this component'
+  },
+  {
+    name: 'owner',
+    label: 'Owner (Team)',
+    type: 'select',
+    options: ['Platform', 'Checkout', 'Search', 'Data', 'SRE', 'Unassigned'],
+    placeholder: 'Select team owner',
+    description: 'Team responsible for this resource'
   }
 ];
 
@@ -230,7 +238,7 @@ export const GCP_FIELDS: ConfigField[] = [
 // List of GCP component types for identification
 const GCP_COMPONENT_TYPES = [
   'compute-engine',
-  'cloud-storage', 
+  'cloud-storage',
   'cloud-sql',
   'kubernetes-engine',
   'cloud-functions',
@@ -247,23 +255,23 @@ export function getConfigFieldsForNodeType(nodeType: string): ConfigField[] {
   const isKubernetesNode = nodeType.startsWith('k8s-');
   const isKafkaNode = nodeType.startsWith('kafka-');
   const isGCPNode = GCP_COMPONENT_TYPES.includes(nodeType);
-  
+
   if (isAzureNode) {
     return [...DEFAULT_FIELDS, ...AZURE_FIELDS];
   }
-  
+
   if (isKubernetesNode) {
     return [...DEFAULT_FIELDS, ...KUBERNETES_FIELDS];
   }
-  
+
   if (isKafkaNode) {
     return [...DEFAULT_FIELDS, ...KAFKA_FIELDS];
   }
-  
+
   if (isGCPNode) {
     return [...DEFAULT_FIELDS, ...GCP_FIELDS];
   }
-  
+
   // Return only default fields for other node types
   return DEFAULT_FIELDS;
 }
@@ -318,11 +326,11 @@ export function getGCPDefaultValues(): Record<string, string> {
 // Function to build Azure resource ID from component fields
 export function buildAzureResourceId(data: any, nodeType: string): string {
   const { subscriptionId, resourceGroup, resourceName } = data;
-  
+
   if (!subscriptionId || !resourceGroup || !resourceName) {
     return '';
   }
-  
+
   // Map node types to Azure resource provider types
   const resourceTypeMap: Record<string, string> = {
     'azure-function-app': 'Microsoft.Web/sites',
@@ -335,35 +343,35 @@ export function buildAzureResourceId(data: any, nodeType: string): string {
     'azure-key-vault': 'Microsoft.KeyVault/vaults',
     'azure-cosmos-db': 'Microsoft.DocumentDB/databaseAccounts'
   };
-  
+
   const resourceType = resourceTypeMap[nodeType];
   if (!resourceType) {
     return '';
   }
-  
+
   return `/subscriptions/${subscriptionId}/resourceGroups/${resourceGroup}/providers/${resourceType}/${resourceName}`;
 }
 
 // Function to build Kubernetes resource identifier from component fields
 export function buildKubernetesResourceId(data: any, nodeType: string): string {
   const { namespace, resourceName, clusterName } = data;
-  
+
   if (!namespace || !resourceName) {
     return '';
   }
-  
+
   // Map node types to Kubernetes resource types
   const resourceTypeMap: Record<string, string> = {
     'k8s-pod': 'pods',
     'k8s-service': 'services',
     'k8s-cronjob': 'cronjobs'
   };
-  
+
   const resourceType = resourceTypeMap[nodeType];
   if (!resourceType) {
     return '';
   }
-  
+
   // Build resource identifier in the format: [cluster]/namespace/resourceType/resourceName
   const clusterPrefix = clusterName ? `${clusterName}/` : '';
   return `${clusterPrefix}${namespace}/${resourceType}/${resourceName}`;
@@ -372,31 +380,31 @@ export function buildKubernetesResourceId(data: any, nodeType: string): string {
 // Function to build Kafka resource identifier from component fields
 export function buildKafkaResourceId(data: any, nodeType: string): string {
   const { brokerList, topicName } = data;
-  
+
   if (!brokerList) {
     return '';
   }
-  
+
   if (nodeType === 'kafka-cluster') {
     return brokerList;
   }
-  
+
   if (nodeType === 'kafka-topic' && topicName) {
     const cluster = brokerList.split(',')[0]; // Use first broker as cluster identifier
     return `${cluster}/${topicName}`;
   }
-  
+
   return brokerList;
 }
 
 // Function to build GCP resource identifier from component fields
 export function buildGCPResourceId(data: any, nodeType: string): string {
   const { projectId, resourceName, zone, region } = data;
-  
+
   if (!projectId || !resourceName) {
     return '';
   }
-  
+
   // Map node types to GCP resource types and determine if zonal or regional
   const resourceConfig: Record<string, { type: string; isZonal: boolean }> = {
     'compute-engine': { type: 'instances', isZonal: true },
@@ -410,12 +418,12 @@ export function buildGCPResourceId(data: any, nodeType: string): string {
     'app-engine': { type: 'services', isZonal: false },
     'vpc-network': { type: 'networks', isZonal: false }
   };
-  
+
   const config = resourceConfig[nodeType];
   if (!config) {
     return `projects/${projectId}`;
   }
-  
+
   // Build resource path based on whether it's zonal or regional
   if (config.isZonal && zone) {
     return `projects/${projectId}/zones/${zone}/${config.type}/${resourceName}`;
