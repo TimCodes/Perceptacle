@@ -1,0 +1,17 @@
+
+> perceptacle-server@1.0.0 test
+> jest __tests__/log-ingestion.test.ts
+
+FAIL __tests__/log-ingestion.test.ts
+  ● Test suite failed to run
+
+    [96m__tests__/log-ingestion.test.ts[0m:[93m4[0m:[93m69[0m - [91merror[0m[90m TS2307: [0mCannot find module '../tests/mocks' or its corresponding type declarations.
+
+    [7m4[0m import { k8s, ClientSecretCredential, DefaultAzureCredential } from '../tests/mocks';
+    [7m [0m [91m                                                                    ~~~~~~~~~~~~~~~~[0m
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        6.78 s
+Ran all test suites matching /__tests__\\log-ingestion.test.ts/i.

@@ -15,13 +15,13 @@ const ensureAzureService = (req: Request, res: Response, next: any) => {
       console.log(`Azure service initialized (using ${serviceFactory.isUsingMocks() ? 'mock' : 'real'} implementation)`);
     } catch (error) {
       console.error('Failed to initialize Azure service:', error);
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'Failed to initialize Azure service. Check your configuration.',
         details: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
-  
+
   next();
 };
 
@@ -40,9 +40,9 @@ router.get("/resources", ensureAzureService, async (req: Request, res: Response)
     res.json(resources);
   } catch (error: any) {
     console.error('Error getting Azure resources:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Azure resources',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -51,7 +51,7 @@ router.get("/resources", ensureAzureService, async (req: Request, res: Response)
 router.get("/resources/:resourceId(*)", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const resourceId = req.params.resourceId;
-    
+
     if (!resourceId) {
       return res.status(400).json({ error: 'Resource ID is required' });
     }
@@ -60,9 +60,9 @@ router.get("/resources/:resourceId(*)", ensureAzureService, async (req: Request,
     res.json(resource);
   } catch (error: any) {
     console.error('Error getting Azure resource:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Azure resource',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -71,7 +71,7 @@ router.get("/resources/:resourceId(*)", ensureAzureService, async (req: Request,
 router.get("/resources/:resourceId(*)/metrics", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const resourceId = req.params.resourceId;
-    
+
     if (!resourceId) {
       return res.status(400).json({ error: 'Resource ID is required' });
     }
@@ -88,9 +88,9 @@ router.get("/resources/:resourceId(*)/metrics", ensureAzureService, async (req: 
     res.json(metrics);
   } catch (error: any) {
     console.error('Error getting Azure metrics:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Azure metrics',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -99,7 +99,7 @@ router.get("/resources/:resourceId(*)/metrics", ensureAzureService, async (req: 
 router.get("/resources/:resourceId(*)/metric-definitions", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const resourceId = req.params.resourceId;
-    
+
     if (!resourceId) {
       return res.status(400).json({ error: 'Resource ID is required' });
     }
@@ -108,9 +108,9 @@ router.get("/resources/:resourceId(*)/metric-definitions", ensureAzureService, a
     res.json(definitions);
   } catch (error: any) {
     console.error('Error getting metric definitions:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve metric definitions',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -119,13 +119,13 @@ router.get("/resources/:resourceId(*)/metric-definitions", ensureAzureService, a
 router.post("/resources/:resourceId(*)/logs", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const resourceId = req.params.resourceId;
-    
+
     if (!resourceId) {
       return res.status(400).json({ error: 'Resource ID is required' });
     }
 
     const { query, timespan, workspaceId } = req.body;
-    
+
     if (!query) {
       return res.status(400).json({ error: 'KQL query is required' });
     }
@@ -145,9 +145,9 @@ router.post("/resources/:resourceId(*)/logs", ensureAzureService, async (req: Re
     res.json(logs);
   } catch (error: any) {
     console.error('Error getting Azure logs:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Azure logs',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -156,7 +156,7 @@ router.post("/resources/:resourceId(*)/logs", ensureAzureService, async (req: Re
 router.get("/resources/:resourceId(*)/diagnostic-settings", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const resourceId = req.params.resourceId;
-    
+
     if (!resourceId) {
       return res.status(400).json({ error: 'Resource ID is required' });
     }
@@ -165,16 +165,16 @@ router.get("/resources/:resourceId(*)/diagnostic-settings", ensureAzureService, 
     res.json(settings);
   } catch (error: any) {
     console.error('Error getting diagnostic settings:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve diagnostic settings',
-      details: error.message 
+      details: error.message
     });
   }
 });
 
 // Health check endpoint
 router.get("/health", (req: Request, res: Response) => {
-  res.json({ 
+  res.json({
     status: 'healthy',
     service: 'azure-proxy',
     timestamp: new Date().toISOString(),
@@ -188,7 +188,7 @@ router.get("/health", (req: Request, res: Response) => {
 router.get("/service-bus/:resourceGroupName/:namespaceName/summary", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const { resourceGroupName, namespaceName } = req.params;
-    
+
     if (!resourceGroupName || !namespaceName) {
       return res.status(400).json({ error: 'Resource group name and namespace name are required' });
     }
@@ -197,9 +197,9 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/summary", ensureAzure
     res.json(summary);
   } catch (error: any) {
     console.error('Error getting Service Bus namespace summary:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Service Bus namespace summary',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -208,7 +208,7 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/summary", ensureAzure
 router.get("/service-bus/:resourceGroupName/:namespaceName/queues", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const { resourceGroupName, namespaceName } = req.params;
-    
+
     if (!resourceGroupName || !namespaceName) {
       return res.status(400).json({ error: 'Resource group name and namespace name are required' });
     }
@@ -217,9 +217,9 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/queues", ensureAzureS
     res.json(queues);
   } catch (error: any) {
     console.error('Error getting Service Bus queues:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Service Bus queues',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -228,7 +228,7 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/queues", ensureAzureS
 router.get("/service-bus/:resourceGroupName/:namespaceName/queues/:queueName", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const { resourceGroupName, namespaceName, queueName } = req.params;
-    
+
     if (!resourceGroupName || !namespaceName || !queueName) {
       return res.status(400).json({ error: 'Resource group name, namespace name, and queue name are required' });
     }
@@ -237,9 +237,9 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/queues/:queueName", e
     res.json(queueInfo);
   } catch (error: any) {
     console.error('Error getting Service Bus queue info:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Service Bus queue information',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -248,7 +248,7 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/queues/:queueName", e
 router.get("/service-bus/:resourceGroupName/:namespaceName/topics", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const { resourceGroupName, namespaceName } = req.params;
-    
+
     if (!resourceGroupName || !namespaceName) {
       return res.status(400).json({ error: 'Resource group name and namespace name are required' });
     }
@@ -257,9 +257,9 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/topics", ensureAzureS
     res.json(topics);
   } catch (error: any) {
     console.error('Error getting Service Bus topics:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Service Bus topics',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -268,7 +268,7 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/topics", ensureAzureS
 router.get("/service-bus/:resourceGroupName/:namespaceName/topics/:topicName", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const { resourceGroupName, namespaceName, topicName } = req.params;
-    
+
     if (!resourceGroupName || !namespaceName || !topicName) {
       return res.status(400).json({ error: 'Resource group name, namespace name, and topic name are required' });
     }
@@ -277,9 +277,9 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/topics/:topicName", e
     res.json(topicInfo);
   } catch (error: any) {
     console.error('Error getting Service Bus topic info:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Service Bus topic information',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -288,7 +288,7 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/topics/:topicName", e
 router.get("/service-bus/:resourceGroupName/:namespaceName/subscriptions", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const { resourceGroupName, namespaceName } = req.params;
-    
+
     if (!resourceGroupName || !namespaceName) {
       return res.status(400).json({ error: 'Resource group name and namespace name are required' });
     }
@@ -297,9 +297,9 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/subscriptions", ensur
     res.json(subscriptions);
   } catch (error: any) {
     console.error('Error getting Service Bus subscriptions:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Service Bus subscriptions',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -308,7 +308,7 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/subscriptions", ensur
 router.get("/service-bus/:resourceGroupName/:namespaceName/topics/:topicName/subscriptions/:subscriptionName", ensureAzureService, async (req: Request, res: Response) => {
   try {
     const { resourceGroupName, namespaceName, topicName, subscriptionName } = req.params;
-    
+
     if (!resourceGroupName || !namespaceName || !topicName || !subscriptionName) {
       return res.status(400).json({ error: 'Resource group name, namespace name, topic name, and subscription name are required' });
     }
@@ -317,9 +317,29 @@ router.get("/service-bus/:resourceGroupName/:namespaceName/topics/:topicName/sub
     res.json(subscriptionInfo);
   } catch (error: any) {
     console.error('Error getting Service Bus subscription info:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve Service Bus subscription information',
-      details: error.message 
+      details: error.message
+    });
+  }
+});
+
+// Send a message to a Service Bus queue or topic
+router.post("/service-bus/send", ensureAzureService, async (req: Request, res: Response) => {
+  try {
+    const { queueOrTopicName, message } = req.body;
+
+    if (!queueOrTopicName || !message) {
+      return res.status(400).json({ error: 'Queue/Topic name and message are required' });
+    }
+
+    await azureService!.sendServiceBusMessage(queueOrTopicName, message);
+    res.json({ success: true, message: 'Message sent successfully' });
+  } catch (error: any) {
+    console.error('Error sending Service Bus message:', error);
+    res.status(500).json({
+      error: 'Failed to send Service Bus message',
+      details: error.message
     });
   }
 });

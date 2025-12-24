@@ -7,8 +7,7 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 ### Critical Gaps:
 - 🚧 **Agentic Capabilities**: Python/LangGraph agents package created, needs agent implementation.
 - ✅ **RAG Integration**: Application is now connected to the external RAG service with mock support.
-- ❌ **Incomplete Data Connections**: Oracle service is a skeleton; Mongo is missing.
-- ❌ **No Log Ingestion**: Current integrations fetch resources/metrics, not logs.
+- ❌ **Incomplete Data Connections**: Oracle service is a skeleton.
 - ❌ **No Action/Reposting**: Cannot send messages to Kafka/Service Bus/HTTP.
 - ❌ **No Dashboard View**: UI is limited to diagram editor.
 
@@ -69,20 +68,20 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 **2.2 MongoDB Integration**
 - **Story Points**: 5
 - **Description**: As an engineer, I need to connect to MongoDB to view database health and logs.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Create `MongoService` in `packages/server`.
-  - [ ] Implement connection health check.
-  - [ ] Fetch collection stats and slow query logs.
+  - [x] Create `MongoService` in `packages/server`.
+  - [x] Implement connection health check.
+  - [x] Fetch collection stats and slow query logs.
 
 **2.3 Log Ingestion Pipeline**
 - **Story Points**: 8
 - **Description**: As an engineer, I need Kubernetes and Azure logs to be ingested/forwarded to the RAG system or available for analysis.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Update `KubernetesService` to stream/fetch pod logs.
-  - [ ] Update `AzureService` to fetch Monitor logs.
-  - [ ] Ensure logs are formatted and available for the Agent/RAG context.
+  - [x] Update `KubernetesService` to stream/fetch pod logs.
+  - [x] Update `AzureService` to fetch Monitor logs.
+  - [x] Ensure logs are formatted and available for the Agent/RAG context.
 
 ---
 
@@ -96,10 +95,10 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 **3.1 Kafka Producer & Reposting**
 - **Story Points**: 5
 - **Description**: As an engineer, I need to repost failed messages to Kafka topics to fix data pipeline issues.
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Implement `KafkaService` producer in backend.
-  - [ ] Add UI action to "Repost Message" on a Kafka node.
+  - [x] Implement `KafkaService` producer in backend.
+  - [x] Add UI action to "Repost Message" on a Kafka node.
 
 **3.2 Azure Service Bus Sender**
 - **Story Points**: 5

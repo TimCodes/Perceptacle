@@ -1,0 +1,17 @@
+
+> perceptacle-server@1.0.0 test
+> jest __tests__/log-ingestion.test.ts
+
+FAIL __tests__/log-ingestion.test.ts
+  ● Test suite failed to run
+
+    [96m__tests__/log-ingestion.test.ts[0m:[93m82[0m:[93m40[0m - [91merror[0m[90m TS2345: [0mArgument of type 'DefaultAzureCredential' is not assignable to parameter of type 'ClientSecretCredential | DefaultAzureCredential'.
+
+    [7m82[0m             service = new AzureService(new DefaultAzureCredential(), 'test-sub-id');
+    [7m  [0m [91m                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        5.702 s
+Ran all test suites matching /__tests__\\log-ingestion.test.ts/i.

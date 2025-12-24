@@ -1,7 +1,7 @@
 import { ResourceManagementClient } from "@azure/arm-resources";
 import { MonitorClient } from "@azure/arm-monitor";
 import { OperationalInsightsManagementClient } from "@azure/arm-operationalinsights";
-import { ServiceBusAdministrationClient } from "@azure/service-bus";
+import { ServiceBusAdministrationClient, ServiceBusClient } from "@azure/service-bus";
 import { ServiceBusManagementClient } from "@azure/arm-servicebus";
 import { ClientSecretCredential, DefaultAzureCredential } from "@azure/identity";
 import { LogsQueryClient } from "@azure/monitor-query-logs";
@@ -117,36 +117,43 @@ export class AzureService {
   private logsQueryClient: LogsQueryClient;
   private metricsQueryClient: MetricsClient;
   private serviceBusManagementClient: ServiceBusManagementClient;
+  private serviceBusClient: ServiceBusClient | undefined;
   private subscriptionId: string;
+  private serviceBusNamespace?: string;
 
-  constructor(credentials: ClientSecretCredential | DefaultAzureCredential, subscriptionId: string) {
+  constructor(credentials: ClientSecretCredential | DefaultAzureCredential, subscriptionId: string, serviceBusNamespace?: string) {
     this.subscriptionId = subscriptionId;
+    this.serviceBusNamespace = serviceBusNamespace;
     this.resourceClient = new ResourceManagementClient(credentials, subscriptionId);
     this.monitorClient = new MonitorClient(credentials, subscriptionId);
     this.operationalInsightsClient = new OperationalInsightsManagementClient(credentials, subscriptionId);
     this.logsQueryClient = new LogsQueryClient(credentials);
     this.metricsQueryClient = new MetricsClient("https://management.azure.com", credentials);
     this.serviceBusManagementClient = new ServiceBusManagementClient(credentials, subscriptionId);
+
+    if (serviceBusNamespace) {
+      this.serviceBusClient = new ServiceBusClient(serviceBusNamespace, credentials);
+    }
   }
 
   /**
    * Create Azure service instance using client credentials
    */
-  static fromCredentials(credentials: AzureCredentials, subscriptionId: string): AzureService {
-    const credential = new ClientSecretCredential(
+  static fromCredentials(credentials: AzureCredentials, subscriptionId: string, serviceBusNamespace?: string): AzureService {
+    const creds = new ClientSecretCredential(
       credentials.tenantId,
       credentials.clientId,
       credentials.clientSecret
     );
-    return new AzureService(credential, subscriptionId);
+    return new AzureService(creds, subscriptionId, serviceBusNamespace);
   }
 
   /**
    * Create Azure service instance using default Azure credentials
    */
-  static fromDefaultCredentials(subscriptionId: string): AzureService {
+  static fromDefaultCredentials(subscriptionId: string, serviceBusNamespace?: string): AzureService {
     const credential = new DefaultAzureCredential();
-    return new AzureService(credential, subscriptionId);
+    return new AzureService(credential, subscriptionId, serviceBusNamespace);
   }
 
   /**
@@ -199,10 +206,10 @@ export class AzureService {
 
       return (metrics.value || []).map(metric => {
         const timeseriesData = metric.timeseries?.[0]?.data || [];
-        
+
         // Get the latest data point or aggregate if multiple points exist
         const latestData = timeseriesData[timeseriesData.length - 1];
-        
+
         return {
           name: metric.name?.value || '',
           value: this.extractMetricValue(latestData),
@@ -284,7 +291,7 @@ export class AzureService {
         console.warn('Partial result received from logs query', result);
         return [];
       }
-      
+
     } catch (error) {
       console.error('Error getting Azure logs', { error, params });
       throw error;
@@ -322,9 +329,9 @@ export class AzureService {
         scheduledMessageCount: queue.countDetails?.scheduledMessageCount || 0,
         transferMessageCount: queue.countDetails?.transferMessageCount || 0,
         transferDeadLetterMessageCount: queue.countDetails?.transferDeadLetterMessageCount || 0,
-        totalMessageCount: (queue.countDetails?.activeMessageCount || 0) + 
-                          (queue.countDetails?.deadLetterMessageCount || 0) + 
-                          (queue.countDetails?.scheduledMessageCount || 0),
+        totalMessageCount: (queue.countDetails?.activeMessageCount || 0) +
+          (queue.countDetails?.deadLetterMessageCount || 0) +
+          (queue.countDetails?.scheduledMessageCount || 0),
         status: queue.status || 'Unknown',
         sizeInBytes: queue.sizeInBytes || 0,
         maxSizeInMegabytes: queue.maxSizeInMegabytes || 0,
@@ -354,7 +361,7 @@ export class AzureService {
         namespaceName,
         topicName
       );
-      
+
       let subscriptionCount = 0;
       for await (const subscription of subscriptions) {
         subscriptionCount++;
@@ -367,9 +374,9 @@ export class AzureService {
         scheduledMessageCount: topic.countDetails?.scheduledMessageCount || 0,
         transferMessageCount: topic.countDetails?.transferMessageCount || 0,
         transferDeadLetterMessageCount: topic.countDetails?.transferDeadLetterMessageCount || 0,
-        totalMessageCount: (topic.countDetails?.activeMessageCount || 0) + 
-                          (topic.countDetails?.deadLetterMessageCount || 0) + 
-                          (topic.countDetails?.scheduledMessageCount || 0),
+        totalMessageCount: (topic.countDetails?.activeMessageCount || 0) +
+          (topic.countDetails?.deadLetterMessageCount || 0) +
+          (topic.countDetails?.scheduledMessageCount || 0),
         status: topic.status || 'Unknown',
         sizeInBytes: topic.sizeInBytes || 0,
         maxSizeInMegabytes: topic.maxSizeInMegabytes || 0,
@@ -403,9 +410,9 @@ export class AzureService {
         scheduledMessageCount: subscription.countDetails?.scheduledMessageCount || 0,
         transferMessageCount: subscription.countDetails?.transferMessageCount || 0,
         transferDeadLetterMessageCount: subscription.countDetails?.transferDeadLetterMessageCount || 0,
-        totalMessageCount: (subscription.countDetails?.activeMessageCount || 0) + 
-                          (subscription.countDetails?.deadLetterMessageCount || 0) + 
-                          (subscription.countDetails?.scheduledMessageCount || 0),
+        totalMessageCount: (subscription.countDetails?.activeMessageCount || 0) +
+          (subscription.countDetails?.deadLetterMessageCount || 0) +
+          (subscription.countDetails?.scheduledMessageCount || 0),
         status: subscription.status || 'Unknown',
         createdAt: subscription.createdAt,
         updatedAt: subscription.updatedAt
@@ -587,9 +594,9 @@ export class AzureService {
   private parseResourceId(resourceId: string) {
     const regex = /^\/subscriptions\/([^\/]+)\/resourceGroups\/([^\/]+)\/providers\/([^\/]+)\/([^\/]+)\/([^\/]+)$/;
     const match = resourceId.match(regex);
-    
+
     if (!match) return null;
-    
+
     return {
       subscriptionId: match[1],
       resourceGroup: match[2],
@@ -604,48 +611,28 @@ export class AzureService {
    */
   private extractMetricValue(data: any): string {
     if (!data) return '0';
-    
+
     // Try different aggregation types in order of preference
     const value = data.average ?? data.total ?? data.maximum ?? data.minimum ?? data.count ?? 0;
     return value.toString();
   }
 
-  /**
-   * Simulate log query response (placeholder for actual implementation)
-   */
-  private simulateLogQuery(params: LogQueryParams): ResourceLog[] {
-    // This is a placeholder - real implementation would use LogsQueryClient
-    // from @azure/monitor-query package
-    console.log(`Simulating log query for resource: ${params.resourceId}`);
-    console.log(`Query: ${params.query}`);
-    
-    return [
-      {
-        timestamp: new Date(),
-        message: 'Sample log entry for resource',
-        level: 'Information',
-        properties: {
-          resourceId: params.resourceId,
-          correlationId: 'sample-correlation-id'
-        }
-      }
-    ];
-  }
+
 
   /**
    * Parse timestamp from log row
    */
   private parseLogTimestamp(row: any[], columns: any[]): Date {
-    const timestampIndex = columns.findIndex(col => 
-      col.name.toLowerCase().includes('timestamp') || 
+    const timestampIndex = columns.findIndex(col =>
+      col.name.toLowerCase().includes('timestamp') ||
       col.name.toLowerCase().includes('time') ||
       col.name === 'TimeGenerated'
     );
-    
+
     if (timestampIndex >= 0 && row[timestampIndex]) {
       return new Date(row[timestampIndex]);
     }
-    
+
     return new Date();
   }
 
@@ -653,16 +640,16 @@ export class AzureService {
    * Extract log message from row
    */
   private extractLogMessage(row: any[], columns: any[]): string {
-    const messageIndex = columns.findIndex(col => 
-      col.name.toLowerCase().includes('message') || 
+    const messageIndex = columns.findIndex(col =>
+      col.name.toLowerCase().includes('message') ||
       col.name.toLowerCase().includes('text') ||
       col.name === 'Message'
     );
-    
+
     if (messageIndex >= 0 && row[messageIndex]) {
       return row[messageIndex].toString();
     }
-    
+
     return 'No message';
   }
 
@@ -670,16 +657,16 @@ export class AzureService {
    * Extract log level from row
    */
   private extractLogLevel(row: any[], columns: any[]): string {
-    const levelIndex = columns.findIndex(col => 
-      col.name.toLowerCase().includes('level') || 
+    const levelIndex = columns.findIndex(col =>
+      col.name.toLowerCase().includes('level') ||
       col.name.toLowerCase().includes('severity') ||
       col.name === 'Level'
     );
-    
+
     if (levelIndex >= 0 && row[levelIndex]) {
       return row[levelIndex].toString();
     }
-    
+
     return 'Information';
   }
 
@@ -688,14 +675,40 @@ export class AzureService {
    */
   private extractLogProperties(row: any[], columns: any[]): Record<string, any> {
     const properties: Record<string, any> = {};
-    
+
     columns.forEach((col, index) => {
       if (row[index] !== null && row[index] !== undefined) {
         properties[col.name] = row[index];
       }
     });
-    
+
     return properties;
+  }
+
+  /**
+   * Send a message to a Service Bus queue or topic
+   */
+  async sendServiceBusMessage(queueOrTopicName: string, message: any): Promise<void> {
+    if (!this.serviceBusClient) {
+      throw new Error('Service Bus client is not initialized. Namespace is required.');
+    }
+
+    const sender = this.serviceBusClient.createSender(queueOrTopicName);
+
+    try {
+      const sbMessage = {
+        body: message,
+        contentType: 'application/json',
+        messageId: new Date().toISOString()
+      };
+
+      await sender.sendMessages(sbMessage);
+    } catch (error) {
+      console.error(`Error sending message to Service Bus ${queueOrTopicName}:`, error);
+      throw error;
+    } finally {
+      await sender.close();
+    }
   }
 }
 

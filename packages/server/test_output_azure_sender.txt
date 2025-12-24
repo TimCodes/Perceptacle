@@ -1,0 +1,25 @@
+
+> perceptacle-server@1.0.0 test
+> jest __tests__/azure-sender.test.ts
+
+FAIL __tests__/azure-sender.test.ts
+  ● Test suite failed to run
+
+    [96m__tests__/azure-sender.test.ts[0m:[93m79[0m:[93m23[0m - [91merror[0m[90m TS2339: [0mProperty 'sendServiceBusMessage' does not exist on type 'AzureService'.
+
+    [7m79[0m         await service.sendServiceBusMessage(queueName, message);
+    [7m  [0m [91m                      ~~~~~~~~~~~~~~~~~~~~~[0m
+    [96m__tests__/azure-sender.test.ts[0m:[93m93[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'sendServiceBusMessage' does not exist on type 'AzureService'.
+
+    [7m93[0m         await expect(service.sendServiceBusMessage('queue', {})).rejects.toThrow('Service Bus client is not initialized');
+    [7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~[0m
+    [96m__tests__/azure-sender.test.ts[0m:[93m101[0m:[93m30[0m - [91merror[0m[90m TS2339: [0mProperty 'sendServiceBusMessage' does not exist on type 'AzureService'.
+
+    [7m101[0m         await expect(service.sendServiceBusMessage('queue', {})).rejects.toThrow('Send failed');
+    [7m   [0m [91m                             ~~~~~~~~~~~~~~~~~~~~~[0m
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        35.975 s
+Ran all test suites matching /__tests__\\azure-sender.test.ts/i.

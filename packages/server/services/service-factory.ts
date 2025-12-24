@@ -13,12 +13,14 @@ import { MongoDBService, MongoDBCredentials } from './mongodb';
 import { MockMongoDBService } from './mongodb.mock';
 import { RagService, RagCredentials } from './rag';
 import { MockRagService } from './rag.mock';
+import { KafkaService, KafkaConfig } from './kafka';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
 export interface ServiceFactoryConfig {
   useMocks: boolean;
   azure?: {
     subscriptionId: string;
+    serviceBusNamespace?: string;
     credentials?: AzureCredentials;
   };
   kubernetes?: KubernetesConfig;
@@ -27,6 +29,10 @@ export interface ServiceFactoryConfig {
   };
   oracle?: {
     credentials?: OracleCredentials;
+  };
+  kafka?: {
+    clientId: string;
+    brokers: string[];
   };
   aichat?: {
     openaiApiKey?: string;
@@ -93,10 +99,14 @@ export class ServiceFactory {
       if (this.config.azure.credentials) {
         return AzureService.fromCredentials(
           this.config.azure.credentials,
-          this.config.azure.subscriptionId
+          this.config.azure.subscriptionId,
+          this.config.azure.serviceBusNamespace
         );
       }
-      return AzureService.fromDefaultCredentials(this.config.azure.subscriptionId);
+      return AzureService.fromDefaultCredentials(
+        this.config.azure.subscriptionId,
+        this.config.azure.serviceBusNamespace
+      );
     }
   }
 
@@ -186,6 +196,19 @@ export class ServiceFactory {
   }
 
   /**
+   * Create Kafka service instance
+   */
+  createKafkaService(): KafkaService {
+    // Default config if not provided
+    const config: KafkaConfig = this.config.kafka || {
+      clientId: 'perceptacle-server',
+      brokers: ['localhost:9092']
+    };
+
+    return new KafkaService(config);
+  }
+
+  /**
    * Check if the factory is configured to use mock services
    */
   isUsingMocks(): boolean {
@@ -215,6 +238,7 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
     useMocks,
     azure: {
       subscriptionId: process.env.AZURE_SUBSCRIPTION_ID || 'mock-subscription-id',
+      serviceBusNamespace: process.env.SERVICE_BUS_NAMESPACE,
       credentials: process.env.AZURE_CLIENT_ID && process.env.AZURE_CLIENT_SECRET && process.env.AZURE_TENANT_ID ? {
         clientId: process.env.AZURE_CLIENT_ID,
         clientSecret: process.env.AZURE_CLIENT_SECRET,
@@ -242,6 +266,10 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
         privateKey: 'mock-private-key',
         region: 'us-phoenix-1'
       }
+    },
+    kafka: {
+      clientId: 'perceptacle-server',
+      brokers: process.env.KAFKA_BROKERS ? process.env.KAFKA_BROKERS.split(',') : ['localhost:9092']
     },
     aichat: {
       openaiApiKey: process.env.OPENAI_API_KEY,
@@ -327,4 +355,8 @@ export function isRagService(service: RagService | MockRagService): service is R
 
 export function isMockRagService(service: RagService | MockRagService): service is MockRagService {
   return service instanceof MockRagService;
+}
+
+export function isKafkaService(service: KafkaService): service is KafkaService {
+  return service instanceof KafkaService;
 }

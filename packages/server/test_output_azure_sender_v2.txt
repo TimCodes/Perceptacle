@@ -1,0 +1,45 @@
+
+> perceptacle-server@1.0.0 test
+> jest __tests__/azure-sender.test.ts
+
+  console.error
+    Error sending message to Service Bus queue: Error: Send failed
+        at Object.<anonymous> (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\__tests__\azure-sender.test.ts:79:23)
+        at Promise.then.completed (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\utils.js:231:10)
+        at _callCircusTest (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:316:40)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at _runTest (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:252:3)
+        at _runTestsForDescribeBlock (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:126:9)
+        at _runTestsForDescribeBlock (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:121:9)
+        at run (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:71:3)
+        at runAndTransformResultsToJestFormat (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+        at jestAdapter (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+        at runTestInternal (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-runner\build\runTest.js:367:16)
+        at runTest (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-runner\build\runTest.js:444:34)
+
+    [0m [90m 498 |[39m                 namespaceName[33m,[39m
+     [90m 499 |[39m                 resourceGroupName[33m,[39m
+    [31m[1m>[22m[39m[90m 500 |[39m                 topic[33m.[39mname[33m,[39m
+     [90m     |[39m                     [31m[1m^[22m[39m
+     [90m 501 |[39m                 subscription[33m.[39mname
+     [90m 502 |[39m               )[33m;[39m
+     [90m 503 |[39m               subscriptionInfos[33m.[39mpush(subscriptionInfo)[33m;[39m[0m
+
+      at AzureService.sendServiceBusMessage (services/azure.ts:500:21)
+      at Object.<anonymous> (__tests__/azure-sender.test.ts:81:9)
+
+PASS __tests__/azure-sender.test.ts (7.498 s)
+  AzureService - Service Bus Sender
+    √ should initialize ServiceBusClient if namespace is provided (2 ms)
+    √ should not initialize ServiceBusClient if namespace is missing
+    √ should send a message to Service Bus (1 ms)
+    √ should throw error if attempting to send without namespace (2 ms)
+    √ should handle send errors (14 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        7.675 s
+Ran all test suites matching /__tests__\\azure-sender.test.ts/i.

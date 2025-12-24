@@ -145,7 +145,7 @@ export class KubernetesService {
 
   constructor(config?: KubernetesConfig) {
     this.kc = new k8s.KubeConfig();
-    
+
     if (config?.kubeconfig) {
       this.kc.loadFromString(config.kubeconfig);
     } else {
@@ -235,18 +235,23 @@ export class KubernetesService {
   /**
    * Get logs from a specific pod
    */
+  /**
+   * Get logs from a specific pod
+   */
   async getPodLogs(params: PodLogParams): Promise<string> {
     try {
-      // For demo purposes, return simulated logs
-      // In production, use: this.k8sApi.readNamespacedPodLog()
-      const timestamp = new Date().toISOString();
-      return `${timestamp} [INFO] Sample log entry from pod ${params.podName}
-${timestamp} [INFO] Container ${params.containerName || 'main'} is running
-${timestamp} [DEBUG] Processing request...
-${timestamp} [INFO] Request completed successfully`;
+      const response = await this.k8sApi.readNamespacedPodLog(
+        params.podName,
+        params.namespace,
+        // @ts-ignore - arguments mismatch between versions
+        params.containerName
+      );
+
+      // @ts-ignore - return type mismatch
+      return response.body || response;
     } catch (error: any) {
       console.error('Error getting pod logs:', error);
-      throw new Error(`Failed to get logs for pod ${params.podName}: ${error.message}`);
+      throw new Error(`Failed to get logs for pod ${params.podName}: ${error.body?.message || error.message}`);
     }
   }
 

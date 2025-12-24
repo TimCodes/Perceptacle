@@ -1,0 +1,69 @@
+
+> perceptacle-server@1.0.0 test
+> jest __tests__/kafka.test.ts
+
+  console.log
+    Connected to Kafka producer
+
+      at KafkaService.connect (services/kafka.ts:26:21)
+
+  console.log
+    Connected to Kafka producer
+
+      at KafkaService.connect (services/kafka.ts:26:21)
+
+  console.log
+    Disconnected from Kafka producer
+
+      at KafkaService.disconnect (services/kafka.ts:43:21)
+
+  console.log
+    Connected to Kafka producer
+
+      at KafkaService.connect (services/kafka.ts:26:21)
+
+  console.log
+    Connected to Kafka producer
+
+      at KafkaService.connect (services/kafka.ts:26:21)
+
+  console.error
+    Failed to send message to topic topic: Error: Send failed
+        at Object.<anonymous> (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\__tests__\kafka.test.ts:50:23)
+        at Promise.then.completed (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\utils.js:231:10)
+        at _callCircusTest (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:316:40)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at _runTest (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:252:3)
+        at _runTestsForDescribeBlock (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:126:9)
+        at _runTestsForDescribeBlock (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:121:9)
+        at run (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\run.js:71:3)
+        at runAndTransformResultsToJestFormat (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+        at jestAdapter (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+        at runTestInternal (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-runner\build\runTest.js:367:16)
+        at runTest (C:\Users\i3ere\OneDrive\Documents\AiApps\Perceptacle\packages\server\node_modules\jest-runner\build\runTest.js:444:34)
+
+    [0m [90m 63 |[39m         }
+     [90m 64 |[39m
+    [31m[1m>[22m[39m[90m 65 |[39m         [36mtry[39m {
+     [90m    |[39m                     [31m[1m^[22m[39m
+     [90m 66 |[39m             [36mconst[39m record[33m:[39m [33mProducerRecord[39m [33m=[39m {
+     [90m 67 |[39m                 topic[33m,[39m
+     [90m 68 |[39m                 messages[33m,[39m[0m
+
+      at KafkaService.sendMessage (services/kafka.ts:65:21)
+      at Object.<anonymous> (__tests__/kafka.test.ts:52:9)
+
+PASS __tests__/kafka.test.ts (6.822 s)
+  KafkaService
+    √ should connect to Kafka (10 ms)
+    √ should disconnect from Kafka (2 ms)
+    √ should send a message (1 ms)
+    √ should handle send errors (6 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        6.977 s
+Ran all test suites matching /__tests__\\kafka.test.ts/i.

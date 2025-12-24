@@ -1,0 +1,20 @@
+
+> perceptacle-server@1.0.0 test
+> jest __tests__/log-ingestion.test.ts
+
+PASS __tests__/log-ingestion.test.ts (8.047 s)
+  Log Ingestion Pipeline
+    KubernetesService
+      √ should fetch pod logs using readNamespacedPodLog (3 ms)
+    AzureService
+      √ should fetch logs using LogsQueryClient (1 ms)
+    LogFormatter
+      √ should format Azure logs correctly (1 ms)
+      √ should format text logs correctly
+      √ should handle array of strings for text logs
+
+Test Suites: 1 passed, 1 total
+Tests:       5 passed, 5 total
+Snapshots:   0 total
+Time:        8.208 s
+Ran all test suites matching /__tests__\\log-ingestion.test.ts/i.
