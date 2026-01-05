@@ -1,11 +1,15 @@
 # Dead Code Cleanup - Completion Report
 
 **Date:** 2025-01-05  
-**Status:** ✅ COMPLETE
+**Status:** ✅ COMPLETE (Updated)
+
+> **Update:** Root database configuration files restored per user request on 2025-01-05.
 
 ## Summary
 
-Successfully removed **~3,968 lines of dead code** from the Perceptacle repository based on the comprehensive analysis performed.
+Successfully removed **~3,875 lines of dead code** from the Perceptacle repository based on the comprehensive analysis performed.
+
+**Update:** Root-level database configuration files (`drizzle.config.ts`, `db/schema.ts`, `db/init/01-init-databases.sh`) were initially removed as duplicates but have been restored per user request.
 
 ## Changes Made
 
@@ -58,16 +62,18 @@ This file was leftover from a previous monolithic architecture. The current setu
 - `packages/client/src/utils/gcp-components.ts` - GCP support not implemented
 - `packages/client/src/utils/mock-log-generator.ts` - Not used in production
 
-### 4. Removed Duplicate Configuration Files (~90 LOC)
+### 4. ~~Removed~~ Restored Root Database Configuration Files (~90 LOC)
 
-**Deleted:**
-- `/drizzle.config.ts` - Root level config (server package has its own)
-- `/db/schema.ts` - Root level schema (server package has its own)
-- `/db/init/01-init-databases.sh` - Initialization script
+**Status: RESTORED** (per user request)
 
-The server package maintains its own database configuration at:
-- `packages/server/drizzle.config.ts`
-- `packages/server/db/schema.ts`
+The following files were initially removed but have been restored:
+- `/drizzle.config.ts` - Root level Drizzle configuration
+- `/db/schema.ts` - Root level database schema  
+- `/db/init/01-init-databases.sh` - Database initialization script
+
+**Note:** Both root-level and server package configurations now coexist:
+- Root level: `/drizzle.config.ts`, `/db/schema.ts`
+- Server package: `packages/server/drizzle.config.ts`, `packages/server/db/schema.ts`
 
 ### 5. Relocated Demo Files (~1,055 LOC)
 
@@ -117,8 +123,9 @@ These functions were exported but never called anywhere in the codebase.
 - ~4,038 lines of dead code identified
 - 40 unused items across multiple categories
 
-**After cleanup:**
-- ~3,968 lines of dead code removed
+**After cleanup (Updated):**
+- ~3,875 lines of dead code removed (reduced from ~3,968 after restoring db files)
+- Root database configuration files restored per user request (+~90 LOC)
 - 0 dead code items detected by automated script
 - Cleaner, more maintainable codebase
 - Reduced bundle size (from UI component removal)
