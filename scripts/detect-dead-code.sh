@@ -95,8 +95,9 @@ if [ -d "$CLIENT_DIR/components/ui" ]; then
   
   for component in "${unused_components[@]}"; do
     if [ -f "$CLIENT_DIR/components/ui/$component.tsx" ]; then
-      # Check if component is imported (excluding self-references and imports of Radix UI)
-      import_count=$(grep -r "from.*ui/$component" --include="*.tsx" --include="*.ts" "$CLIENT_DIR" 2>/dev/null | wc -l)
+      # Check if component is imported (more precise pattern matching)
+      # Matches: from "@/components/ui/COMPONENT" or from "./ui/COMPONENT" or from "../ui/COMPONENT"
+      import_count=$(grep -r "from ['\"].*ui/$component['\"]" --include="*.tsx" --include="*.ts" "$CLIENT_DIR" 2>/dev/null | wc -l)
       
       if [ "$import_count" -eq "0" ]; then
         report_dead_code "Unused UI Component" "packages/client/src/components/ui/$component.tsx" "No imports found"
@@ -132,8 +133,10 @@ echo "------------------------------------------------"
 
 # Check for root-level database files
 if [ -f "$PROJECT_ROOT/db/schema.ts" ]; then
-  # Check if it's imported
-  if ! grep -r "from.*db/schema" --include="*.ts" "$PROJECT_ROOT" 2>/dev/null | grep -v packages/server | grep -q .; then
+  # Check if root schema is imported (excluding server package imports)
+  root_schema_imports=$(grep -r "from.*db/schema" --include="*.ts" "$PROJECT_ROOT" 2>/dev/null | grep -v "packages/server" | grep -v "db/schema.ts:" | wc -l)
+  
+  if [ "$root_schema_imports" -eq "0" ]; then
     report_dead_code "Duplicate Schema" "db/schema.ts" "Root-level schema not imported (server has its own)"
   fi
 fi
@@ -160,7 +163,12 @@ if [ -f "$SERVER_DIR/services/service-factory.ts" ]; then
   
   for guard in "${type_guards[@]}"; do
     # Check if function is used outside its definition
-    usage_count=$(grep -r "$guard" --include="*.ts" "$SERVER_DIR" 2>/dev/null | grep -v "export function $guard" | wc -l)
+    # Excludes: export function NAME, function NAME(, const NAME =
+    usage_count=$(grep -r "\b$guard\b" --include="*.ts" "$SERVER_DIR" 2>/dev/null | \
+                  grep -v "export function $guard" | \
+                  grep -v "function $guard(" | \
+                  grep -v "const $guard =" | \
+                  wc -l)
     
     if [ "$usage_count" -eq "0" ]; then
       report_dead_code "Unused Type Guard" "packages/server/services/service-factory.ts::$guard()" "Function defined but never called"
