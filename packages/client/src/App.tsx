@@ -1,3 +1,7 @@
+/**
+ * Root application component with routing, theme, and global providers.
+ * Sets up application shell with navigation and page routing.
+ */
 import { Switch, Route } from "wouter";
 import { queryClient } from "@/utils/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -11,6 +15,7 @@ import DashboardData from "@/pages/dashboard";
 
 import Navbar from "@/components/NavBar/NavBar";
 
+/** Application routing configuration */
 function Router() {
   return (
     <Switch>
@@ -23,6 +28,7 @@ function Router() {
   );
 }
 
+/** Main application component with provider hierarchy */
 function App() {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

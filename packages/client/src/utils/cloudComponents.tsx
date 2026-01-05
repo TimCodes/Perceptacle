@@ -1,3 +1,7 @@
+/**
+ * Cloud component registry for diagram builder.
+ * Defines available infrastructure components (GCP, Azure, Kubernetes, generic).
+ */
 import {
   Server,
   Database,
@@ -13,6 +17,7 @@ import {
 import { AzureComponents, azureIconMap } from './azure-components';
 import { KubernetesComponents, kubernetesIconMap } from './kubernetes-components';
 
+/** Icon map combining all cloud provider icons */
 export const iconMap = {
   Server,
   Database,
@@ -28,6 +33,7 @@ export const iconMap = {
   ...kubernetesIconMap
 };
 
+/** Predefined cloud infrastructure components */
 const predefinedComponents = [
   // GCP Components
   {

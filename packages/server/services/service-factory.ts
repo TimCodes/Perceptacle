@@ -1,3 +1,8 @@
+/**
+ * Service factory for managing real and mock service implementations.
+ * Provides centralized service instantiation with environment-based configuration.
+ */
+
 // Service factory to switch between real and mock implementations
 import { KubernetesService, KubernetesConfig } from './kubernetes';
 import { MockKubernetesService } from './kubernetes.mock';
@@ -17,6 +22,7 @@ import { KafkaService, KafkaConfig } from './kafka';
 import { HttpActionService } from './http-action';
 import { ClientSecretCredential, DefaultAzureCredential } from '@azure/identity';
 
+/** Configuration for service factory - determines which services to use (real or mock) */
 export interface ServiceFactoryConfig {
   useMocks: boolean;
   azure?: {
@@ -50,6 +56,7 @@ export interface ServiceFactoryConfig {
   };
 }
 
+/** Factory class for creating service instances with mock/real toggle */
 export class ServiceFactory {
   private config: ServiceFactoryConfig;
 

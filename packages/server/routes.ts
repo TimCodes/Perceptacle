@@ -1,3 +1,7 @@
+/**
+ * API route registration - mounts all API endpoints.
+ * Returns HTTP server instance for WebSocket support.
+ */
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import azureRoutes from "./routes/azure";
@@ -11,6 +15,7 @@ import telemetryMapsRoutes from "./routes/telemetryMaps";
 import kafkaRoutes from "./routes/kafka";
 import httpActionRoutes from "./routes/http-action";
 
+/** Registers all API routes and returns HTTP server */
 export function registerRoutes(app: Express): Server {
   // Register Azure routes
   app.use("/api/azure", azureRoutes);
