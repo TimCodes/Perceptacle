@@ -53,7 +53,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
-  const { setSelectedNode, setNodes: setStoreNodes, setEdges: setStoreEdges, ownerFilter } = useDiagramStore();
+  const { setSelectedNode, setNodes: setStoreNodes, setEdges: setStoreEdges } = useDiagramStore();
 
   // Save/Load state
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -66,28 +66,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
 
   const { toast } = useToast();
 
-  // Apply filter to nodes visibility
-  useEffect(() => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        const nodeOwner = node.data.owner;
-        // Also hide if filter is active but node has no owner (unassigned)
-        // Adjust logic as needed: e.g. show unassigned if filter is 'Unassigned'
-        const shouldHide = ownerFilter && ownerFilter !== 'all'
-          ? (nodeOwner !== ownerFilter)
-          : false;
 
-        return {
-          ...node,
-          hidden: shouldHide,
-          style: {
-            ...node.style,
-            opacity: shouldHide ? 0.2 : 1, // Dim instead of fully hidden for better UX, or use hidden: true
-          }
-        };
-      })
-    );
-  }, [ownerFilter, setNodes]);
 
   // Handle external save trigger
   useEffect(() => {

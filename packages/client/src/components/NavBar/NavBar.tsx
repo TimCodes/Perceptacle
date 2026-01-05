@@ -1,12 +1,6 @@
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useDiagramStore } from "@/utils/diagram-store";
+
+
 import { Settings as SettingsIcon, Library } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -27,26 +21,7 @@ export default function NavBar() {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Team Filter */}
-          <div className="w-[200px]">
-            <Select
-              value={useDiagramStore((state) => state.ownerFilter) || "all"}
-              onValueChange={(val) => useDiagramStore.getState().setOwnerFilter(val === "all" ? null : val)}
-            >
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="Filter by Team" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Teams</SelectItem>
-                <SelectItem value="Platform">Platform</SelectItem>
-                <SelectItem value="Checkout">Checkout</SelectItem>
-                <SelectItem value="Search">Search</SelectItem>
-                <SelectItem value="Data">Data</SelectItem>
-                <SelectItem value="SRE">SRE</SelectItem>
-                <SelectItem value="Unassigned">Unassigned</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+
 
           <div className="flex gap-2">
             <Button

@@ -53,10 +53,18 @@ interface CustomField {
   placeholder?: string;
 }
 
+interface Component {
+  type: string;
+  label: string;
+  category: string;
+  icon: any;
+  fields?: CustomField[];
+}
+
 export default function NodeTypes() {
   const [_, setLocation] = useLocation();
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [customComponents, setCustomComponents] = useState(() => {
+  const [customComponents, setCustomComponents] = useState<Component[]>(() => {
     const saved = localStorage.getItem("customComponents");
     return saved ? JSON.parse(saved) : [];
   });
@@ -79,7 +87,7 @@ export default function NodeTypes() {
     fields: [] as CustomField[],
   });
 
-  const allComponents = [...cloudComponents, ...customComponents];
+  const allComponents: Component[] = [...(cloudComponents as unknown as Component[]), ...customComponents];
   const selectedComponent = allComponents.find((c) => c.type === selectedType);
 
   const addField = () => {
@@ -389,11 +397,10 @@ export default function NodeTypes() {
                           >
                             Field Configuration
                             <ChevronRight
-                              className={`h-4 w-4 transition-transform ${
-                                openFieldIds.includes(field.id)
-                                  ? "rotate-90"
-                                  : ""
-                              }`}
+                              className={`h-4 w-4 transition-transform ${openFieldIds.includes(field.id)
+                                ? "rotate-90"
+                                : ""
+                                }`}
                             />
                           </Button>
 
@@ -428,11 +435,10 @@ export default function NodeTypes() {
                   return (
                     <div
                       key={component.type}
-                      className={`flex items-center gap-3 p-3 rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground ${
-                        selectedType === component.type
-                          ? "bg-accent text-accent-foreground"
-                          : ""
-                      }`}
+                      className={`flex items-center gap-3 p-3 rounded-md cursor-pointer hover:bg-accent hover:text-accent-foreground ${selectedType === component.type
+                        ? "bg-accent text-accent-foreground"
+                        : ""
+                        }`}
                       onClick={() => setSelectedType(component.type)}
                     >
                       <Icon className="h-5 w-5" />
@@ -472,10 +478,10 @@ export default function NodeTypes() {
                     {customComponents.some(
                       (c) => c.type === selectedComponent.type,
                     ) && (
-                      <Badge variant="secondary" className="ml-2">
-                        Custom
-                      </Badge>
-                    )}
+                        <Badge variant="secondary" className="ml-2">
+                          Custom
+                        </Badge>
+                      )}
                   </div>
                 </div>
 

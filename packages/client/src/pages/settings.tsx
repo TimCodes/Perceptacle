@@ -1,13 +1,10 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft } from "lucide-react";
-import { useLocation } from "wouter";
 import { useTheme } from "next-themes";
 
 export default function Settings() {
-  const [_, setLocation] = useLocation();
+
   const { theme, setTheme } = useTheme();
 
   return (
@@ -49,7 +46,7 @@ export default function Settings() {
               <Switch
                 id="snap-to-grid"
                 checked={true}
-                onCheckedChange={() => {}}
+                onCheckedChange={() => { }}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -57,7 +54,7 @@ export default function Settings() {
               <Switch
                 id="show-minimap"
                 checked={false}
-                onCheckedChange={() => {}}
+                onCheckedChange={() => { }}
               />
             </div>
           </CardContent>

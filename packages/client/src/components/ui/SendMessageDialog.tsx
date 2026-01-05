@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -32,7 +32,7 @@ export function SendMessageDialog({ queueOrTopicName }: SendMessageDialogProps) 
             let parsedMessage;
             try {
                 parsedMessage = JSON.parse(message);
-            } catch (e) {
+            } catch {
                 parsedMessage = { text: message };
             }
 

@@ -61,27 +61,22 @@ const MetricCard = ({ title, value, subtext, icon: Icon, trend }: any) => (
     </Card>
 );
 
-import { useDiagramStore } from "@/utils/diagram-store";
+
 
 // ... existing imports ...
 
 export default function DashboardPage() {
-    const ownerFilter = useDiagramStore((state) => state.ownerFilter);
+
 
     // Filter "logs" based on simulated ownership (random assignment for mock logs)
-    const filteredLogs = resentLogs.filter(log => {
-        if (!ownerFilter || ownerFilter === 'all') return true;
-        // Simulate that logs 1,3 are Platform, 2,4 are Checkout, 5 is Search
-        const mockOwners: Record<number, string> = { 1: 'Platform', 2: 'Checkout', 3: 'Platform', 4: 'Checkout', 5: 'Search' };
-        return mockOwners[log.id] === ownerFilter;
-    });
+    const filteredLogs = resentLogs;
 
     return (
         <div className="p-8 space-y-8 min-h-screen bg-stone-950/50">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-stone-200 to-stone-400 bg-clip-text text-transparent">
-                        {ownerFilter && ownerFilter !== 'all' ? `${ownerFilter} Team Dashboard` : 'System Dashboard'}
+                        System Dashboard
                     </h2>
                     <p className="text-muted-foreground">Overview of system health and performance.</p>
                 </div>
