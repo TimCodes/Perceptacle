@@ -59,7 +59,7 @@ Perceptacle is built as a modern full-stack monorepo application with clear sepa
 
 ### Getting Started
 - [Project README](../README.md) - Setup and installation instructions
-- [Docker Setup](../docs/DOCKER.md) - Container-based development
+- [Docker Setup](./DOCKER.md) - Container-based development
 
 ### Architecture & Design
 - [Architecture Overview](./architecture.md) - System design, layers, and patterns
