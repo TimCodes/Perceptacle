@@ -340,38 +340,10 @@ export function isMockGitHubService(service: GitHubService | MockGitHubService):
   return service instanceof MockGitHubService;
 }
 
-export function isOracleService(service: OracleService | MockOracleService): service is OracleService {
-  return service instanceof OracleService;
-}
-
-export function isMockOracleService(service: OracleService | MockOracleService): service is MockOracleService {
-  return service instanceof MockOracleService;
-}
-
 export function isAIChatService(service: AIChatService | MockAIChatService): service is AIChatService {
   return service instanceof AIChatService;
 }
 
 export function isMockAIChatService(service: AIChatService | MockAIChatService): service is MockAIChatService {
   return service instanceof MockAIChatService;
-}
-
-export function isMongoDBService(service: MongoDBService | MockMongoDBService): service is MongoDBService {
-  return service instanceof MongoDBService;
-}
-
-export function isMockMongoDBService(service: MongoDBService | MockMongoDBService): service is MockMongoDBService {
-  return service instanceof MockMongoDBService;
-}
-
-export function isRagService(service: RagService | MockRagService): service is RagService {
-  return service instanceof RagService;
-}
-
-export function isMockRagService(service: RagService | MockRagService): service is MockRagService {
-  return service instanceof MockRagService;
-}
-
-export function isKafkaService(service: KafkaService): service is KafkaService {
-  return service instanceof KafkaService;
 }

@@ -162,16 +162,19 @@ if [ -f "$SERVER_DIR/services/service-factory.ts" ]; then
   )
   
   for guard in "${type_guards[@]}"; do
-    # Check if function is used outside its definition
-    # Excludes: export function NAME, function NAME(, const NAME =
-    usage_count=$(grep -r "\b$guard\b" --include="*.ts" "$SERVER_DIR" 2>/dev/null | \
-                  grep -v "export function $guard" | \
-                  grep -v "function $guard(" | \
-                  grep -v "const $guard =" | \
-                  wc -l)
-    
-    if [ "$usage_count" -eq "0" ]; then
-      report_dead_code "Unused Type Guard" "packages/server/services/service-factory.ts::$guard()" "Function defined but never called"
+    # First check if the function is defined in service-factory.ts
+    if grep -q "export function $guard" "$SERVER_DIR/services/service-factory.ts" 2>/dev/null; then
+      # Check if function is used outside its definition
+      # Excludes: export function NAME, function NAME(, const NAME =
+      usage_count=$(grep -r "\b$guard\b" --include="*.ts" "$SERVER_DIR" 2>/dev/null | \
+                    grep -v "export function $guard" | \
+                    grep -v "function $guard(" | \
+                    grep -v "const $guard =" | \
+                    wc -l)
+      
+      if [ "$usage_count" -eq "0" ]; then
+        report_dead_code "Unused Type Guard" "packages/server/services/service-factory.ts::$guard()" "Function defined but never called"
+      fi
     fi
   done
 fi
