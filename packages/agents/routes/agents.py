@@ -53,6 +53,35 @@ async def chat(request: ChatRequest) -> ChatResponse:
         )
 
 
+from fastapi.responses import StreamingResponse
+import json
+
+@router.post("/chat/stream")
+async def chat_stream(request: ChatRequest):
+    """
+    Stream chat response from the agent.
+    """
+    try:
+        agent = get_agent()
+        
+        async def event_generator():
+            async for event in agent.stream_chat(
+                message=request.message,
+                session_id=request.session_id,
+                context=request.context
+            ):
+                yield f"data: {json.dumps(event)}\n\n"
+            yield "data: [DONE]\n\n"
+
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error processing chat request: {str(e)}"
+        )
+
+
 @router.get("/status")
 async def agent_status():
     """

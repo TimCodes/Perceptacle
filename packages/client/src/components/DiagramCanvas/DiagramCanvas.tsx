@@ -9,8 +9,6 @@ import ReactFlow, {
   Edge,
   ReactFlowInstance,
   Node,
-  Handle,
-  Position,
   ConnectionLineType,
   MarkerType,
 } from "reactflow";
@@ -22,6 +20,7 @@ import { TelemetryMapsLibrary } from "@/components/TelemetryMapsLibrary";
 import { TelemetryMapService } from "@/services/telemetryMapService";
 import { TelemetryMap, ReactFlowNode, ReactFlowEdge } from "@/types/telemetryMap";
 import { useToast } from "@/hooks/use-toast";
+import CustomNode from "./CustomNode";
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
 
@@ -33,77 +32,7 @@ interface DiagramCanvasProps {
   onLoadComplete?: () => void;
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "active":
-      return "hsl(var(--success))";
-    case "warning":
-      return "hsl(var(--warning))";
-    case "error":
-      return "hsl(var(--destructive))";
-    case "inactive":
-      return "hsl(var(--muted))";
-    default:
-      return "hsl(var(--border))";
-  }
-};
 
-const CustomNode = ({ data }: { data: any }) => {
-  const components = getCloudComponents();
-  const Component = components.find((comp) => comp.type === data.type)?.icon;
-
-  return (
-    <div className="relative p-2 rounded-md bg-background border text-foreground shadow-sm">
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="!w-3 !h-3 !-left-1.5 !border-2 !bg-background hover:!bg-muted"
-        style={{ zIndex: 1 }}
-      />
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
-          {Component && <Component className="w-5 h-5" />}
-          <span className="text-sm font-medium">{data.label}</span>
-        </div>
-
-        {/* Custom Fields Section */}
-        {data.customFields && data.customFields.length > 0 && (
-          <div className="border-t pt-2 mt-1 space-y-1">
-            {data.customFields.map((field: any, index: number) => (
-              <div key={index} className="flex items-center gap-2 text-xs">
-                <span className="text-muted-foreground">{field.name}:</span>
-                <span className="font-medium">
-                  {field.type === "select" ? (
-                    <span className="px-1.5 py-0.5 bg-accent/50 rounded-sm">
-                      {field.value || "(Not set)"}
-                    </span>
-                  ) : field.type === "url" ? (
-                    <a
-                      href={field.value}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      {field.value ? "Link" : "(Not set)"}
-                    </a>
-                  ) : (
-                    field.value || "(Not set)"
-                  )}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        className="!w-3 !h-3 !-right-1.5 !border-2 !bg-background hover:!bg-muted"
-        style={{ zIndex: 1 }}
-      />
-    </div>
-  );
-};
 
 const nodeTypes = {
   default: CustomNode,
@@ -197,6 +126,42 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
     };
   }, [nodes]); // Remove setStoreNodes from deps to prevent infinite loop
 
+  // Update edges appearance based on node status
+  useEffect(() => {
+    if (nodes.length === 0 || edges.length === 0) return;
+
+    const nodeStatusMap = new Map(nodes.map(n => [n.id, n.data.status]));
+
+    setEdges(eds => eds.map(edge => {
+      const sourceStatus = nodeStatusMap.get(edge.source);
+
+      // Default to active style
+      let animated = true;
+      let stroke = "hsl(var(--primary))";
+
+      if (sourceStatus === 'offline' || sourceStatus === 'inactive') {
+        animated = false;
+        stroke = "hsl(var(--muted))";
+      } else if (sourceStatus === 'error') {
+        stroke = "hsl(var(--destructive))";
+      }
+
+      // Only update if changed to avoid unnecessary re-renders
+      if (edge.animated !== animated || edge.style?.stroke !== stroke) {
+        return {
+          ...edge,
+          animated,
+          style: { ...edge.style, stroke },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: stroke,
+          }
+        };
+      }
+      return edge;
+    }));
+  }, [nodes.map(n => n.data.status).join(',')]); // Only depend on status changes
+
   useEffect(() => {
     if (edges.length >= 0) { // Allow empty arrays too
       setStoreEdges(edges);
@@ -271,7 +236,6 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       },
       className: "dark:bg-background dark:text-foreground",
       style: {
-        border: `2px solid ${getStatusColor(node.status)}`,
         borderRadius: "8px",
         minWidth: 180,
       },
@@ -431,7 +395,8 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
             disk: Math.floor(Math.random() * 100),
             network: Math.floor(Math.random() * 100),
             lastUpdated: new Date().toISOString(),
-            activeAlerts: Math.floor(Math.random() * 5),
+            activeAlerts: Math.random() > 0.7 ? Math.floor(Math.random() * 3) + 1 : 0,
+            alertSeverity: Math.random() > 0.5 ? 'critical' : 'warning',
           },
           logs: [
             {
@@ -443,7 +408,6 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         },
         className: "dark:bg-background dark:text-foreground",
         style: {
-          border: `2px solid ${getStatusColor(initialStatus)}`,
           borderRadius: "8px",
           minWidth: 180,
         },

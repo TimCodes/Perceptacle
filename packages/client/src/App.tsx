@@ -14,6 +14,7 @@ import { ThemeProvider } from "./utils/theme-provider";
 import DashboardData from "@/pages/dashboard";
 
 import Navbar from "@/components/NavBar/NavBar";
+import ChatInterface from "@/components/Chat/ChatInterface";
 
 /** Application routing configuration */
 function Router() {
@@ -35,6 +36,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Navbar />
         <Router />
+        <ChatInterface />
       </QueryClientProvider>
     </ThemeProvider>
   );

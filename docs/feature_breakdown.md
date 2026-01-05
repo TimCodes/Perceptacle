@@ -130,6 +130,15 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
   - [ ] Implement widgets for CPU/Memory metrics (using Recharts).
   - [ ] Implement a Log Viewer widget.
 
+**4.3 Active Alert Overlay**
+- **Story Points**: 5
+- **Description**: As an operator, I want to see active alerts directly on the diagram nodes so I can spot issues geographically/topologically.
+- **Status**: ✅ **DONE**
+- **Acceptance Criteria**:
+  - [x] Add "Alerts" field or state to nodes.
+  - [x] Visual indicator (red border/badge) on nodes with active alerts.
+  - [x] Hover to see alert details.
+
 ---
 
 ## 🟢 **PRIORITY 3: ENHANCED EXPERIENCE**
@@ -142,16 +151,25 @@ Perceptacle is a hybrid observability, data visualization, and troubleshooting p
 **5.1 Advanced Chat Interface**
 - **Story Points**: 3
 - **Description**: As a user, I want a richer chat experience with history, code highlighting, and streaming responses.
-- **Status**: 🚧 **IN PROGRESS** (Basic chat exists)
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Implement streaming responses from the Python agent.
-  - [ ] Persist chat history per session.
-  - [ ] Add syntax highlighting for code blocks in chat.
+  - [x] Implement streaming responses from the Python agent.
+  - [x] Persist chat history per session.
+  - [x] Add syntax highlighting for code blocks in chat.
 
 **5.2 Visual Refinements**
 - **Story Points**: 3
 - **Description**: As a user, I want the diagram nodes to visually reflect their health state (e.g., turning red on error).
-- **Status**: ⬜ **TODO**
+- **Status**: ✅ **DONE**
 - **Acceptance Criteria**:
-  - [ ] Bind node colors/borders to real-time health metrics.
-  - [ ] Add animations for active data flow.
+  - [x] Bind node colors/borders to real-time health metrics.
+  - [x] Add animations for active data flow.
+
+**5.3 Context-Aware Chat**
+- **Story Points**: 5
+- **Description**: As a user, I want the chat assistant to be aware of my current context (selected node, active diagram) so I can ask questions like "Check logs for this node" without typing the ID.
+- **Status**: ✅ **DONE**
+- **Acceptance Criteria**:
+  - [x] Client: Capture selected node/diagram state.
+  - [x] Client: Send context with chat message.
+  - [x] Server/Agent: Receive and utilize context in the prompt.
