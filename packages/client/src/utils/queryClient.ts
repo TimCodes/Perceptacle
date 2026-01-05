@@ -1,5 +1,10 @@
+/**
+ * TanStack Query client configuration for API data fetching and caching.
+ * Configures default behavior for queries and mutations.
+ */
 import { QueryClient } from "@tanstack/react-query";
 
+/** Configured query client with fetch defaults and retry logic */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

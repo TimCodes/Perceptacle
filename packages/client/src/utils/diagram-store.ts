@@ -1,6 +1,11 @@
+/**
+ * Global state management for diagram editor using Zustand.
+ * Manages nodes, edges, selection state, and diagram persistence.
+ */
 import { create } from 'zustand';
 import { Node, Edge, ReactFlowInstance } from 'reactflow';
 
+/** Diagram state interface */
 interface DiagramState {
   nodes: Node[];
   edges: Edge[];
@@ -32,6 +37,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
   setRfInstance: (instance) => set({ rfInstance: instance }),
   setOwnerFilter: (filter) => set({ ownerFilter: filter }),
 
+  /** Updates selected node while preventing infinite update loops */
   updateSelectedNode: (node) => {
     const { nodes, selectedNode } = get();
     if (!selectedNode) return;
@@ -52,6 +58,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     });
   },
 
+  /** Adds log entry to node, maintaining last 100 logs */
   addNodeLog: (nodeId: string, message: string, level: 'info' | 'warning' | 'error' = 'info') => {
     const { nodes } = get();
     const updatedNodes = nodes.map((node) => {
@@ -76,6 +83,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     set({ nodes: updatedNodes });
   },
 
+  /** Saves diagram to localStorage */
   saveDiagram: () => {
     const { rfInstance } = get();
     if (!rfInstance) return;
@@ -84,6 +92,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     localStorage.setItem('gcp-diagram', JSON.stringify(flow));
   },
 
+  /** Loads diagram from localStorage */
   loadDiagram: () => {
     const { rfInstance } = get();
     if (!rfInstance) return;
@@ -97,6 +106,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     }
   },
 
+  /** Clears all nodes and edges from diagram */
   clearDiagram: () => {
     set({
       nodes: [],

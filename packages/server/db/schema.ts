@@ -1,7 +1,11 @@
+/**
+ * PostgreSQL database schema for telemetry maps using Drizzle ORM.
+ * Defines tables for maps, nodes, and connections with relations and indexes.
+ */
 import { pgTable, uuid, varchar, text, timestamp, boolean, jsonb, real, index } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-// Telemetry Maps table
+/** Telemetry Maps table - stores map metadata */
 export const telemetryMaps = pgTable('telemetry_maps', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
@@ -17,7 +21,7 @@ export const telemetryMaps = pgTable('telemetry_maps', {
   publicIdx: index('idx_telemetry_maps_public').on(table.isPublic),
 }));
 
-// Telemetry Map Nodes table
+/** Telemetry Map Nodes table - stores individual diagram nodes */
 export const telemetryMapNodes = pgTable('telemetry_map_nodes', {
   id: uuid('id').primaryKey().defaultRandom(),
   mapId: uuid('map_id').notNull().references(() => telemetryMaps.id, { onDelete: 'cascade' }),
@@ -34,7 +38,7 @@ export const telemetryMapNodes = pgTable('telemetry_map_nodes', {
   mapIdIdx: index('idx_telemetry_map_nodes_map_id').on(table.mapId),
 }));
 
-// Telemetry Map Connections table
+/** Telemetry Map Connections table - stores edges between nodes */
 export const telemetryMapConnections = pgTable('telemetry_map_connections', {
   id: uuid('id').primaryKey().defaultRandom(),
   mapId: uuid('map_id').notNull().references(() => telemetryMaps.id, { onDelete: 'cascade' }),

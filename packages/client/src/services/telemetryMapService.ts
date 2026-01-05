@@ -1,3 +1,7 @@
+/**
+ * API service for telemetry map operations.
+ * Handles CRUD operations for saving and loading infrastructure diagrams.
+ */
 import { 
   TelemetryMap, 
   CreateTelemetryMapRequest, 
@@ -8,6 +12,7 @@ import {
 
 const API_BASE = '/api/telemetry-maps';
 
+/** Service for managing telemetry maps via API */
 export class TelemetryMapService {
   /**
    * Get all telemetry maps for a user or public maps

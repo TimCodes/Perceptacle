@@ -1,3 +1,7 @@
+/**
+ * Home page - main diagram editor with canvas and configuration panel.
+ * Provides drag-and-drop diagram building with real-time node configuration.
+ */
 import { useState } from "react";
 import DiagramCanvas from "@/components//DiagramCanvas/DiagramCanvas";
 import DropDown from "@/components/NodeTypeDropdown/DropDown";
@@ -12,6 +16,7 @@ import DiagramToolbar from "@/components/DiagramCanvas/DiagramToolbar";
 
 const MotionDiv = motion.div;
 
+/** Main diagram editor page component */
 export default function Home() {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const [saveTriggered, setSaveTriggered] = useState(false);
