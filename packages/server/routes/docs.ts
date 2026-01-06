@@ -7,8 +7,8 @@ const router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files from the docs directory
-const docsPath = path.resolve(__dirname, "../../docs");
+// Serve static files from the docs directory (at repo root)
+const docsPath = path.resolve(__dirname, "../../../docs");
 router.use(express.static(docsPath));
 
 // Handle all routes to serve index.html for Docsify
