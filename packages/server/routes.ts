@@ -14,6 +14,7 @@ import ragRoutes from "./routes/rag";
 import telemetryMapsRoutes from "./routes/telemetryMaps";
 import kafkaRoutes from "./routes/kafka";
 import httpActionRoutes from "./routes/http-action";
+import docsRoutes from "./routes/docs";
 
 /** Registers all API routes and returns HTTP server */
 export function registerRoutes(app: Express): Server {
@@ -46,6 +47,9 @@ export function registerRoutes(app: Express): Server {
 
   // Register HTTP action routes
   app.use("/api/actions/http", httpActionRoutes);
+
+  // Register documentation routes
+  app.use("/docs", docsRoutes);
 
   const httpServer = createServer(app);
 
