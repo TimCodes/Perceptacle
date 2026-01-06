@@ -13,7 +13,12 @@ router.use(express.static(docsPath));
 
 // Handle all routes to serve index.html for Docsify
 router.get("*", (_req: Request, res: Response) => {
-  res.sendFile(path.join(docsPath, "index.html"));
+  res.sendFile(path.join(docsPath, "index.html"), (err) => {
+    if (err) {
+      console.error("Error serving documentation:", err);
+      res.status(500).json({ error: "Failed to load documentation" });
+    }
+  });
 });
 
 export default router;
