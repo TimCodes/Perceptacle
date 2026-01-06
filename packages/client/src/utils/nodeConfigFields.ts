@@ -38,14 +38,7 @@ export const DEFAULT_FIELDS: ConfigField[] = [
     placeholder: 'https://github.com/username/repository',
     description: 'Link to the GitHub repository for this component'
   },
-  {
-    name: 'owner',
-    label: 'Owner (Team)',
-    type: 'select',
-    options: ['Platform', 'Checkout', 'Search', 'Data', 'SRE', 'Unassigned'],
-    placeholder: 'Select team owner',
-    description: 'Team responsible for this resource'
-  }
+
 ];
 
 // Azure-specific fields for metrics and log collection

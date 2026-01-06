@@ -21,6 +21,7 @@ import { TelemetryMapService } from "@/services/telemetryMapService";
 import { TelemetryMap, ReactFlowNode, ReactFlowEdge } from "@/types/telemetryMap";
 import { useToast } from "@/hooks/use-toast";
 import CustomNode from "./CustomNode";
+import { NodeConfigDialog } from "../NodeConfigDialog";
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
 
@@ -30,6 +31,8 @@ interface DiagramCanvasProps {
   onSaveComplete?: () => void;
   loadTriggered?: boolean;
   onLoadComplete?: () => void;
+  clearTriggered?: boolean;
+  onClearComplete?: () => void;
 }
 
 
@@ -49,7 +52,7 @@ const defaultEdgeOptions = {
   },
 };
 
-export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveComplete, loadTriggered, onLoadComplete }: DiagramCanvasProps) {
+export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveComplete, loadTriggered, onLoadComplete, clearTriggered, onClearComplete }: DiagramCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
@@ -58,6 +61,8 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   // Save/Load state
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLibraryDialog, setShowLibraryDialog] = useState(false);
+  const [showNodeConfig, setShowNodeConfig] = useState(false);
+  const [pendingNode, setPendingNode] = useState<Node | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentUserId] = useState('user123'); // Replace with actual user authentication
 
@@ -83,6 +88,15 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       onLoadComplete?.();
     }
   }, [loadTriggered, onLoadComplete]);
+
+  // Handle external clear trigger
+  useEffect(() => {
+    if (clearTriggered) {
+      setNodes([]);
+      setEdges([]);
+      onClearComplete?.();
+    }
+  }, [clearTriggered, onClearComplete, setNodes, setEdges]);
 
   // Sync local state with store - debounced to prevent infinite loops during drag
   useEffect(() => {
@@ -392,10 +406,28 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         },
       };
 
-      setNodes((nds) => nds.concat(newNode));
+      setPendingNode(newNode);
+      setShowNodeConfig(true);
     },
-    [rfInstance, setNodes],
+    [rfInstance],
   );
+
+  const handleSaveNodeConfig = (nodeData: any) => {
+    if (pendingNode) {
+      const finalNode = {
+        ...pendingNode,
+        data: nodeData
+      };
+      setNodes((nds) => nds.concat(finalNode));
+      setPendingNode(null);
+      setShowNodeConfig(false);
+    }
+  };
+
+  const handleCancelNodeConfig = () => {
+    setPendingNode(null);
+    setShowNodeConfig(false);
+  };
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -444,6 +476,13 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         onClose={() => setShowLibraryDialog(false)}
         onLoadMap={handleLoadMap}
         userId={currentUserId}
+      />
+
+      <NodeConfigDialog
+        isOpen={showNodeConfig}
+        onClose={handleCancelNodeConfig}
+        onSave={handleSaveNodeConfig}
+        initialNode={pendingNode}
       />
     </div>
   );

@@ -46,6 +46,16 @@ export default function Home() {
     setLoadTriggered(false);
   };
 
+  const [clearTriggered, setClearTriggered] = useState(false);
+
+  const triggerClear = () => {
+    setClearTriggered(true);
+  };
+
+  const onClearComplete = () => {
+    setClearTriggered(false);
+  };
+
   return (
     <ReactFlowProvider>
       <div className="h-[calc(100vh-65px)]  w-screen flex flex-col">
@@ -58,15 +68,17 @@ export default function Home() {
             <div className="absolute top-6 left-6 z-10">
               <DropDown onComponentSelect={handleComponentSelect} />
             </div>
-            <DiagramCanvas 
-              onNodeSelected={handleNodeSelected} 
+            <DiagramCanvas
+              onNodeSelected={handleNodeSelected}
               saveTriggered={saveTriggered}
               onSaveComplete={onSaveComplete}
               loadTriggered={loadTriggered}
               onLoadComplete={onLoadComplete}
+              clearTriggered={clearTriggered}
+              onClearComplete={onClearComplete}
             />
           </div>
-          <DiagramToolbar onSaveMap={triggerSave} onLoadMap={triggerLoad} />
+          <DiagramToolbar onSaveMap={triggerSave} onLoadMap={triggerLoad} onClearMap={triggerClear} />
           <AnimatePresence initial={false}>
             {isConfigPanelOpen ? (
               <MotionDiv

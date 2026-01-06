@@ -68,7 +68,6 @@ const MetricCard = ({ title, value, subtext, icon: Icon, trend }: any) => (
 export default function DashboardPage() {
 
 
-    // Filter "logs" based on simulated ownership (random assignment for mock logs)
     const filteredLogs = resentLogs;
 
     return (
@@ -211,7 +210,7 @@ export default function DashboardPage() {
                                     ))
                                 ) : (
                                     <div className="text-sm text-muted-foreground text-center py-8">
-                                        No logs found for this team.
+                                        No logs found.
                                     </div>
                                 )}
                             </div>
@@ -219,6 +218,6 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </div >
     );
 }
