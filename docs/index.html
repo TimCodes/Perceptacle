@@ -25,11 +25,34 @@
         placeholder: 'Search',
         noData: 'No Results!',
         depth: 6
+      },
+      mermaidConfig: {
+        theme: 'default',
+        themeVariables: {
+          primaryColor: '#3b82f6'
+        }
       }
     }
   </script>
   <!-- Docsify v4 -->
   <script src="assets/docsify/docsify.min.js"></script>
+  <!-- Mermaid library -->
+  <script src="assets/docsify/mermaid.min.js"></script>
+  <script>
+    // Ensure mermaid is available globally and initialize it
+    if (typeof mermaid !== 'undefined') {
+      mermaid.initialize({ 
+        startOnLoad: false,
+        theme: 'default',
+        themeVariables: {
+          primaryColor: '#3b82f6'
+        }
+      });
+      window.mermaid = mermaid;
+    }
+  </script>
+  <!-- Mermaid plugin for Docsify -->
+  <script src="assets/docsify/docsify-mermaid.js"></script>
   <!-- Search plugin -->
   <script src="assets/docsify/search.min.js"></script>
 </body>
