@@ -53,6 +53,28 @@
   </script>
   <!-- Mermaid plugin for Docsify -->
   <script src="assets/docsify/docsify-mermaid.js"></script>
+  <!-- Custom plugin to trigger Mermaid rendering -->
+  <script>
+    window.$docsify.plugins = (window.$docsify.plugins || []).concat(function(hook, vm) {
+      hook.doneEach(function() {
+        // Trigger Mermaid rendering after each page is loaded
+        if (typeof mermaid !== 'undefined') {
+          try {
+            // Use init() for older versions or run() for newer versions
+            if (typeof mermaid.run === 'function') {
+              mermaid.run({
+                querySelector: '.mermaid'
+              });
+            } else if (typeof mermaid.init === 'function') {
+              mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+            }
+          } catch (e) {
+            console.error('Mermaid rendering error:', e);
+          }
+        }
+      });
+    });
+  </script>
   <!-- Search plugin -->
   <script src="assets/docsify/search.min.js"></script>
 </body>

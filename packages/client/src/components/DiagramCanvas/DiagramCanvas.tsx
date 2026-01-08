@@ -22,6 +22,7 @@ import { TelemetryMap, ReactFlowNode, ReactFlowEdge } from "@/types/telemetryMap
 import { useToast } from "@/hooks/use-toast";
 import CustomNode from "./CustomNode";
 import { NodeConfigDialog } from "../NodeConfigDialog";
+import { NewMapDialog, NewMapData } from "../NewMapDialog";
 
 // Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
 
@@ -31,8 +32,8 @@ interface DiagramCanvasProps {
   onSaveComplete?: () => void;
   loadTriggered?: boolean;
   onLoadComplete?: () => void;
-  clearTriggered?: boolean;
-  onClearComplete?: () => void;
+  newMapTriggered?: boolean;
+  onNewMapComplete?: () => void;
 }
 
 
@@ -52,7 +53,7 @@ const defaultEdgeOptions = {
   },
 };
 
-export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveComplete, loadTriggered, onLoadComplete, clearTriggered, onClearComplete }: DiagramCanvasProps) {
+export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveComplete, loadTriggered, onLoadComplete, newMapTriggered, onNewMapComplete }: DiagramCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
@@ -62,9 +63,11 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLibraryDialog, setShowLibraryDialog] = useState(false);
   const [showNodeConfig, setShowNodeConfig] = useState(false);
+  const [showNewMapDialog, setShowNewMapDialog] = useState(false);
   const [pendingNode, setPendingNode] = useState<Node | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentUserId] = useState('user123'); // Replace with actual user authentication
+  const [currentMapMetadata, setCurrentMapMetadata] = useState<NewMapData | null>(null);
 
   // Use ref to prevent infinite loops during rapid updates
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -89,14 +92,13 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
     }
   }, [loadTriggered, onLoadComplete]);
 
-  // Handle external clear trigger
+  // Handle external new map trigger
   useEffect(() => {
-    if (clearTriggered) {
-      setNodes([]);
-      setEdges([]);
-      onClearComplete?.();
+    if (newMapTriggered) {
+      setShowNewMapDialog(true);
+      onNewMapComplete?.();
     }
-  }, [clearTriggered, onClearComplete, setNodes, setEdges]);
+  }, [newMapTriggered, onNewMapComplete]);
 
   // Sync local state with store - debounced to prevent infinite loops during drag
   useEffect(() => {
@@ -429,6 +431,18 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
     setShowNodeConfig(false);
   };
 
+  // New map handler
+  const handleCreateNewMap = (data: NewMapData) => {
+    setCurrentMapMetadata(data);
+    setNodes([]);
+    setEdges([]);
+    setShowNewMapDialog(false);
+    toast({
+      title: 'Success',
+      description: `New map "${data.name}" created!`,
+    });
+  };
+
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
       setSelectedNode(node);
@@ -469,6 +483,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         nodes={nodes as ReactFlowNode[]}
         edges={edges as ReactFlowEdge[]}
         isLoading={isSaving}
+        initialData={currentMapMetadata || undefined}
       />
 
       <TelemetryMapsLibrary
@@ -483,6 +498,12 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         onClose={handleCancelNodeConfig}
         onSave={handleSaveNodeConfig}
         initialNode={pendingNode}
+      />
+
+      <NewMapDialog
+        isOpen={showNewMapDialog}
+        onClose={() => setShowNewMapDialog(false)}
+        onCreate={handleCreateNewMap}
       />
     </div>
   );

@@ -5,10 +5,10 @@ import { useDiagramStore } from "@/utils/diagram-store";
 interface DiagramToolbarProps {
   onSaveMap?: () => void;
   onLoadMap?: () => void;
-  onClearMap?: () => void;
+  onNewMap?: () => void;
 }
 
-const DiagramToolbar = ({ onSaveMap, onLoadMap, onClearMap }: DiagramToolbarProps) => {
+const DiagramToolbar = ({ onSaveMap, onLoadMap, onNewMap }: DiagramToolbarProps) => {
   const { nodes } = useDiagramStore();
 
   return (
@@ -18,7 +18,7 @@ const DiagramToolbar = ({ onSaveMap, onLoadMap, onClearMap }: DiagramToolbarProp
           variant="ghost"
           size="icon"
           title="Create New Map"
-          onClick={onClearMap}
+          onClick={onNewMap}
         >
           <Plus className="h-4 w-4" />
         </Button>

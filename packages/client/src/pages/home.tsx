@@ -21,6 +21,7 @@ export default function Home() {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
   const [saveTriggered, setSaveTriggered] = useState(false);
   const [loadTriggered, setLoadTriggered] = useState(false);
+  const [newMapTriggered, setNewMapTriggered] = useState(false);
 
   const handleNodeSelected = () => {
     setIsConfigPanelOpen(true);
@@ -46,14 +47,12 @@ export default function Home() {
     setLoadTriggered(false);
   };
 
-  const [clearTriggered, setClearTriggered] = useState(false);
-
-  const triggerClear = () => {
-    setClearTriggered(true);
+  const triggerNewMap = () => {
+    setNewMapTriggered(true);
   };
 
-  const onClearComplete = () => {
-    setClearTriggered(false);
+  const onNewMapComplete = () => {
+    setNewMapTriggered(false);
   };
 
   return (
@@ -74,11 +73,11 @@ export default function Home() {
               onSaveComplete={onSaveComplete}
               loadTriggered={loadTriggered}
               onLoadComplete={onLoadComplete}
-              clearTriggered={clearTriggered}
-              onClearComplete={onClearComplete}
+              newMapTriggered={newMapTriggered}
+              onNewMapComplete={onNewMapComplete}
             />
           </div>
-          <DiagramToolbar onSaveMap={triggerSave} onLoadMap={triggerLoad} onClearMap={triggerClear} />
+          <DiagramToolbar onSaveMap={triggerSave} onLoadMap={triggerLoad} onNewMap={triggerNewMap} />
           <AnimatePresence initial={false}>
             {isConfigPanelOpen ? (
               <MotionDiv

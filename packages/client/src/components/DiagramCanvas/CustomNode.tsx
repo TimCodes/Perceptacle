@@ -21,11 +21,11 @@ const getStatusClasses = (status: string, activeAlerts: number, alertSeverity: s
 
     switch (status) {
         case 'active':
-            return 'border-green-500 shadow-sm'; // Success/Active
+            return 'border-[1px]  border-green-300 outline-0'; // Success/Active
         case 'warning':
-            return 'border-yellow-500 shadow-sm';
+            return 'border-[1px] border-yellow-500 outline-0';
         case 'error':
-            return 'border-destructive shadow-md';
+            return 'border-[1px] border-destructive outline-2 border-dashed';
         case 'offline':
         case 'inactive':
             return 'border-muted opacity-80 grayscale';
@@ -50,7 +50,7 @@ const CustomNode = ({ data }: { data: any }) => {
             <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>
                     <div className={cn(
-                        "relative p-2 rounded-md bg-background border-2 text-foreground min-w-[180px] transition-all duration-300",
+                        "relative p-3 rounded-md bg-background border-2 text-foreground min-w-[180px] transition-all duration-300 bg-sky-900",
                         borderClasses
                     )}>
 
@@ -69,7 +69,7 @@ const CustomNode = ({ data }: { data: any }) => {
                         <Handle
                             type="target"
                             position={Position.Left}
-                            className="!w-3 !h-3 !-left-2 !border-2 !bg-background hover:!bg-muted"
+                            className="!w-3 !h-3 !left-0 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 !border-2 !bg-background hover:!bg-muted"
                         />
 
                         <div className="flex flex-col gap-2">
@@ -94,7 +94,7 @@ const CustomNode = ({ data }: { data: any }) => {
                         <Handle
                             type="source"
                             position={Position.Right}
-                            className="!w-3 !h-3 !-right-2 !border-2 !bg-background hover:!bg-muted"
+                            className="!w-3 !h-3 !right-0 !top-1/2 !translate-x-1/2 !-translate-y-1/2 !border-2 !bg-background hover:!bg-muted"
                         />
                     </div>
                 </TooltipTrigger>

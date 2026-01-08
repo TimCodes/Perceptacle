@@ -21,6 +21,11 @@ interface SaveMapDialogProps {
   nodes: ReactFlowNode[];
   edges: ReactFlowEdge[];
   isLoading?: boolean;
+  initialData?: {
+    name?: string;
+    description?: string;
+    tags?: string[];
+  };
 }
 
 export function SaveMapDialog({
@@ -30,11 +35,12 @@ export function SaveMapDialog({
   nodes,
   edges,
   isLoading = false,
+  initialData,
 }: SaveMapDialogProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState(initialData?.name || '');
+  const [description, setDescription] = useState(initialData?.description || '');
   const [isPublic, setIsPublic] = useState(false);
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState('');
 
   const handleAddTag = () => {
@@ -58,7 +64,7 @@ export function SaveMapDialog({
 
   const handleSave = () => {
     if (!name.trim()) return;
-    
+
     onSave({
       name: name.trim(),
       description: description.trim() || undefined,
@@ -86,7 +92,7 @@ export function SaveMapDialog({
         <DialogHeader>
           <DialogTitle>Save Telemetry Map</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {/* Map Statistics */}
           <div className="bg-muted/50 p-3 rounded-lg">
@@ -95,7 +101,7 @@ export function SaveMapDialog({
               <span>Connections: {edges.length}</span>
             </div>
           </div>
-          
+
           {/* Name Input */}
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -108,7 +114,7 @@ export function SaveMapDialog({
               className="w-full"
             />
           </div>
-          
+
           {/* Description Input */}
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -122,7 +128,7 @@ export function SaveMapDialog({
               className="w-full"
             />
           </div>
-          
+
           {/* Tags Input */}
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -149,7 +155,7 @@ export function SaveMapDialog({
               className="w-full"
             />
           </div>
-          
+
           {/* Public Checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -162,12 +168,12 @@ export function SaveMapDialog({
             </label>
           </div>
         </div>
-        
+
         <DialogFooter>
           <Button variant="outline" onClick={handleClose}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSave}
             disabled={!name.trim() || isLoading}
           >

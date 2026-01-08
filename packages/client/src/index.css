@@ -10,6 +10,7 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -37,6 +38,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -223,4 +225,39 @@ button:focus-visible {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.react-flow__node {
+  background: transparent !important;
+  background-color: red !important;
+  border: 0 !important;
+}
+
+.react-flow__node-default.selectable {
+  background: transparent !important;
+  border: 0 !important;
+  background-color: transparent !important;
+  /* 50% transparent red background */
+}
+
+
+.react-flow__node-default.selected {
+  background: transparent !important;
+  border: 10px dotted rgb(53, 53, 53) !important;
+  background-color: transparent !important;
+  /* 50% transparent red background */
+  padding: 10 !important;
+  margin: 10 !important;
+  display: flex;
+  justify-content: center;
+  /* Centers content horizontally */
+  align-items: center;
+}
+
+.react-flow__node-default {
+  background: transparent !important;
+  background-color: red !important;
+  border: 0 !important;
+
+  /* 50% transparent red background */
 }
