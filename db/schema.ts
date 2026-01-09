@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, text, timestamp, boolean, jsonb, real, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, timestamp, jsonb, real, index } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Telemetry Maps table
@@ -9,12 +9,10 @@ export const telemetryMaps = pgTable('telemetry_maps', {
   createdBy: varchar('created_by', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  isPublic: boolean('is_public').default(false).notNull(),
   tags: text('tags').array(),
   metadata: jsonb('metadata').default('{}').notNull(),
 }, (table) => ({
   createdByIdx: index('idx_telemetry_maps_created_by').on(table.createdBy),
-  publicIdx: index('idx_telemetry_maps_public').on(table.isPublic),
 }));
 
 // Telemetry Map Nodes table

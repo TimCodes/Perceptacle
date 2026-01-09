@@ -9,6 +9,7 @@ import { cn } from "@/utils/cn";
 
 import NodeInfoSideBar from "@/components/NodeInfoSideBar/NodeInfoSideBar";
 import DiagramToolbar from "@/components/DiagramCanvas/DiagramToolbar";
+import AIChat from "@/components/AIChat/AIChat";
 
 const MotionDiv = motion.div;
 
@@ -96,6 +97,9 @@ export default function Home() {
               <ChevronLeft className="h-4 w-4" />
             )}
           </Button>
+
+          {/* AI Chat Component */}
+          <AIChat />
         </div>
       </div>
     </ReactFlowProvider>

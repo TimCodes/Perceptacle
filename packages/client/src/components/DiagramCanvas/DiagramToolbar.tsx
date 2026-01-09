@@ -1,6 +1,7 @@
-import { Save, Download, Trash2, Plus } from "lucide-react";
+import { Save, Download, Trash2, Plus, Search, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDiagramStore } from "@/utils/diagram-store";
+import { Link } from "wouter";
 
 interface DiagramToolbarProps {
   onSaveMap?: () => void;
@@ -33,6 +34,30 @@ const DiagramToolbar = ({ onSaveMap, onLoadMap }: DiagramToolbarProps) => {
         >
           <Download className="h-4 w-4" />
         </Button>
+        <Link href="/search">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            title="Search"
+            asChild
+          >
+            <a>
+              <Search className="h-4 w-4 text-white" />
+            </a>
+          </Button>
+        </Link>
+        <Link href="/messages">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            title="Messages"
+            asChild
+          >
+            <a>
+              <MessageSquare className="h-4 w-4 text-white" />
+            </a>
+          </Button>
+        </Link>
         <Button variant="ghost" size="icon" title="Clear Canvas">
           <Trash2 className="h-4 w-4" />
         </Button>

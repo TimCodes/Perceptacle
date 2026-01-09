@@ -13,7 +13,6 @@ import {
   Search, 
   Calendar, 
   Users, 
-  Share2, 
   Trash2, 
   Eye,
   Copy,
@@ -53,13 +52,11 @@ export function TelemetryMapsLibrary({
   const loadMaps = async () => {
     setIsLoading(true);
     try {
-      const [myMapsData, publicMapsData] = await Promise.all([
-        userId ? TelemetryMapService.getTelemetryMaps(userId) : Promise.resolve([]),
-        TelemetryMapService.getTelemetryMaps(undefined, true),
-      ]);
+      const allMaps = await TelemetryMapService.getTelemetryMaps(userId);
       
-      setMyMaps(myMapsData);
-      setPublicMaps(publicMapsData);
+      // All maps are public, but separate user's own maps for convenience
+      setMyMaps(userId ? allMaps.filter(map => map.createdBy === userId) : []);
+      setPublicMaps(allMaps);
     } catch (error) {
       console.error('Failed to load maps:', error);
       toast({
@@ -152,12 +149,6 @@ export function TelemetryMapsLibrary({
             </div>
           )}
         </div>
-        {map.isPublic && (
-          <Badge variant="secondary" className="text-xs">
-            <Share2 className="h-3 w-3 mr-1" />
-            Public
-          </Badge>
-        )}
       </div>
       
       {map.tags.length > 0 && (
@@ -193,7 +184,6 @@ export function TelemetryMapsLibrary({
                 name: `${map.name} (Copy)`,
                 id: '',
                 createdBy: userId || '',
-                isPublic: false,
               };
               onLoadMap(mapCopy);
               onClose();

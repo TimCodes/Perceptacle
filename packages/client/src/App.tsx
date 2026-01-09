@@ -5,6 +5,9 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Settings from "@/pages/settings";
 import NodeTypes from "@/pages/node-types";
+import TelemetryMaps from "@/pages/telemetry-maps";
+import Search from "@/pages/search";
+import Messages from "@/pages/messages";
 import { ThemeProvider } from "./utils/theme-provider";
 
 import Navbar from "@/components/NavBar/NavBar";
@@ -15,6 +18,9 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/settings" component={Settings} />
       <Route path="/node-types" component={NodeTypes} />
+      <Route path="/telemetry-maps" component={TelemetryMaps} />
+      <Route path="/search" component={Search} />
+      <Route path="/messages" component={Messages} />
       <Route component={NotFound} />
     </Switch>
   );

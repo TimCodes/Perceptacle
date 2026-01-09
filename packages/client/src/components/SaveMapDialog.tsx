@@ -9,7 +9,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import { ReactFlowNode, ReactFlowEdge, SaveMapDialogData } from '@/types/telemetryMap';
@@ -33,7 +32,6 @@ export function SaveMapDialog({
 }: SaveMapDialogProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [isPublic, setIsPublic] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
 
@@ -62,7 +60,6 @@ export function SaveMapDialog({
     onSave({
       name: name.trim(),
       description: description.trim() || undefined,
-      isPublic,
       tags,
     });
   };
@@ -70,7 +67,6 @@ export function SaveMapDialog({
   const resetForm = () => {
     setName('');
     setDescription('');
-    setIsPublic(false);
     setTags([]);
     setTagInput('');
   };
@@ -148,18 +144,6 @@ export function SaveMapDialog({
               placeholder="Add tag and press Enter"
               className="w-full"
             />
-          </div>
-          
-          {/* Public Checkbox */}
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="public"
-              checked={isPublic}
-              onCheckedChange={(checked) => setIsPublic(!!checked)}
-            />
-            <label htmlFor="public" className="text-sm">
-              Make this map public (others can view and copy)
-            </label>
           </div>
         </div>
         

@@ -10,12 +10,11 @@ const API_BASE = '/api/telemetry-maps';
 
 export class TelemetryMapService {
   /**
-   * Get all telemetry maps for a user or public maps
+   * Get all telemetry maps
    */
-  static async getTelemetryMaps(userId?: string, isPublic = false): Promise<TelemetryMap[]> {
+  static async getTelemetryMaps(userId?: string): Promise<TelemetryMap[]> {
     const params = new URLSearchParams();
-    if (userId && !isPublic) params.append('userId', userId);
-    if (isPublic) params.append('isPublic', 'true');
+    if (userId) params.append('userId', userId);
     
     const response = await fetch(`${API_BASE}?${params.toString()}`, {
       credentials: 'include',
@@ -185,7 +184,6 @@ export class TelemetryMapService {
     metadata: {
       name: string;
       description?: string;
-      isPublic?: boolean;
       tags?: string[];
     },
     userId: string
@@ -195,7 +193,6 @@ export class TelemetryMapService {
     const createRequest: CreateTelemetryMapRequest = {
       name: metadata.name,
       description: metadata.description,
-      isPublic: metadata.isPublic || false,
       tags: metadata.tags || [],
       nodes: telemetryNodes,
       connections,
@@ -210,7 +207,7 @@ export class TelemetryMapService {
   static async loadDiagram(mapId: string, userId?: string): Promise<{
     nodes: ReactFlowNode[];
     edges: ReactFlowEdge[];
-    metadata: Pick<TelemetryMap, 'id' | 'name' | 'description' | 'isPublic' | 'tags' | 'createdBy' | 'createdAt' | 'updatedAt'>;
+    metadata: Pick<TelemetryMap, 'id' | 'name' | 'description' | 'tags' | 'createdBy' | 'createdAt' | 'updatedAt'>;
   }> {
     const map = await this.getTelemetryMap(mapId, userId);
     const { nodes, edges } = this.convertFromTelemetryMapFormat(map);
@@ -222,7 +219,6 @@ export class TelemetryMapService {
         id: map.id,
         name: map.name,
         description: map.description,
-        isPublic: map.isPublic,
         tags: map.tags,
         createdBy: map.createdBy,
         createdAt: map.createdAt,

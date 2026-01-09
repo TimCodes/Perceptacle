@@ -6,7 +6,6 @@ export interface TelemetryMap {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  isPublic: boolean;
   tags: string[];
   metadata: Record<string, any>;
   nodes: TelemetryMapNode[];
@@ -40,7 +39,6 @@ export interface TelemetryMapConnection {
 export interface CreateTelemetryMapRequest {
   name: string;
   description?: string;
-  isPublic?: boolean;
   tags?: string[];
   nodes: Omit<TelemetryMapNode, 'id' | 'mapId' | 'createdAt'>[];
   connections: Omit<TelemetryMapConnection, 'id' | 'mapId' | 'createdAt'>[];
@@ -49,7 +47,6 @@ export interface CreateTelemetryMapRequest {
 export interface UpdateTelemetryMapRequest {
   name?: string;
   description?: string;
-  isPublic?: boolean;
   tags?: string[];
   nodes?: Omit<TelemetryMapNode, 'id' | 'mapId' | 'createdAt'>[];
   connections?: Omit<TelemetryMapConnection, 'id' | 'mapId' | 'createdAt'>[];
@@ -92,6 +89,5 @@ export interface DiagramExportData {
 export interface SaveMapDialogData {
   name: string;
   description?: string;
-  isPublic: boolean;
   tags: string[];
 }

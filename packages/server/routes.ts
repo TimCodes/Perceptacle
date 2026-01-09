@@ -4,6 +4,7 @@ import azureRoutes from "./routes/azure";
 import kubernetesRoutes from "./routes/kubernetes";
 import githubRoutes from "./routes/github";
 import telemetryMapsRoutes from "./routes/telemetryMaps";
+import aiRoutes from "./routes/ai";
 
 export function registerRoutes(app: Express): Server {
   // Register Azure routes
@@ -17,6 +18,9 @@ export function registerRoutes(app: Express): Server {
   
   // Register Telemetry Maps routes
   app.use("/api/telemetry-maps", telemetryMapsRoutes);
+  
+  // Register AI routes
+  app.use("/api/ai", aiRoutes);
 
   const httpServer = createServer(app);
 

@@ -201,7 +201,6 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   const handleSaveMap = async (data: {
     name: string;
     description?: string;
-    isPublic: boolean;
     tags: string[];
   }) => {
     setIsSaving(true);

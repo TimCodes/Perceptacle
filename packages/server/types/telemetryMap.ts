@@ -6,7 +6,6 @@ export interface TelemetryMap {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
-  isPublic: boolean;
   tags: string[];
   metadata: Record<string, any>;
   nodes: TelemetryMapNode[];

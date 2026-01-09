@@ -11,6 +11,7 @@ import { ConfigurationTab } from "./ConfigurationTab";
 import CICDTab from "./CICDTab";
 import ObservabilityTab from "./ObservabilityTab";
 import TicketsTab from "@/components/NodeInfoSideBar/TicketsTab";
+import AIChatTab from "@/components/NodeInfoSideBar/AIChatTab";
 import EmptyPanel from "@/components/NodeInfoSideBar/EmptyPanel";
 import { getStatusColor } from "@/utils/helpers";
 
@@ -18,6 +19,7 @@ const tabNames: Record<string, string> = {
   cicd: "CI/CD",
   observability: "Observability",
   tickets: "Tickets",
+  aichat: "AI Chat",
 };
 
 export default function NodeInfoSideBar() {
@@ -201,6 +203,10 @@ export default function NodeInfoSideBar() {
 
                 <TabsContent value="tickets" className="space-y-4">
                   <TicketsTab editedNode={editedNode} />
+                </TabsContent>
+
+                <TabsContent value="aichat" className="space-y-4">
+                  <AIChatTab editedNode={editedNode} />
                 </TabsContent>
               </div>
             </Tabs>

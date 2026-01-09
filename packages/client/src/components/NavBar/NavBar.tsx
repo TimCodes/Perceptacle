@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Library } from "lucide-react";
+import { Settings as SettingsIcon, Library, Map } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function NavBar() {
@@ -16,6 +16,13 @@ export default function NavBar() {
         </div>
 
         <div className="absolute right-12 top-4 z-50 flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setLocation("/telemetry-maps")}
+          >
+            <Map className="h-[1.2rem] w-[1.2rem]" />
+          </Button>
           <Button
             variant="outline"
             size="icon"

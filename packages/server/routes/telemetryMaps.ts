@@ -12,7 +12,6 @@ const mockMaps: TelemetryMap[] = [
     createdBy: "user123",
     createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
     updatedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    isPublic: true,
     tags: ["azure", "serverless", "messaging"],
     metadata: {},
     nodes: [
@@ -71,7 +70,6 @@ const mockMaps: TelemetryMap[] = [
     createdBy: "user456",
     createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
     updatedAt: new Date(Date.now() - 172800000).toISOString(),
-    isPublic: true,
     tags: ["kubernetes", "microservices", "containers"],
     metadata: {},
     nodes: [
@@ -100,19 +98,15 @@ const mockMaps: TelemetryMap[] = [
 // In-memory storage for development
 let mockStorage = [...mockMaps];
 
-// Get all telemetry maps for a user or public maps
+// Get all telemetry maps (all maps are public)
 router.get("/", async (req: Request, res: Response) => {
   try {
-    const { userId, isPublic } = req.query;
+    const { userId } = req.query;
     
-    let filteredMaps;
-    if (isPublic === 'true') {
-      filteredMaps = mockStorage.filter(map => map.isPublic);
-    } else if (userId) {
-      filteredMaps = mockStorage.filter(map => map.createdBy === userId);
-    } else {
-      return res.status(400).json({ error: 'userId required for private maps' });
-    }
+    // If userId is provided, filter to their maps, otherwise return all
+    const filteredMaps = userId 
+      ? mockStorage.filter(map => map.createdBy === userId)
+      : mockStorage;
     
     // Sort by updated date
     filteredMaps.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
@@ -124,15 +118,12 @@ router.get("/", async (req: Request, res: Response) => {
   }
 });
 
-// Get a specific telemetry map by ID
+// Get a specific telemetry map by ID (all maps are public)
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { userId } = req.query;
     
-    const map = mockStorage.find(m => 
-      m.id === id && (m.isPublic || m.createdBy === userId)
-    );
+    const map = mockStorage.find(m => m.id === id);
     
     if (!map) {
       return res.status(404).json({ error: 'Telemetry map not found' });
@@ -145,11 +136,11 @@ router.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Create a new telemetry map
+// Create a new telemetry map (all maps are public)
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
-    const { name, description, isPublic, tags, nodes, connections } = req.body;
+    const { name, description, tags, nodes, connections } = req.body;
     
     if (!userId) {
       return res.status(401).json({ error: 'User ID required' });
@@ -166,7 +157,6 @@ router.post("/", async (req: Request, res: Response) => {
       createdBy: userId as string,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      isPublic: isPublic || false,
       tags: tags || [],
       metadata: {},
       nodes: (nodes || []).map((node: any, index: number) => ({
@@ -206,7 +196,7 @@ router.put("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { userId } = req.query;
-    const { name, description, isPublic, tags, nodes, connections } = req.body;
+    const { name, description, tags, nodes, connections } = req.body;
     
     if (!userId) {
       return res.status(401).json({ error: 'User ID required' });
@@ -229,7 +219,6 @@ router.put("/:id", async (req: Request, res: Response) => {
       ...existingMap,
       name: name !== undefined ? name : existingMap.name,
       description: description !== undefined ? description : existingMap.description,
-      isPublic: isPublic !== undefined ? isPublic : existingMap.isPublic,
       tags: tags !== undefined ? tags : existingMap.tags,
       updatedAt: new Date().toISOString(),
       nodes: nodes !== undefined ? nodes.map((node: any, index: number) => ({
