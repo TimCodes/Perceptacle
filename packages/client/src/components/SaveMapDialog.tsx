@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,9 @@ interface SaveMapDialogProps {
     name?: string;
     description?: string;
     tags?: string[];
+    isPublic?: boolean;
   };
+  isUpdate?: boolean; // Flag to indicate if we're updating an existing map
 }
 
 export function SaveMapDialog({
@@ -36,12 +38,23 @@ export function SaveMapDialog({
   edges,
   isLoading = false,
   initialData,
+  isUpdate = false,
 }: SaveMapDialogProps) {
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
-  const [isPublic, setIsPublic] = useState(false);
+  const [isPublic, setIsPublic] = useState(initialData?.isPublic || false);
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState('');
+
+  // Update form when initialData changes or dialog opens
+  useEffect(() => {
+    if (isOpen && initialData) {
+      setName(initialData.name || '');
+      setDescription(initialData.description || '');
+      setTags(initialData.tags || []);
+      setIsPublic(initialData.isPublic || false);
+    }
+  }, [isOpen, initialData]);
 
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
@@ -80,17 +93,18 @@ export function SaveMapDialog({
     setTags([]);
     setTagInput('');
   };
-
-  const handleClose = () => {
+  
+  const handleCancel = () => {
+    // Only reset when explicitly cancelled
     resetForm();
     onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Save Telemetry Map</DialogTitle>
+          <DialogTitle>{isUpdate ? 'Update Telemetry Map' : 'Save Telemetry Map'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -170,14 +184,14 @@ export function SaveMapDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={!name.trim() || isLoading}
           >
-            {isLoading ? 'Saving...' : 'Save Map'}
+            {isLoading ? (isUpdate ? 'Updating...' : 'Saving...') : (isUpdate ? 'Update Map' : 'Save Map')}
           </Button>
         </DialogFooter>
       </DialogContent>

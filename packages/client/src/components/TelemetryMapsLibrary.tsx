@@ -52,11 +52,19 @@ export function TelemetryMapsLibrary({
 
   const loadMaps = async () => {
     setIsLoading(true);
+    console.log('Loading telemetry maps...', { userId, isOpen });
     try {
       const [myMapsData, publicMapsData] = await Promise.all([
         userId ? TelemetryMapService.getTelemetryMaps(userId) : Promise.resolve([]),
         TelemetryMapService.getTelemetryMaps(undefined, true),
       ]);
+      
+      console.log('Maps loaded:', { 
+        myMaps: myMapsData.length, 
+        publicMaps: publicMapsData.length,
+        myMapsData,
+        publicMapsData
+      });
       
       setMyMaps(myMapsData);
       setPublicMaps(publicMapsData);

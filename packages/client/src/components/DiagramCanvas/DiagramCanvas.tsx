@@ -24,7 +24,10 @@ import CustomNode from "./CustomNode";
 import { NodeConfigDialog } from "../NodeConfigDialog";
 import { NewMapDialog, NewMapData } from "../NewMapDialog";
 
-// Add custom component definition.  This is an example and needs to be adapted to your actual custom components.
+// Extended metadata to include isPublic for map updates
+interface MapMetadata extends NewMapData {
+  isPublic?: boolean;
+}
 
 interface DiagramCanvasProps {
   onNodeSelected?: () => void;
@@ -67,7 +70,8 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   const [pendingNode, setPendingNode] = useState<Node | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [currentUserId] = useState('user123'); // Replace with actual user authentication
-  const [currentMapMetadata, setCurrentMapMetadata] = useState<NewMapData | null>(null);
+  const [currentMapMetadata, setCurrentMapMetadata] = useState<MapMetadata | null>(null);
+  const [currentMapId, setCurrentMapId] = useState<string | null>(null);
 
   // Use ref to prevent infinite loops during rapid updates
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -197,17 +201,34 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         })),
       };
 
-      await TelemetryMapService.createTelemetryMap(mapData, currentUserId);
+      let savedMap;
+      if (currentMapId) {
+        // Update existing map
+        savedMap = await TelemetryMapService.updateTelemetryMap(currentMapId, mapData, currentUserId);
+      } else {
+        // Create new map
+        savedMap = await TelemetryMapService.createTelemetryMap(mapData, currentUserId);
+      }
+      
+      // Update current map metadata and ID after successful save
+      setCurrentMapMetadata({
+        name: data.name,
+        description: data.description,
+        tags: data.tags,
+        isPublic: data.isPublic,
+      });
+      setCurrentMapId(savedMap.id);
+      
       setShowSaveDialog(false);
       toast({
         title: 'Success',
-        description: 'Telemetry map saved successfully!',
+        description: currentMapId ? 'Telemetry map updated successfully!' : 'Telemetry map saved successfully!',
       });
     } catch (error) {
       console.error('Failed to save map:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save telemetry map. Please try again.',
+        description: currentMapId ? 'Failed to update telemetry map. Please try again.' : 'Failed to save telemetry map. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -251,6 +272,16 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
 
     setNodes(loadedNodes);
     setEdges(loadedEdges);
+
+    // Set current map metadata and ID for future updates
+    setCurrentMapMetadata({
+      name: map.name,
+      description: map.description,
+      tags: map.tags,
+      isPublic: map.isPublic,
+    });
+    setCurrentMapId(map.id);
+    setShowLibraryDialog(false);
 
     toast({
       title: 'Success',
@@ -434,6 +465,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   // New map handler
   const handleCreateNewMap = (data: NewMapData) => {
     setCurrentMapMetadata(data);
+    setCurrentMapId(null); // Clear map ID since this is a new map
     setNodes([]);
     setEdges([]);
     setShowNewMapDialog(false);
@@ -484,6 +516,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         edges={edges as ReactFlowEdge[]}
         isLoading={isSaving}
         initialData={currentMapMetadata || undefined}
+        isUpdate={!!currentMapId}
       />
 
       <TelemetryMapsLibrary
