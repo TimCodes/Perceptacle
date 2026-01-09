@@ -1,6 +1,6 @@
 /**
  * Home page - main diagram editor with canvas and configuration panel.
- * Provides drag-and-drop diagram building with real-time node configuration.
+ * Provides drag-and-drop diagram building with real-time application node configuration.
  */
 import { useState } from "react";
 import DiagramCanvas from "@/components//DiagramCanvas/DiagramCanvas";
@@ -82,7 +82,7 @@ export default function Home() {
             {isConfigPanelOpen ? (
               <MotionDiv
                 key="config-panel"
-                className="bg-background border-l"
+                className="bg-background border-l z-50"
                 initial={{ width: "0px" }}
                 animate={{ width: "400px" }}
                 exit={{ width: 0 }}

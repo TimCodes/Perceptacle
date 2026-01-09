@@ -1,5 +1,5 @@
 """
-Configuration management for the Perceptacle Agents Service.
+Configuration management for the Synapse Agents Service.
 """
 import os
 from typing import Optional
@@ -14,7 +14,7 @@ class Settings:
     """Application settings loaded from environment variables."""
     
     # Service Configuration
-    SERVICE_NAME: str = "perceptacle-agents"
+    SERVICE_NAME: str = "synapse-agents"
     HOST: str = "0.0.0.0"
     PORT: int = int(os.getenv("PORT", "8000"))
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")

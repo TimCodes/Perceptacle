@@ -1,4 +1,4 @@
-// Node configuration field definitions
+// Application node configuration field definitions
 export interface ConfigField {
   name: string;
   label: string;
@@ -9,14 +9,14 @@ export interface ConfigField {
   description?: string;
 }
 
-// Default fields that all nodes have
+// Default fields that all application nodes have
 export const DEFAULT_FIELDS: ConfigField[] = [
   {
     name: 'label',
     label: 'Label',
     type: 'text',
     required: true,
-    placeholder: 'Enter node label'
+    placeholder: 'Enter application node label'
   },
   {
     name: 'status',

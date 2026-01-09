@@ -2,7 +2,7 @@
 
 ## Overview
 
-The RAG (Retrieval-Augmented Generation) Service integration enables the Perceptacle AI assistant to provide context-aware responses using documentation and historical logs. This integration connects to an external RAG service via REST API, allowing the system to search through knowledge bases, documentation, and incident logs to provide better troubleshooting assistance.
+The RAG (Retrieval-Augmented Generation) Service integration enables the Synapse AI assistant to provide context-aware responses using documentation and historical logs. This integration connects to an external RAG service via REST API, allowing the system to search through knowledge bases, documentation, and incident logs to provide better troubleshooting assistance.
 
 ## Architecture
 

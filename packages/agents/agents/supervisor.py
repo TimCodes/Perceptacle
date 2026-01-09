@@ -104,7 +104,7 @@ class SupervisorAgent:
     
     def _create_system_prompt(self) -> str:
         """Create the system prompt for the agent"""
-        return """You are Perceptacle AI, an intelligent troubleshooting assistant for on-call engineers.
+        return """You are Synapse AI, an intelligent troubleshooting assistant for on-call engineers.
 
 Your role is to help engineers diagnose and resolve issues in their infrastructure by:
 1. Analyzing the problem description

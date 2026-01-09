@@ -1,8 +1,8 @@
-# Perceptacle Architecture Documentation
+# Synapse Architecture Documentation
 
 ## System Overview
 
-Perceptacle is architected as a modern, cloud-native monorepo application following a clear client-server separation pattern. The system enables interactive infrastructure diagram creation with real-time data integration from multiple cloud platforms and services.
+Synapse is architected as a modern, cloud-native monorepo application following a clear client-server separation pattern. The system enables interactive infrastructure diagram creation with real-time data integration from multiple cloud platforms and services.
 
 ### High-Level Architecture
 

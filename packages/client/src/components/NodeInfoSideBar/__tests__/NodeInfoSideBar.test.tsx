@@ -60,10 +60,10 @@ jest.mock('../ObservabilityTab', () => ({
   ),
 }));
 
-jest.mock('../TicketsTab', () => ({
+jest.mock('../AIChatTab', () => ({
   __esModule: true,
-  default: ({ editedNode }: any) => (
-    <div data-testid="tickets-tab">Tickets: {editedNode?.data?.label}</div>
+  AIChatTab: ({ editedNode }: any) => (
+    <div data-testid="aichat-tab">AI Chat: {editedNode?.data?.label}</div>
   ),
 }));
 
@@ -132,7 +132,7 @@ describe('NodeInfoSideBar', () => {
       render(<NodeInfoSideBar />);
       
       expect(screen.queryByTestId('empty-panel')).not.toBeInTheDocument();
-      expect(screen.getByText(/Node Configuration/i)).toBeInTheDocument();
+      expect(screen.getByText(/Application Node Configuration/i)).toBeInTheDocument();
     });
 
     it('should render tab navigation', () => {
@@ -147,7 +147,7 @@ describe('NodeInfoSideBar', () => {
       expect(screen.getByTestId('configuration-tab')).toBeInTheDocument();
       expect(screen.getByTestId('cicd-tab')).toBeInTheDocument();
       expect(screen.getByTestId('observability-tab')).toBeInTheDocument();
-      expect(screen.getByTestId('tickets-tab')).toBeInTheDocument();
+      expect(screen.getByTestId('aichat-tab')).toBeInTheDocument();
     });
 
     it('should have correct sidebar width', () => {
@@ -276,7 +276,7 @@ describe('NodeInfoSideBar', () => {
     });
   });
 
-  describe('Tab Titles', () => {
+  describe('Application Node Updates', () => {
     beforeEach(() => {
       (useDiagramStore as unknown as jest.Mock).mockReturnValue({
         selectedNode: mockNode,
@@ -287,7 +287,7 @@ describe('NodeInfoSideBar', () => {
     it('should display default tab title', () => {
       render(<NodeInfoSideBar />);
       
-      expect(screen.getByText(/Node Configuration/i)).toBeInTheDocument();
+      expect(screen.getByText(/Application Node Configuration/i)).toBeInTheDocument();
     });
   });
 });

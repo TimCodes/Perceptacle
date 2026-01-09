@@ -1,6 +1,6 @@
-# Perceptacle Agents Service
+# Synapse Agents Service
 
-Python-based microservice for hosting LangGraph AI agents to provide intelligent troubleshooting and automation capabilities for the Perceptacle platform.
+Python-based microservice for hosting LangGraph AI agents to provide intelligent troubleshooting and automation capabilities for the Synapse platform.
 
 ## Overview
 

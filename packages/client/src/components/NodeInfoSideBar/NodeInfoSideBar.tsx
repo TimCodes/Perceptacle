@@ -10,7 +10,7 @@ import { TabNavigation } from "./TabNavigation";
 import { ConfigurationTab } from "./ConfigurationTab";
 import CICDTab from "./CICDTab";
 import ObservabilityTab from "./ObservabilityTab";
-import TicketsTab from "@/components/NodeInfoSideBar/TicketsTab";
+import { AIChatTab } from "@/components/NodeInfoSideBar/AIChatTab";
 import EmptyPanel from "@/components/NodeInfoSideBar/EmptyPanel";
 import { getStatusColor } from "@/utils/helpers";
 
@@ -18,14 +18,16 @@ const tabNames = {
   configuration: "Configuration",
   cicd: "CI/CD",
   observability: "Observability",
-  tickets: "Tickets",
-};
+  aichat: "AI Chat",
+} as const;
+
+type TabName = keyof typeof tabNames;
 
 export default function NodeInfoSideBar() {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
   const [editedNode, setEditedNode] = useState(selectedNode);
   const [hasChanges, setHasChanges] = useState(false);
-  const [currentTab, setCurrentTab] = useState("configuration");
+  const [currentTab, setCurrentTab] = useState<TabName>("configuration");
   const { toast } = useToast();
   const prevSelectedNodeIdRef = useRef<string | null>(null);
 
@@ -151,26 +153,23 @@ export default function NodeInfoSideBar() {
       setHasChanges(false);
       toast({
         title: "Changes saved",
-        description: "Node configuration has been updated",
+        description: "Application node configuration has been updated",
       });
     }
   };
 
   return (
     <div className="w-[375px] border-l bg-background overflow-hidden flex flex-col h-full">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">Node {tabNames[currentTab]}</h2>
-      </div>
-
-      <ScrollArea className="flex-1">
-        <div className="p-4">
-          <Tabs
-            defaultValue="configuration"
-            className="space-y-4"
-            onValueChange={setCurrentTab}
-          >
-            <TabNavigation />
-
+      <Tabs
+        defaultValue="configuration"
+        className="flex flex-col h-full"
+        onValueChange={(value) => setCurrentTab(value as TabName)}
+      >
+      <div className="p-4 border-b flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Application Node {tabNames[currentTab]}</h2>
+        <TabNavigation />
+      </div>        <ScrollArea className="flex-1">
+          <div className="p-4">
             <div className="space-y-4">
               <TabsContent value="configuration" className="space-y-4">
                 <ConfigurationTab
@@ -188,13 +187,13 @@ export default function NodeInfoSideBar() {
                 <ObservabilityTab editedNode={editedNode} />
               </TabsContent>
 
-              <TabsContent value="tickets" className="space-y-4">
-                <TicketsTab editedNode={editedNode} />
+              <TabsContent value="aichat" className="space-y-4">
+                <AIChatTab editedNode={editedNode} />
               </TabsContent>
             </div>
-          </Tabs>
-        </div>
-      </ScrollArea>
+          </div>
+        </ScrollArea>
+      </Tabs>
 
       {hasChanges && (
         <div className="p-4 bg-background border-t">

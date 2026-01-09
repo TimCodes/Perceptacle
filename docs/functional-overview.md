@@ -2,7 +2,7 @@
 
 ## Core Features
 
-Perceptacle provides a comprehensive suite of features for infrastructure visualization, monitoring, and management. The application is designed for DevOps engineers, SREs, and architects who need to map, monitor, and manage complex distributed systems.
+Synapse provides a comprehensive suite of features for infrastructure visualization, monitoring, and management. The application is designed for DevOps engineers, SREs, and architects who need to map, monitor, and manage complex distributed systems.
 
 ### 1. Interactive Diagram Builder
 

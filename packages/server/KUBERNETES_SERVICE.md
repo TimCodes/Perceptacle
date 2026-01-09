@@ -433,7 +433,7 @@ For the service to function properly, ensure the service account has these permi
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: perceptacle-kubernetes-reader
+  name: Synapse-kubernetes-reader
 rules:
 - apiGroups: [""]
   resources: ["pods", "services", "namespaces", "endpoints", "nodes", "configmaps", "secrets", "persistentvolumeclaims"]
@@ -519,7 +519,7 @@ npm run dev
 
 Check service logs:
 ```bash
-kubectl logs -f deployment/perceptacle-server
+kubectl logs -f deployment/Synapse-server
 ```
 
 ## Performance Considerations
@@ -539,7 +539,7 @@ kubectl logs -f deployment/perceptacle-server
 
 ## Integration with Frontend
 
-The Kubernetes service integrates seamlessly with the existing Perceptacle frontend components:
+The Kubernetes service integrates seamlessly with the existing Synapse frontend components:
 
 1. **Existing Components**: Pod and Service icons are already available
 2. **Metrics Display**: Can reuse `ObservabilityMetricsDisplay` component

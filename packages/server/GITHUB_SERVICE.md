@@ -1,6 +1,6 @@
 # GitHub Service Documentation
 
-This document describes the GitHub API integration service for Perceptacle.
+This document describes the GitHub API integration service for Synapse.
 
 ## Overview
 

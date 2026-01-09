@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "perceptacle-agents"
+name = "synapse-agents"
 version = "1.0.0"
 description = "Python microservice for hosting LangGraph AI agents"
 readme = "README.md"

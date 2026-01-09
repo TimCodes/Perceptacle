@@ -293,7 +293,7 @@ Creates a Kafka service instance for event streaming.
 **Default Config**:
 ```typescript
 {
-  clientId: 'perceptacle-server',
+  clientId: 'Synapse-server',
   brokers: ['localhost:9092']
 }
 ```
@@ -418,7 +418,7 @@ Creates a ServiceFactory instance from environment variables.
 | `GEMINI_API_KEY` | Google Gemini key | undefined |
 | `DEEPSEEK_API_KEY` | DeepSeek key | undefined |
 | `MONGODB_CONNECTION_STRING` | MongoDB URI | `'mongodb://localhost:27017'` |
-| `MONGODB_DATABASE_NAME` | Database name | `'perceptacle'` |
+| `MONGODB_DATABASE_NAME` | Database name | `'Synapse'` |
 | `RAG_SERVICE_URL` | RAG service URL | undefined |
 | `RAG_SERVICE_API_KEY` | RAG API key | undefined |
 

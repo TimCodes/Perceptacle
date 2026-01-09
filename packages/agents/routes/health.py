@@ -1,5 +1,5 @@
 """
-Health check endpoints for the Perceptacle Agents Service.
+Health check endpoints for the Synapse Agents Service.
 """
 from fastapi import APIRouter
 from datetime import datetime

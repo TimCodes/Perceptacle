@@ -1,7 +1,7 @@
 # GitHub API Backend Service - Implementation Summary
 
 ## Overview
-A complete backend service implementation for connecting to the GitHub API, integrated into the Perceptacle backend server.
+A complete backend service implementation for connecting to the GitHub API, integrated into the Synapse backend server.
 
 ## Features Implemented
 

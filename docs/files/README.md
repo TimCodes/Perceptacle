@@ -1,6 +1,6 @@
 # File-Level Documentation Index
 
-This directory contains comprehensive documentation for every source file in the Perceptacle codebase.
+This directory contains comprehensive documentation for every source file in the Synapse codebase.
 
 ## Documentation Structure
 

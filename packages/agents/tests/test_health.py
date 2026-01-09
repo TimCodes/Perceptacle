@@ -15,7 +15,7 @@ def test_health_check():
     data = response.json()
     assert data["status"] == "healthy"
     assert "timestamp" in data
-    assert data["service"] == "perceptacle-agents"
+    assert data["service"] == "synapse-agents"
 
 
 def test_health_check_with_slash():
@@ -49,8 +49,8 @@ def test_root_endpoint():
     response = client.get("/")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "running"
-    assert data["service"] == "perceptacle-agents"
+    assert data["status"] == "ok"
+    assert data["service"] == "synapse-agents"
     assert "version" in data
 
 
