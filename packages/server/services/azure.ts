@@ -710,6 +710,52 @@ export class AzureService {
       await sender.close();
     }
   }
+
+  /**
+   * Consume messages from a Service Bus queue or subscription
+   */
+  async consumeServiceBusMessages(queueOrTopicName: string, callback: (message: any) => void, subscriptionName?: string): Promise<() => Promise<void>> {
+    if (!this.serviceBusClient) {
+      throw new Error('Service Bus client is not initialized. Namespace is required.');
+    }
+
+    let receiver;
+    if (subscriptionName) {
+      receiver = this.serviceBusClient.createReceiver(queueOrTopicName, subscriptionName);
+    } else {
+      receiver = this.serviceBusClient.createReceiver(queueOrTopicName);
+    }
+
+    const processMessage = async (message: any) => {
+      callback({
+        body: message.body,
+        contentType: message.contentType,
+        messageId: message.messageId,
+        enqueuedTimeUtc: message.enqueuedTimeUtc,
+        deliveryCount: message.deliveryCount
+      });
+    };
+
+    const processError = async (args: any) => {
+      console.error(`Error from Service Bus receiver for ${queueOrTopicName}:`, args.error);
+    };
+
+    const subscription = receiver.subscribe({
+      processMessage,
+      processError
+    });
+
+    // Return cleanup function
+    return async () => {
+      try {
+        await subscription.close();
+        await receiver.close();
+        console.log(`Service Bus receiver for ${queueOrTopicName} closed`);
+      } catch (err) {
+        console.error('Error closing Service Bus receiver:', err);
+      }
+    };
+  }
 }
 
 export default AzureService;

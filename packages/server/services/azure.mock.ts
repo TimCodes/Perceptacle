@@ -157,25 +157,25 @@ export class MockAzureService {
     let filteredResources = mockResources;
 
     if (params?.resourceGroup) {
-      filteredResources = filteredResources.filter(resource => 
+      filteredResources = filteredResources.filter(resource =>
         resource.id.includes(`/resourceGroups/${params.resourceGroup}/`)
       );
     }
 
     if (params?.location) {
-      filteredResources = filteredResources.filter(resource => 
+      filteredResources = filteredResources.filter(resource =>
         resource.location === params.location
       );
     }
 
     if (params?.resourceType) {
-      filteredResources = filteredResources.filter(resource => 
+      filteredResources = filteredResources.filter(resource =>
         resource.type === params.resourceType
       );
     }
 
     if (params?.tagName && params?.tagValue) {
-      filteredResources = filteredResources.filter(resource => 
+      filteredResources = filteredResources.filter(resource =>
         (resource.tags as any)[params.tagName!] === params.tagValue
       );
     }
@@ -191,7 +191,7 @@ export class MockAzureService {
 
     // Return a mock resource based on the ID
     const resourceName = resourceId.split('/').pop();
-    
+
     return {
       id: resourceId,
       name: resourceName,
@@ -219,7 +219,7 @@ export class MockAzureService {
 
     const resourceType = this.extractResourceType(params.resourceId);
     const baseTime = new Date();
-    
+
     // Generate metrics based on resource type
     switch (resourceType) {
       case 'Microsoft.Web/sites':
@@ -242,7 +242,7 @@ export class MockAzureService {
     await this.delay(100);
 
     const resourceType = this.extractResourceType(resourceId);
-    
+
     const commonDefinitions = [
       {
         name: 'CpuPercentage',
@@ -503,9 +503,9 @@ export class MockAzureService {
     await this.delay(250);
 
     const mockQueues = ['order-processing', 'user-notifications', 'payment-events', 'audit-logs'];
-    
+
     return Promise.all(
-      mockQueues.map(queueName => 
+      mockQueues.map(queueName =>
         this.getServiceBusQueueInfo(namespaceName, resourceGroupName, queueName)
       )
     );
@@ -518,9 +518,9 @@ export class MockAzureService {
     await this.delay(250);
 
     const mockTopics = ['user-events', 'system-alerts', 'business-events'];
-    
+
     return Promise.all(
-      mockTopics.map(topicName => 
+      mockTopics.map(topicName =>
         this.getServiceBusTopicInfo(namespaceName, resourceGroupName, topicName)
       )
     );
@@ -539,9 +539,9 @@ export class MockAzureService {
       { topicName: 'system-alerts', subscriptionName: 'notification-hub' },
       { topicName: 'business-events', subscriptionName: 'reporting-service' }
     ];
-    
+
     return Promise.all(
-      mockSubscriptions.map(({ topicName, subscriptionName }) => 
+      mockSubscriptions.map(({ topicName, subscriptionName }) =>
         this.getServiceBusSubscriptionInfo(namespaceName, resourceGroupName, topicName, subscriptionName)
       )
     );
@@ -564,15 +564,45 @@ export class MockAzureService {
       totalQueues: queues.length,
       totalTopics: topics.length,
       totalSubscriptions: subscriptions.length,
-      totalActiveMessages: queues.reduce((sum, q) => sum + q.activeMessageCount, 0) + 
-                          topics.reduce((sum, t) => sum + t.activeMessageCount, 0),
-      totalDeadLetterMessages: queues.reduce((sum, q) => sum + q.deadLetterMessageCount, 0) + 
-                              topics.reduce((sum, t) => sum + t.deadLetterMessageCount, 0),
-      totalScheduledMessages: queues.reduce((sum, q) => sum + q.scheduledMessageCount, 0) + 
-                             topics.reduce((sum, t) => sum + t.scheduledMessageCount, 0),
+      totalActiveMessages: queues.reduce((sum, q) => sum + q.activeMessageCount, 0) +
+        topics.reduce((sum, t) => sum + t.activeMessageCount, 0),
+      totalDeadLetterMessages: queues.reduce((sum, q) => sum + q.deadLetterMessageCount, 0) +
+        topics.reduce((sum, t) => sum + t.deadLetterMessageCount, 0),
+      totalScheduledMessages: queues.reduce((sum, q) => sum + q.scheduledMessageCount, 0) +
+        topics.reduce((sum, t) => sum + t.scheduledMessageCount, 0),
       queues,
       topics,
       subscriptions
+    };
+  }
+
+  /**
+   * Mock consume messages from a Service Bus queue or subscription
+   */
+  async consumeServiceBusMessages(queueOrTopicName: string, callback: (message: any) => void, subscriptionName?: string): Promise<() => Promise<void>> {
+    console.log(`[Mock] Starting Service Bus consumer for ${queueOrTopicName} ${subscriptionName ? `(Subscription: ${subscriptionName})` : ''}`);
+
+    // Simulate streaming messages
+    const interval = setInterval(() => {
+      const message = {
+        body: {
+          id: Math.floor(Math.random() * 1000),
+          data: `Mock message for ${queueOrTopicName}`,
+          timestamp: new Date().toISOString()
+        },
+        contentType: 'application/json',
+        messageId: `mock-msg-${Date.now()}`,
+        enqueuedTimeUtc: new Date(),
+        deliveryCount: 1
+      };
+
+      callback(message);
+    }, 2000); // Send message every 2 seconds
+
+    // Return cleanup function
+    return async () => {
+      console.log(`[Mock] Stopping Service Bus consumer for ${queueOrTopicName}`);
+      clearInterval(interval);
     };
   }
 

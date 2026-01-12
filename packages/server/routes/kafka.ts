@@ -40,4 +40,47 @@ router.post('/send', async (req: Request, res: Response) => {
     }
 });
 
+/**
+ * GET /api/kafka/stream
+ * Stream messages from a Kafka topic using Server-Sent Events (SSE)
+ */
+router.get('/stream', async (req: Request, res: Response) => {
+    const topic = req.query.topic as string;
+
+    if (!topic) {
+        return res.status(400).json({ error: 'Topic is required' });
+    }
+
+    // Set headers for SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    let cleanupConsumer: (() => Promise<void>) | undefined;
+
+    try {
+        const service = getKafkaService();
+
+        // Start consuming messages
+        cleanupConsumer = await service.consumeMessages(topic, (message) => {
+            // Send message to client
+            res.write(`data: ${JSON.stringify(message)}\n\n`);
+        });
+
+        // Handle client disconnect
+        req.on('close', async () => {
+            console.log('Client disconnected from Kafka stream');
+            if (cleanupConsumer) {
+                await cleanupConsumer();
+            }
+        });
+
+    } catch (error) {
+        console.error('Error starting Kafka stream:', error);
+        res.write(`event: error\ndata: ${JSON.stringify({ error: 'Failed to start stream' })}\n\n`);
+        res.end();
+    }
+});
+
 export default router;

@@ -74,4 +74,45 @@ export class KafkaService {
             throw new Error(`Failed to send Kafka message: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
+
+    /**
+     * Consume messages from a topic
+     */
+    async consumeMessages(topic: string, callback: (message: any) => void): Promise<() => Promise<void>> {
+        const consumer = this.kafka.consumer({ groupId: `perceptacle-group-${Date.now()}` });
+
+        try {
+            await consumer.connect();
+            await consumer.subscribe({ topic, fromBeginning: false });
+
+            await consumer.run({
+                eachMessage: async ({ topic, partition, message }) => {
+                    const value = message.value?.toString();
+                    const key = message.key?.toString();
+
+                    callback({
+                        topic,
+                        partition,
+                        key,
+                        value,
+                        timestamp: message.timestamp,
+                        offset: message.offset
+                    });
+                },
+            });
+
+            // Return a cleanup function
+            return async () => {
+                try {
+                    await consumer.disconnect();
+                    console.log('Consumer disconnected');
+                } catch (err) {
+                    console.error('Error disconnecting consumer:', err);
+                }
+            };
+        } catch (error) {
+            console.error(`Failed to consume messages from topic ${topic}:`, error);
+            throw new Error(`Failed to consume Kafka messages: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
 }
