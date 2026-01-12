@@ -1,7 +1,7 @@
 # Kubernetes & Kafka Components Implementation Summary
 
 ## Overview
-Successfully added 5 Kubernetes and Kafka icons as node types to the Perceptacle application using official community icons:
+Successfully added 5 Kubernetes and Kafka icons as node types to the Synapse application using official community icons:
 
 ### Kubernetes Resources (Official)
 1. **Pod** - Basic deployable unit in Kubernetes

@@ -1,8 +1,8 @@
-# Perceptacle Documentation
+# Synapse Documentation
 
 ## Project Purpose
 
-Perceptacle is a comprehensive infrastructure and telemetry diagram builder designed for DevOps engineers, SREs, and architects. It provides an interactive canvas for creating, managing, and monitoring infrastructure diagrams with real-time integrations to various cloud platforms and services including Kubernetes, GitHub, Azure, MongoDB, Oracle, and Kafka.
+Synapse is a comprehensive infrastructure and telemetry diagram builder designed for DevOps engineers, SREs, and architects. It provides an interactive canvas for creating, managing, and monitoring infrastructure diagrams with real-time integrations to various cloud platforms and services including Kubernetes, GitHub, Azure, MongoDB, Oracle, and Kafka.
 
 The application enables teams to:
 - Visualize infrastructure topology and service dependencies
@@ -14,7 +14,7 @@ The application enables teams to:
 
 ## Application Scope
 
-Perceptacle is built as a modern full-stack monorepo application with clear separation between client and server:
+Synapse is built as a modern full-stack monorepo application with clear separation between client and server:
 
 - **Frontend**: React 18 + TypeScript + ReactFlow for interactive diagram building
 - **Backend**: Express + TypeScript API server with WebSocket support

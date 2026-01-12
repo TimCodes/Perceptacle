@@ -248,7 +248,7 @@ curl -X POST http://localhost:5000/api/github/repos/octocat/Hello-World/issues \
 
 All requirements have been successfully implemented and tested!
 
-The GitHub API backend service is ready for integration into your Perceptacle application.
+The GitHub API backend service is ready for integration into your Synapse application.
 
 ### What's Working:
 ✅ Pull Requests API

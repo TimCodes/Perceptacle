@@ -1,4 +1,4 @@
-// Main exports for Perceptacle services
+// Main exports for Synapse services
 export * from './azure';
 export * from './azure.mock';
 export * from './kubernetes';

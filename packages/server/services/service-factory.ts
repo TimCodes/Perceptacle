@@ -209,7 +209,7 @@ export class ServiceFactory {
   createKafkaService(): KafkaService {
     // Default config if not provided
     const config: KafkaConfig = this.config.kafka || {
-      clientId: 'perceptacle-server',
+      clientId: 'synapse-server',
       brokers: ['localhost:9092']
     };
 
@@ -283,7 +283,7 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
       }
     },
     kafka: {
-      clientId: 'perceptacle-server',
+      clientId: 'synapse-server',
       brokers: process.env.KAFKA_BROKERS ? process.env.KAFKA_BROKERS.split(',') : ['localhost:9092']
     },
     aichat: {
@@ -298,7 +298,7 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
         databaseName: process.env.MONGODB_DATABASE_NAME
       } : {
         connectionString: 'mongodb://localhost:27017',
-        databaseName: 'perceptacle'
+        databaseName: 'synapse'
       }
     },
     rag: {

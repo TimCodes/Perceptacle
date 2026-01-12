@@ -1,6 +1,6 @@
 /**
  * Global state management for diagram editor using Zustand.
- * Manages nodes, edges, selection state, and diagram persistence.
+ * Manages application nodes, edges, selection state, and diagram persistence.
  */
 import { create } from 'zustand';
 import { Node, Edge, ReactFlowInstance } from 'reactflow';
@@ -35,7 +35,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
   setRfInstance: (instance) => set({ rfInstance: instance }),
 
 
-  /** Updates selected node while preventing infinite update loops */
+  /** Updates selected application node while preventing infinite update loops */
   updateSelectedNode: (node) => {
     const { nodes, selectedNode } = get();
     if (!selectedNode) return;
@@ -56,7 +56,7 @@ export const useDiagramStore = create<DiagramState>((set, get) => ({
     });
   },
 
-  /** Adds log entry to node, maintaining last 100 logs */
+  /** Adds log entry to application node, maintaining last 100 logs */
   addNodeLog: (nodeId: string, message: string, level: 'info' | 'warning' | 'error' = 'info') => {
     const { nodes } = get();
     const updatedNodes = nodes.map((node) => {

@@ -1,8 +1,8 @@
-# Perceptacle Feature Breakdown
+# Synapse Feature Breakdown
 
 ## 🎯 Executive Summary
 
-Perceptacle is a hybrid observability, data visualization, and troubleshooting platform designed to assist on-call engineers. While the project has a solid foundation with a React-based diagramming UI and initial Node.js backend integrations for Azure, Kubernetes, and GitHub, it currently lacks the core "intelligent" features that differentiate it. Specifically, the AI agentic capabilities, comprehensive data ingestion, and active remediation are missing or incomplete.
+Synapse is a hybrid observability, data visualization, and troubleshooting platform designed to assist on-call engineers. While the project has a solid foundation with a React-based diagramming UI and initial Node.js backend integrations for Azure, Kubernetes, and GitHub, it currently lacks the core "intelligent" features that differentiate it. Specifically, the AI agentic capabilities, comprehensive data ingestion, and active remediation are missing or incomplete.
 
 ### Critical Gaps:
 - 🚧 **Agentic Capabilities**: Python/LangGraph agents package created, needs agent implementation.

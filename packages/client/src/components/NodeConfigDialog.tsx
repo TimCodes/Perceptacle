@@ -84,7 +84,7 @@ export function NodeConfigDialog({
                         <Input
                             value={label}
                             onChange={(e) => setLabel(e.target.value)}
-                            placeholder="Node Label"
+                            placeholder="Application Node Label"
                         />
                     </div>
 

@@ -1,8 +1,8 @@
 {
-  "name": "perceptacle-server",
+  "name": "synapse-server",
   "version": "1.0.0",
   "type": "module",
-  "description": "Backend server for Perceptacle diagram builder",
+  "description": "Backend server for Synapse diagram builder",
   "main": "index.ts",
   "scripts": {
     "dev": "tsx index.ts",

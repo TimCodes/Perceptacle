@@ -1,4 +1,4 @@
-# Perceptacle - Separated Client/Server Architecture
+# Synapse - Separated Client/Server Architecture
 
 This project has been restructured as a monorepo with separated client and server applications.
 
@@ -37,7 +37,7 @@ Docker provides a consistent development environment and is the easiest way to g
 2. **Quick start**:
    ```bash
    git clone <repository-url>
-   cd Perceptacle
+   cd Synapse
    cp .env.example .env
    npm run docker:dev
    ```

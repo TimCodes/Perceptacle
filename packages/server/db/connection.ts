@@ -7,7 +7,7 @@ import postgres from 'postgres';
 import * as schema from './schema.js';
 
 /** PostgreSQL connection string from environment or default */
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/perceptacle_dev';
+const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/synapse_dev';
 
 const sql = postgres(connectionString);
 

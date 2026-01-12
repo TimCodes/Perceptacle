@@ -2,7 +2,7 @@
 
 ## Overview
 
-Comprehensive documentation has been successfully generated for the Perceptacle codebase. This documentation set provides developer-grade technical documentation suitable for onboarding engineers, architects, and technical stakeholders.
+Comprehensive documentation has been successfully generated for the Synapse codebase. This documentation set provides developer-grade technical documentation suitable for onboarding engineers, architects, and technical stakeholders.
 
 ## Documentation Deliverables
 

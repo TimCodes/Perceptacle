@@ -1,4 +1,3 @@
-import React from "react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -6,14 +5,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Settings, GitBranch, BarChart, Ticket } from "lucide-react";
+import { Settings, GitBranch, BarChart, MessageSquare } from "lucide-react";
 
 export const TabNavigation = () => (
-  <TabsList className="grid w-full grid-cols-4">
+  <TabsList className="inline-flex h-9 items-center gap-1">
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <TabsTrigger value="cicd" className="p-2">
+          <TabsTrigger value="cicd" className="p-2 h-8 w-8">
             <GitBranch className="h-4 w-4" />
           </TabsTrigger>
         </TooltipTrigger>
@@ -26,7 +25,7 @@ export const TabNavigation = () => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <TabsTrigger value="observability" className="p-2">
+          <TabsTrigger value="observability" className="p-2 h-8 w-8">
             <BarChart className="h-4 w-4" />
           </TabsTrigger>
         </TooltipTrigger>
@@ -39,12 +38,12 @@ export const TabNavigation = () => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <TabsTrigger value="tickets" className="p-2">
-            <Ticket className="h-4 w-4" />
+          <TabsTrigger value="aichat" className="p-2 h-8 w-8">
+            <MessageSquare className="h-4 w-4" />
           </TabsTrigger>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Tickets</p>
+          <p>AI Chat</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -52,7 +51,7 @@ export const TabNavigation = () => (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <TabsTrigger value="configuration" className="p-2">
+          <TabsTrigger value="configuration" className="p-2 h-8 w-8">
             <Settings className="h-4 w-4" />
           </TabsTrigger>
         </TooltipTrigger>
