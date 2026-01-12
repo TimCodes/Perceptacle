@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Handle, Position } from 'reactflow';
 import {
     Tooltip,
@@ -6,9 +6,22 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AlertCircle, Bell } from "lucide-react";
+import { AlertCircle, Bell, AlertTriangle, Info } from "lucide-react";
 import { getCloudComponents } from "@/utils/cloudComponents";
 import { cn } from "@/utils/cn";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+// Helper for log icons
+const getLogIcon = (level: string) => {
+    switch (level) {
+        case "error":
+            return <AlertCircle className="h-3 w-3 text-destructive" />;
+        case "warning":
+            return <AlertTriangle className="h-3 w-3 text-yellow-500" />;
+        default:
+            return <Info className="h-3 w-3 text-blue-500" />;
+    }
+};
 
 // Helper for status colors
 const getStatusClasses = (status: string, activeAlerts: number, alertSeverity: string) => {
@@ -35,6 +48,7 @@ const getStatusClasses = (status: string, activeAlerts: number, alertSeverity: s
 };
 
 const CustomNode = ({ data }: { data: any }) => {
+    const [isHovered, setIsHovered] = useState(false);
     const components = getCloudComponents();
     const Component = components.find((comp) => comp.type === data.type)?.icon;
 
@@ -42,6 +56,8 @@ const CustomNode = ({ data }: { data: any }) => {
     const activeAlerts = data.metrics?.activeAlerts || 0;
     const alertSeverity = data.metrics?.alertSeverity || 'warning';
     const status = data.status || 'active';
+    const logs = data.logs || [];
+    const recentLogs = logs.slice(-5).reverse(); // Get last 5 logs, most recent first
 
     const borderClasses = getStatusClasses(status, activeAlerts, alertSeverity);
 
@@ -49,10 +65,14 @@ const CustomNode = ({ data }: { data: any }) => {
         <TooltipProvider>
             <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>
-                    <div className={cn(
-                        "relative p-3 rounded-md bg-background border-2 text-foreground min-w-[180px] transition-all duration-300 bg-sky-900",
-                        borderClasses
-                    )}>
+                    <div 
+                        className={cn(
+                            "relative p-3 rounded-md bg-background border-2 text-foreground min-w-[180px] transition-all duration-300 bg-sky-900 overflow-visible",
+                            borderClasses
+                        )}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                    >
 
                         {/* Alert Badge */}
                         {activeAlerts > 0 && (
@@ -90,6 +110,52 @@ const CustomNode = ({ data }: { data: any }) => {
                                 </div>
                             )}
                         </div>
+
+                        {/* Recent Logs Panel - Animates from bottom on hover */}
+                        {logs.length > 0 && (
+                            <div 
+                                className={cn(
+                                    "absolute left-0 right-0 bg-background border-t border-x border-b rounded-b-md shadow-lg transition-all duration-300 ease-in-out z-30",
+                                    isHovered 
+                                        ? "top-full opacity-100 translate-y-0" 
+                                        : "top-full opacity-0 translate-y-[-10px] pointer-events-none"
+                                )}
+                                style={{ 
+                                    borderColor: 'inherit',
+                                }}
+                            >
+                                <div className="p-2">
+                                    <div className="text-xs font-semibold mb-2 text-muted-foreground">Recent Logs</div>
+                                    <ScrollArea className="h-[120px]">
+                                        <div className="space-y-1">
+                                            {recentLogs.map((log: any, index: number) => (
+                                                <div
+                                                    key={index}
+                                                    className={cn(
+                                                        "flex gap-2 p-1.5 rounded text-xs",
+                                                        log.level === "error"
+                                                            ? "bg-destructive/20"
+                                                            : log.level === "warning"
+                                                                ? "bg-yellow-500/20"
+                                                                : "bg-blue-500/20"
+                                                    )}
+                                                >
+                                                    <div className="flex-shrink-0 mt-0.5">
+                                                        {getLogIcon(log.level)}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-medium truncate">{log.message}</p>
+                                                        <p className="text-[10px] text-muted-foreground">
+                                                            {new Date(log.timestamp).toLocaleTimeString()}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </ScrollArea>
+                                </div>
+                            </div>
+                        )}
 
                         <Handle
                             type="source"
