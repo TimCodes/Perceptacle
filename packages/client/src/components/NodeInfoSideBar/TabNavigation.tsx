@@ -5,7 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Settings, GitBranch, BarChart, MessageSquare } from "lucide-react";
+import { Settings, GitBranch, BarChart, MessageSquare, Send } from "lucide-react";
 
 export const TabNavigation = () => (
   <TabsList className="inline-flex h-9 items-center gap-1">
@@ -31,6 +31,19 @@ export const TabNavigation = () => (
         </TooltipTrigger>
         <TooltipContent>
           <p>Observability</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <TabsTrigger value="messages" className="p-2 h-8 w-8">
+            <Send className="h-4 w-4" />
+          </TabsTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Messages</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
