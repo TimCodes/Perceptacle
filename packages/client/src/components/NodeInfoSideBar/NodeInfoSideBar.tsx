@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Save } from "lucide-react";
+import { Save, Maximize2, Minimize2 } from "lucide-react";
 import { useDiagramStore } from "@/utils/diagram-store";
 import { useToast } from "@/hooks/use-toast";
 import { TabNavigation } from "./TabNavigation";
@@ -23,7 +23,15 @@ const tabNames = {
 
 type TabName = keyof typeof tabNames;
 
-export default function NodeInfoSideBar() {
+interface NodeInfoSideBarProps {
+  isExpanded?: boolean;
+  toggleExpanded?: () => void;
+}
+
+export default function NodeInfoSideBar({
+  isExpanded = false,
+  toggleExpanded,
+}: NodeInfoSideBarProps) {
   const { selectedNode, updateSelectedNode } = useDiagramStore();
   const [editedNode, setEditedNode] = useState(selectedNode);
   const [hasChanges, setHasChanges] = useState(false);
@@ -122,9 +130,9 @@ export default function NodeInfoSideBar() {
         style:
           field === "status"
             ? {
-                ...prev.style,
-                border: `2px solid ${getStatusColor(value)}`,
-              }
+              ...prev.style,
+              border: `2px solid ${getStatusColor(value)}`,
+            }
             : prev.style,
       };
     });
@@ -159,16 +167,35 @@ export default function NodeInfoSideBar() {
   };
 
   return (
-    <div className="w-[375px] border-l bg-background overflow-hidden flex flex-col h-full">
+    <div className="w-full border-l bg-background overflow-hidden flex flex-col h-full">
       <Tabs
         defaultValue="configuration"
         className="flex flex-col h-full"
         onValueChange={(value) => setCurrentTab(value as TabName)}
       >
-      <div className="p-4 border-b flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Application Node {tabNames[currentTab]}</h2>
-        <TabNavigation />
-      </div>        <ScrollArea className="flex-1">
+        <div className="p-4 border-b flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {toggleExpanded && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleExpanded}
+                className="h-8 w-8"
+              >
+                {isExpanded ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+            <h2 className="text-lg font-semibold">
+              Application Node {tabNames[currentTab]}
+            </h2>
+          </div>
+          <TabNavigation />
+        </div>
+        <ScrollArea className="flex-1">
           <div className="p-4">
             <div className="space-y-4">
               <TabsContent value="configuration" className="space-y-4">
