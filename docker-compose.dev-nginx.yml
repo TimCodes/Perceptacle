@@ -4,10 +4,10 @@ services:
   # PostgreSQL Database (same as development)
   postgres:
     image: postgres:15-alpine
-    container_name: perceptacle-db-dev-nginx
+    container_name: synapse-db-dev-nginx
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-perceptacle_dev}
+      POSTGRES_DB: ${DB_NAME:-synapse_dev}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
@@ -16,23 +16,23 @@ services:
       - postgres_dev_nginx_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-perceptacle_dev}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-synapse_dev}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - perceptacle-dev-nginx-network
+      - synapse-dev-nginx-network
 
   # Backend Server (Development)
   server:
     build:
       context: ./server
       target: development
-    container_name: perceptacle-server-dev-nginx
+    container_name: synapse-server-dev-nginx
     restart: unless-stopped
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-perceptacle_dev}
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-synapse_dev}
       CLIENT_URL: http://localhost:${CLIENT_PORT:-8080}
       PORT: 3000
     ports:
@@ -45,14 +45,14 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - perceptacle-dev-nginx-network
+      - synapse-dev-nginx-network
 
   # Frontend Client (Development with Nginx)
   client:
     build:
       context: ./client
       target: development-nginx
-    container_name: perceptacle-client-dev-nginx
+    container_name: synapse-client-dev-nginx
     restart: unless-stopped
     environment:
       NODE_ENV: development
@@ -61,7 +61,7 @@ services:
     depends_on:
       - server
     networks:
-      - perceptacle-dev-nginx-network
+      - synapse-dev-nginx-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
@@ -73,5 +73,5 @@ volumes:
     driver: local
 
 networks:
-  perceptacle-dev-nginx-network:
+  synapse-dev-nginx-network:
     driver: bridge

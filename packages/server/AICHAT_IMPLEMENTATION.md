@@ -1,7 +1,7 @@
 # AIChat Service Implementation Summary
 
 ## Overview
-Successfully implemented a comprehensive AIChat service for the Perceptacle server package that provides a unified interface for interacting with multiple AI models using langchain.js.
+Successfully implemented a comprehensive AIChat service for the Synapse server package that provides a unified interface for interacting with multiple AI models using langchain.js.
 
 ## Deliverables
 

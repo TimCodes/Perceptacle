@@ -1,5 +1,5 @@
 /**
- * Express server entry point for Perceptacle API.
+ * Express server entry point for Synapse API.
  * Configures middleware, CORS, logging, error handling, and starts HTTP server.
  */
 import express, { type Request, Response, NextFunction } from "express";
@@ -71,7 +71,7 @@ app.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    service: 'perceptacle-server'
+    service: 'synapse-server'
   });
 });
 

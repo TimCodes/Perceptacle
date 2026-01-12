@@ -1,7 +1,7 @@
-# Perceptacle Application Analysis
+# Synapse Application Analysis
 
 ## Executive Summary
-Perceptacle has evolved into a full-stack cloud architecture diagramming and management platform. It is now structured as a monorepo containing a React-based frontend and a robust Node.js/Express backend. The application not only allows users to draw diagrams but also integrates with major cloud providers (Azure, Oracle), container orchestration platforms (Kubernetes), and development tools (GitHub) to fetch real-time data and visualize infrastructure. It also features AI capabilities via LangChain.
+Synapse has evolved into a full-stack cloud architecture diagramming and management platform. It is now structured as a monorepo containing a React-based frontend and a robust Node.js/Express backend. The application not only allows users to draw diagrams but also integrates with major cloud providers (Azure, Oracle), container orchestration platforms (Kubernetes), and development tools (GitHub) to fetch real-time data and visualize infrastructure. It also features AI capabilities via LangChain.
 
 ## Functional Analysis
 

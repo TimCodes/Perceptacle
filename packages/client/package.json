@@ -1,8 +1,8 @@
 {
-  "name": "perceptacle-client",
+  "name": "synapse-client",
   "version": "1.0.0",
   "type": "module",
-  "description": "Frontend client for Perceptacle diagram builder",
+  "description": "Frontend client for Synapse diagram builder",
   "main": "src/main.tsx",
   "scripts": {
     "dev": "vite",

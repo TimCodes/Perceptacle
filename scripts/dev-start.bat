@@ -1,7 +1,7 @@
 @echo off
 REM Docker Development Environment Start Script
 
-echo Starting Perceptacle Development Environment...
+echo Starting Synapse Development Environment...
 echo.
 
 REM Copy environment file if it doesn't exist

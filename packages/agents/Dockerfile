@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Perceptacle Agents Service
+# Multi-stage Dockerfile for Synapse Agents Service
 
 # Development stage
 FROM python:3.11-slim as development

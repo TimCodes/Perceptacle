@@ -69,7 +69,7 @@ describe('Server Setup', () => {
       res.status(200).json({ 
         status: 'ok', 
         timestamp: new Date().toISOString(),
-        service: 'perceptacle-server' 
+        service: 'synapse-server' 
       });
     });
 
@@ -93,7 +93,7 @@ describe('Server Setup', () => {
         .expect(200);
 
       expect(response.body.status).toBe('ok');
-      expect(response.body.service).toBe('perceptacle-server');
+      expect(response.body.service).toBe('synapse-server');
       expect(response.body.timestamp).toBeDefined();
     });
 

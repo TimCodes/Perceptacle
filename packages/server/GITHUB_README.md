@@ -1,6 +1,6 @@
 # GitHub API Integration
 
-This directory contains the GitHub API integration for the Perceptacle backend server.
+This directory contains the GitHub API integration for the Synapse backend server.
 
 ## Files Created
 

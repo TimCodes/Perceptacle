@@ -1,7 +1,7 @@
 @echo off
 REM Docker Production Environment Start Script
 
-echo Starting Perceptacle Production Environment...
+echo Starting Synapse Production Environment...
 echo.
 
 REM Check if production env file exists

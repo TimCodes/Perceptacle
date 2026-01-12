@@ -1,7 +1,7 @@
 # Azure Components Implementation Summary
 
 ## Overview
-Successfully added 9 Azure service icons as node types to the Perceptacle application using official Microsoft Azure icons (V22):
+Successfully added 9 Azure service icons as node types to the Synapse application using official Microsoft Azure icons (V22):
 
 1. **Function App** - Azure Functions serverless compute
 2. **Service Bus** - Message broker service 

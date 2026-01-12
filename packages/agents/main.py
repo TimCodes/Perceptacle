@@ -1,5 +1,5 @@
 """
-Perceptacle Agents Service - FastAPI application for hosting LangGraph agents.
+Synapse Agents Service - FastAPI application for hosting LangGraph agents.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +23,7 @@ settings = get_settings()
 
 # Create FastAPI application
 app = FastAPI(
-    title="Perceptacle Agents Service",
+    title="Synapse Agents Service",
     description="Python microservice for hosting LangGraph AI agents",
     version="1.0.0",
 )

@@ -1,9 +1,9 @@
 {
-  "name": "perceptacle-monorepo",
+  "name": "synapse-monorepo",
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "description": "Perceptacle diagram builder - monorepo with separated client and server",
+  "description": "Synapse diagram builder - monorepo with separated client and server",
   "scripts": {
     "dev": "npm run db:start:dev && concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd packages/server && npm run dev",

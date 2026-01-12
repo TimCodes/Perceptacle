@@ -1,7 +1,7 @@
 # Server Package Test Summary
 
 ## Overview
-Comprehensive test suite for the Perceptacle server package using Jest and supertest.
+Comprehensive test suite for the Synapse server package using Jest and supertest.
 
 ## Test Statistics
 - **Total Tests**: 129 tests passing

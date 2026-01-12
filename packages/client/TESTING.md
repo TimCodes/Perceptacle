@@ -1,6 +1,6 @@
 # Client Package Unit Tests
 
-This directory contains comprehensive unit tests for the Perceptacle Client Package, following **Kent C. Dodds' testing methodology and philosophy**.
+This directory contains comprehensive unit tests for the Synapse Client Package, following **Kent C. Dodds' testing methodology and philosophy**.
 
 ## Testing Philosophy
 

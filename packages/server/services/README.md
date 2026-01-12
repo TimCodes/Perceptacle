@@ -1,4 +1,4 @@
-# Perceptacle Services
+# Synapse Services
 
 This directory contains services for interacting with cloud infrastructure, orchestration platforms, and databases.
 

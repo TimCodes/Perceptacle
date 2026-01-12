@@ -1,6 +1,6 @@
 # Flow Diagrams
 
-This document contains sequence diagrams, state transitions, and component interaction flows for all major application workflows in Perceptacle.
+This document contains sequence diagrams, state transitions, and component interaction flows for all major application workflows in Synapse.
 
 ## Table of Contents
 

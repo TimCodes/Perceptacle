@@ -32,15 +32,15 @@ describe('TabNavigation', () => {
     const triggers = container.querySelectorAll('button[data-value]');
     expect(triggers[0]).toHaveAttribute('data-value', 'cicd');
     expect(triggers[1]).toHaveAttribute('data-value', 'observability');
-    expect(triggers[2]).toHaveAttribute('data-value', 'tickets');
+    expect(triggers[2]).toHaveAttribute('data-value', 'aichat');
     expect(triggers[3]).toHaveAttribute('data-value', 'configuration');
   });
 
-  it('should render with grid layout classes', () => {
+  it('should render with inline-flex layout classes', () => {
     const { container } = render(<TabNavigation />);
     
     const tabsList = container.firstChild as HTMLElement;
-    expect(tabsList).toHaveClass('grid', 'w-full', 'grid-cols-4');
+    expect(tabsList).toHaveClass('inline-flex', 'h-9', 'items-center', 'gap-1');
   });
 
   it('should render all icons', () => {
@@ -60,7 +60,7 @@ describe('TabNavigation', () => {
     // Tooltips render their content
     expect(screen.getByText('CI/CD')).toBeInTheDocument();
     expect(screen.getByText('Observability')).toBeInTheDocument();
-    expect(screen.getByText('Tickets')).toBeInTheDocument();
+    expect(screen.getByText('AI Chat')).toBeInTheDocument();
     expect(screen.getByText('Configuration')).toBeInTheDocument();
   });
 });

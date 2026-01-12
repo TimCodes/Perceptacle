@@ -1,6 +1,6 @@
-# Docker Setup for Perceptacle
+# Docker Setup for Synapse
 
-This document provides comprehensive instructions for running Perceptacle using Docker and Docker Compose.
+This document provides comprehensive instructions for running Synapse using Docker and Docker Compose.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This document provides comprehensive instructions for running Perceptacle using 
 1. **Clone and setup**:
    ```bash
    git clone <repository-url>
-   cd Perceptacle
+   cd Synapse
    cp .env.example .env
    ```
 
@@ -66,15 +66,15 @@ This document provides comprehensive instructions for running Perceptacle using 
 
 ### Containers
 
-- **perceptacle-client**: React frontend (Nginx in prod, Vite dev server in dev)
-- **perceptacle-server**: Express backend server
-- **perceptacle-db**: PostgreSQL database
+- **Synapse-client**: React frontend (Nginx in prod, Vite dev server in dev)
+- **Synapse-server**: Express backend server
+- **Synapse-db**: PostgreSQL database
 
 ### Networking
 
 All containers communicate through a custom Docker network:
-- Development: `perceptacle-dev-network`
-- Production: `perceptacle-network`
+- Development: `Synapse-dev-network`
+- Production: `Synapse-network`
 
 ### Volumes
 
@@ -94,7 +94,7 @@ All containers communicate through a custom Docker network:
 
 ```bash
 # Database
-DB_NAME=perceptacle_dev
+DB_NAME=Synapse_dev
 DB_USER=postgres
 DB_PASSWORD=postgres
 DB_PORT=5432
@@ -158,7 +158,7 @@ Both frontend and backend support hot reload in development mode:
    docker-compose -f docker-compose.dev.yml exec server sh
    
    # Access database
-   docker-compose -f docker-compose.dev.yml exec postgres psql -U postgres -d perceptacle_dev
+   docker-compose -f docker-compose.dev.yml exec postgres psql -U postgres -d Synapse_dev
    ```
 
 ## Useful Commands
@@ -195,10 +195,10 @@ docker-compose -f docker-compose.dev.yml exec server npm run db:push
 docker-compose -f docker-compose.dev.yml exec server npm run db:studio
 
 # Backup database
-docker-compose -f docker-compose.dev.yml exec postgres pg_dump -U postgres perceptacle_dev > backup.sql
+docker-compose -f docker-compose.dev.yml exec postgres pg_dump -U postgres Synapse_dev > backup.sql
 
 # Restore database
-docker-compose -f docker-compose.dev.yml exec -T postgres psql -U postgres perceptacle_dev < backup.sql
+docker-compose -f docker-compose.dev.yml exec -T postgres psql -U postgres Synapse_dev < backup.sql
 ```
 
 ### Development Helpers

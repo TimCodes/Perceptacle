@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 
 import { Settings as SettingsIcon, Library } from "lucide-react";
 import { useLocation } from "wouter";
+import SynapseLogo from "@/assets/SynapseLogo.png";
 
 export default function NavBar() {
   const [location, setLocation] = useLocation();
@@ -11,8 +12,9 @@ export default function NavBar() {
       <div className="flex justify-between h-16 ml-10">
         <div className="flex ">
           <div className="flex-shrink-0 flex items-center gap-4">
-            <Button variant="ghost" onClick={() => setLocation("/")}>
-              GitHub Manager(S)
+            <Button variant="ghost" onClick={() => setLocation("/")} className="flex items-center gap-2">
+              <img src={SynapseLogo} alt="Synapse Logo" className="h-8 w-8" />
+            
             </Button>
             <Button variant={location === "/dashboard" ? "secondary" : "ghost"} onClick={() => setLocation("/dashboard")}>
               Dashboard

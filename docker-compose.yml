@@ -4,10 +4,10 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: perceptacle-db
+    container_name: synapse-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-perceptacle}
+      POSTGRES_DB: ${DB_NAME:-synapse}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
@@ -16,23 +16,23 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-perceptacle}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-synapse}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - perceptacle-network
+      - synapse-network
 
   # Backend Server
   server:
     build:
       context: ./packages/server
       target: production
-    container_name: perceptacle-server
+    container_name: synapse-server
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-perceptacle}
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-synapse}
       CLIENT_URL: http://localhost:${CLIENT_PORT:-80}
       PORT: 3000
     ports:
@@ -41,7 +41,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - perceptacle-network
+      - synapse-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
@@ -53,14 +53,14 @@ services:
     build:
       context: ./packages/client
       target: production
-    container_name: perceptacle-client
+    container_name: synapse-client
     restart: unless-stopped
     ports:
       - "${CLIENT_PORT:-80}:80"
     depends_on:
       - server
     networks:
-      - perceptacle-network
+      - synapse-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 30s
@@ -72,7 +72,7 @@ services:
     build:
       context: ./packages/agents
       target: production
-    container_name: perceptacle-agents
+    container_name: synapse-agents
     restart: unless-stopped
     environment:
       ENVIRONMENT: production
@@ -81,7 +81,7 @@ services:
     ports:
       - "${AGENTS_PORT:-8000}:8000"
     networks:
-      - perceptacle-network
+      - synapse-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -93,5 +93,5 @@ volumes:
     driver: local
 
 networks:
-  perceptacle-network:
+  synapse-network:
     driver: bridge
