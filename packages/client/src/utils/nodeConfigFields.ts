@@ -244,7 +244,7 @@ const GCP_COMPONENT_TYPES = [
 
 // Function to get configuration fields for a specific node type
 export function getConfigFieldsForNodeType(nodeType: string): ConfigField[] {
-  const isAzureNode = nodeType.startsWith('azure-');
+  const isAzureNode = nodeType.startsWith('azure-') || nodeType === 'ServiceBusQueue';
   const isKubernetesNode = nodeType.startsWith('k8s-');
   const isKafkaNode = nodeType.startsWith('kafka-');
   const isGCPNode = GCP_COMPONENT_TYPES.includes(nodeType);
@@ -328,6 +328,7 @@ export function buildAzureResourceId(data: any, nodeType: string): string {
   const resourceTypeMap: Record<string, string> = {
     'azure-function-app': 'Microsoft.Web/sites',
     'azure-service-bus': 'Microsoft.ServiceBus/namespaces',
+    'ServiceBusQueue': 'Microsoft.ServiceBus/namespaces',
     'azure-application-insights': 'Microsoft.Insights/components',
     'azure-virtual-network': 'Microsoft.Network/virtualNetworks',
     'azure-app-service': 'Microsoft.Web/sites',

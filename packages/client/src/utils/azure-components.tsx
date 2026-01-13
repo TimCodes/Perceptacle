@@ -17,8 +17,8 @@ import CosmosDBIconSvg from '@/assets/azure-icons/azure-cosmos-db.svg';
 
 // Create React components for Azure SVG icons
 export const FunctionAppsIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={FunctionAppsIconSvg} 
+  <img
+    src={FunctionAppsIconSvg}
     alt="Function Apps"
     width={size}
     height={size}
@@ -27,8 +27,8 @@ export const FunctionAppsIcon = ({ size = 24, className = "" }: AzureIconProps) 
 );
 
 export const ServiceBusIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={ServiceBusIconSvg} 
+  <img
+    src={ServiceBusIconSvg}
     alt="Service Bus"
     width={size}
     height={size}
@@ -37,8 +37,8 @@ export const ServiceBusIcon = ({ size = 24, className = "" }: AzureIconProps) =>
 );
 
 export const ApplicationInsightsIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={ApplicationInsightsIconSvg} 
+  <img
+    src={ApplicationInsightsIconSvg}
     alt="Application Insights"
     width={size}
     height={size}
@@ -47,8 +47,8 @@ export const ApplicationInsightsIcon = ({ size = 24, className = "" }: AzureIcon
 );
 
 export const VirtualNetworksIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={VirtualNetworksIconSvg} 
+  <img
+    src={VirtualNetworksIconSvg}
     alt="Virtual Networks"
     width={size}
     height={size}
@@ -57,8 +57,8 @@ export const VirtualNetworksIcon = ({ size = 24, className = "" }: AzureIconProp
 );
 
 export const AppServicesIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={AppServicesIconSvg} 
+  <img
+    src={AppServicesIconSvg}
     alt="App Services"
     width={size}
     height={size}
@@ -67,8 +67,8 @@ export const AppServicesIcon = ({ size = 24, className = "" }: AzureIconProps) =
 );
 
 export const FirewallsIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={FirewallsIconSvg} 
+  <img
+    src={FirewallsIconSvg}
     alt="Firewalls"
     width={size}
     height={size}
@@ -77,8 +77,8 @@ export const FirewallsIcon = ({ size = 24, className = "" }: AzureIconProps) => 
 );
 
 export const ApplicationGatewaysIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={ApplicationGatewaysIconSvg} 
+  <img
+    src={ApplicationGatewaysIconSvg}
     alt="Application Gateways"
     width={size}
     height={size}
@@ -87,8 +87,8 @@ export const ApplicationGatewaysIcon = ({ size = 24, className = "" }: AzureIcon
 );
 
 export const KeyVaultsIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={KeyVaultsIconSvg} 
+  <img
+    src={KeyVaultsIconSvg}
     alt="Key Vaults"
     width={size}
     height={size}
@@ -97,8 +97,8 @@ export const KeyVaultsIcon = ({ size = 24, className = "" }: AzureIconProps) => 
 );
 
 export const CosmosDBIcon = ({ size = 24, className = "" }: AzureIconProps) => (
-  <img 
-    src={CosmosDBIconSvg} 
+  <img
+    src={CosmosDBIconSvg}
     alt="Azure Cosmos DB"
     width={size}
     height={size}
@@ -115,7 +115,7 @@ export const AzureComponents = [
     category: 'Serverless'
   },
   {
-    type: 'azure-service-bus',
+    type: 'ServiceBusQueue',
     name: 'Service Bus',
     icon: ServiceBusIcon,
     category: 'Integration'

@@ -209,7 +209,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         // Create new map
         savedMap = await TelemetryMapService.createTelemetryMap(mapData, currentUserId);
       }
-      
+
       // Update current map metadata and ID after successful save
       setCurrentMapMetadata({
         name: data.name,
@@ -218,7 +218,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         isPublic: data.isPublic,
       });
       setCurrentMapId(savedMap.id);
-      
+
       setShowSaveDialog(false);
       toast({
         title: 'Success',
@@ -346,7 +346,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         })) || [];
 
       // Initialize Azure-specific fields for Azure nodes
-      const isAzureNode = type.startsWith('azure-');
+      const isAzureNode = type.startsWith('azure-') || type === 'ServiceBusQueue';
       const azureFields = isAzureNode ? {
         subscriptionId: '',
         resourceGroup: '',
