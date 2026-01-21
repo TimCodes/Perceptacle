@@ -90,7 +90,31 @@ app.get('/health', (_req: Request, res: Response) => {
 
   // Use PORT from environment or default to 3000 for Docker compatibility
   const PORT = Number(process.env.PORT) || 3000;
+
+  server.on('error', (e: any) => {
+    if (e.code === 'EADDRINUSE') {
+      log(`ERROR: Port ${PORT} is already in use. Please stop other processes running on this port and try again.`, "server");
+      process.exit(1);
+    } else {
+      log(`Server error: ${e.message}`, "server");
+      throw e;
+    }
+  });
+
   server.listen(PORT, "0.0.0.0", () => {
     log(`API server running on port ${PORT}`);
   });
 })();
+
+// Global error handlers to prevent silent crashes
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+  // Keep the process alive for inspection in dev, or exit? 
+  // Better to exit to avoid unstable state, but with logging.
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION at:', promise, 'reason:', reason);
+});
+
