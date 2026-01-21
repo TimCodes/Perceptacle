@@ -60,7 +60,16 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
-  const { setSelectedNode, setNodes: setStoreNodes, setEdges: setStoreEdges } = useDiagramStore();
+  const { nodes: storeNodes, setSelectedNode, setNodes: setStoreNodes, setEdges: setStoreEdges } = useDiagramStore();
+
+  // Sync store state to local state to handle updates from sidebar
+  useEffect(() => {
+    // Deep comparison to avoid unnecessary updates and loops
+    // This allows the sidebar to update the store, and propagate back to canvas
+    if (JSON.stringify(storeNodes) !== JSON.stringify(nodes)) {
+      setNodes(storeNodes);
+    }
+  }, [storeNodes, setNodes]); // omit 'nodes' from dependency to avoid loop since we read it inside
 
   // Save/Load state
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -209,7 +218,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         // Create new map
         savedMap = await TelemetryMapService.createTelemetryMap(mapData, currentUserId);
       }
-      
+
       // Update current map metadata and ID after successful save
       setCurrentMapMetadata({
         name: data.name,
@@ -218,7 +227,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         isPublic: data.isPublic,
       });
       setCurrentMapId(savedMap.id);
-      
+
       setShowSaveDialog(false);
       toast({
         title: 'Success',
@@ -346,7 +355,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         })) || [];
 
       // Initialize Azure-specific fields for Azure nodes
-      const isAzureNode = type.startsWith('azure-');
+      const isAzureNode = type.startsWith('azure-') || type === 'ServiceBusQueue';
       const azureFields = isAzureNode ? {
         subscriptionId: '',
         resourceGroup: '',

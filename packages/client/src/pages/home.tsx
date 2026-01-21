@@ -19,6 +19,7 @@ const MotionDiv = motion.div;
 /** Main diagram editor page component */
 export default function Home() {
   const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
+  const [isConfigPanelExpanded, setIsConfigPanelExpanded] = useState(false);
   const [saveTriggered, setSaveTriggered] = useState(false);
   const [loadTriggered, setLoadTriggered] = useState(false);
   const [newMapTriggered, setNewMapTriggered] = useState(false);
@@ -84,7 +85,7 @@ export default function Home() {
                 key="config-panel"
                 className="bg-background border-l z-50"
                 initial={{ width: "0px" }}
-                animate={{ width: "400px" }}
+                animate={{ width: isConfigPanelExpanded ? "75%" : "30%" }}
                 exit={{ width: 0 }}
                 transition={{
                   type: "spring",
@@ -92,7 +93,12 @@ export default function Home() {
                   damping: 30,
                 }}
               >
-                <NodeInfoSideBar />
+                <NodeInfoSideBar
+                  isExpanded={isConfigPanelExpanded}
+                  toggleExpanded={() =>
+                    setIsConfigPanelExpanded(!isConfigPanelExpanded)
+                  }
+                />
               </MotionDiv>
             ) : null}
           </AnimatePresence>
@@ -103,7 +109,11 @@ export default function Home() {
             onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)}
             className={cn(
               "absolute top-4 z-10 shadow-md",
-              isConfigPanelOpen ? "right-[400px]" : "right-0",
+              isConfigPanelOpen
+                ? isConfigPanelExpanded
+                  ? "right-[75%]"
+                  : "right-[30%]"
+                : "right-0",
             )}
           >
             {isConfigPanelOpen ? (

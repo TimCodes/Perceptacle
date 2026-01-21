@@ -38,7 +38,7 @@ const mockMaps: TelemetryMap[] = [
         id: "node-2",
         mapId: "map-1",
         nodeId: "azure-service-bus-1",
-        nodeType: "azure-service-bus",
+        nodeType: "ServiceBusQueue",
         label: "Order Queue",
         status: "active",
         description: "Queues order messages",
@@ -104,7 +104,7 @@ let mockStorage = [...mockMaps];
 router.get("/", async (req: Request, res: Response) => {
   try {
     const { userId, isPublic } = req.query;
-    
+
     let filteredMaps;
     if (isPublic === 'true') {
       filteredMaps = mockStorage.filter(map => map.isPublic);
@@ -113,10 +113,10 @@ router.get("/", async (req: Request, res: Response) => {
     } else {
       return res.status(400).json({ error: 'userId required for private maps' });
     }
-    
+
     // Sort by updated date
     filteredMaps.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-    
+
     res.json(filteredMaps);
   } catch (error) {
     console.error('Error fetching telemetry maps:', error);
@@ -129,15 +129,15 @@ router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { userId } = req.query;
-    
-    const map = mockStorage.find(m => 
+
+    const map = mockStorage.find(m =>
       m.id === id && (m.isPublic || m.createdBy === userId)
     );
-    
+
     if (!map) {
       return res.status(404).json({ error: 'Telemetry map not found' });
     }
-    
+
     res.json(map);
   } catch (error) {
     console.error('Error fetching telemetry map:', error);
@@ -150,15 +150,15 @@ router.post("/", async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
     const { name, description, isPublic, tags, nodes, connections } = req.body;
-    
+
     if (!userId) {
       return res.status(401).json({ error: 'User ID required' });
     }
-    
+
     if (!name) {
       return res.status(400).json({ error: 'Map name is required' });
     }
-    
+
     const newMap: TelemetryMap = {
       id: `map-${Date.now()}`,
       name,
@@ -191,9 +191,9 @@ router.post("/", async (req: Request, res: Response) => {
         createdAt: new Date().toISOString(),
       })),
     };
-    
+
     mockStorage.push(newMap);
-    
+
     res.status(201).json(newMap);
   } catch (error) {
     console.error('Error creating telemetry map:', error);
@@ -207,23 +207,23 @@ router.put("/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     const { userId } = req.query;
     const { name, description, isPublic, tags, nodes, connections } = req.body;
-    
+
     if (!userId) {
       return res.status(401).json({ error: 'User ID required' });
     }
-    
+
     const mapIndex = mockStorage.findIndex(m => m.id === id);
-    
+
     if (mapIndex === -1) {
       return res.status(404).json({ error: 'Telemetry map not found' });
     }
-    
+
     const existingMap = mockStorage[mapIndex];
-    
+
     if (existingMap.createdBy !== userId) {
       return res.status(403).json({ error: 'Not authorized to update this map' });
     }
-    
+
     // Update the map
     const updatedMap: TelemetryMap = {
       ...existingMap,
@@ -254,9 +254,9 @@ router.put("/:id", async (req: Request, res: Response) => {
         createdAt: new Date().toISOString(),
       })) : existingMap.connections,
     };
-    
+
     mockStorage[mapIndex] = updatedMap;
-    
+
     res.json(updatedMap);
   } catch (error) {
     console.error('Error updating telemetry map:', error);
@@ -269,25 +269,25 @@ router.delete("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { userId } = req.query;
-    
+
     if (!userId) {
       return res.status(401).json({ error: 'User ID required' });
     }
-    
+
     const mapIndex = mockStorage.findIndex(m => m.id === id);
-    
+
     if (mapIndex === -1) {
       return res.status(404).json({ error: 'Telemetry map not found' });
     }
-    
+
     const existingMap = mockStorage[mapIndex];
-    
+
     if (existingMap.createdBy !== userId) {
       return res.status(403).json({ error: 'Not authorized to delete this map' });
     }
-    
+
     mockStorage.splice(mapIndex, 1);
-    
+
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting telemetry map:', error);
