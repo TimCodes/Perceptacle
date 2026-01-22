@@ -20,80 +20,14 @@ export interface PodLogParams {
 export interface PodMetrics {
   podName: string;
   namespace: string;
-  containers: ContainerMetrics[];
   timestamp: Date;
-}
-
-export interface ContainerMetrics {
-  name: string;
-  cpu: string;
-  memory: string;
-  cpuUsageNanoCores: number;
-  memoryUsageBytes: number;
-}
-
-export interface ServiceInfo {
-  name: string;
-  namespace: string;
-  type: string;
-  clusterIP: string;
-  externalIPs: string[];
-  ports: ServicePort[];
-  selector: Record<string, string>;
-  endpoints: EndpointInfo[];
-}
-
-export interface ServicePort {
-  name?: string;
-  port: number;
-  targetPort: number | string;
-  protocol: string;
-}
-
-export interface EndpointInfo {
-  ip: string;
-  nodeName?: string;
-  ready: boolean;
-}
-
-export interface ClusterInfo {
-  version: string;
-  nodes: NodeInfo[];
-  namespaces: string[];
-  totalPods: number;
-  totalServices: number;
-  totalDeployments: number;
-}
-
-export interface NodeInfo {
-  name: string;
-  status: string;
-  roles: string[];
-  age: string;
-  version: string;
-  internalIP: string;
-  externalIP?: string;
-  os: string;
-  kernelVersion: string;
-  containerRuntime: string;
-  capacity: NodeCapacity;
-  allocatable: NodeCapacity;
-  conditions: NodeCondition[];
-}
-
-export interface NodeCapacity {
-  cpu: string;
-  memory: string;
-  pods: string;
-  storage: string;
-}
-
-export interface NodeCondition {
-  type: string;
-  status: string;
-  reason?: string;
-  message?: string;
-  lastTransitionTime: Date;
+  containers: Array<{
+    name: string;
+    cpu: string;
+    memory: string;
+    cpuUsageNanoCores: number;
+    memoryUsageBytes: number;
+  }>;
 }
 
 export interface PodInfo {
@@ -104,17 +38,34 @@ export interface PodInfo {
   age: string;
   ip: string;
   node: string;
-  containers: PodContainer[];
+  containers: Array<{
+    name: string;
+    image: string;
+    ready: boolean;
+    restartCount: number;
+    state: string;
+  }>;
   labels: Record<string, string>;
   annotations: Record<string, string>;
 }
 
-export interface PodContainer {
+export interface ServiceInfo {
   name: string;
-  image: string;
-  ready: boolean;
-  restartCount: number;
-  state: string;
+  namespace: string;
+  type: string;
+  clusterIP: string;
+  externalIPs: string[];
+  ports: Array<{
+    name?: string;
+    port: number;
+    targetPort: number | string;
+    protocol: string;
+  }>;
+  selector: Record<string, string>;
+  endpoints: Array<{
+    ip: string;
+    ready: boolean;
+  }>;
 }
 
 export interface DeploymentInfo {
@@ -130,6 +81,42 @@ export interface DeploymentInfo {
   selector: Record<string, string>;
 }
 
+export interface ClusterInfo {
+  version: string;
+  nodes: Array<{
+    name: string;
+    status: string;
+    roles: string[];
+    age: string;
+    version: string;
+    internalIP: string;
+    os: string;
+    kernelVersion: string;
+    containerRuntime: string;
+    capacity: {
+      cpu: string;
+      memory: string;
+      pods: string;
+      storage: string;
+    };
+    allocatable: {
+      cpu: string;
+      memory: string;
+      pods: string;
+      storage: string;
+    };
+    conditions: Array<{
+      type: string;
+      status: string;
+      lastTransitionTime: Date;
+    }>;
+  }>;
+  namespaces: string[];
+  totalPods: number;
+  totalServices: number;
+  totalDeployments: number;
+}
+
 export interface NamespaceResourceUsage {
   namespace: string;
   pods: number;
@@ -140,6 +127,9 @@ export interface NamespaceResourceUsage {
   persistentVolumeClaims: number;
 }
 
+/**
+ * Kubernetes service for interacting with Kubernetes clusters
+ */
 export class KubernetesService {
   private kc: k8s.KubeConfig;
   private k8sApi: k8s.CoreV1Api;
@@ -205,49 +195,72 @@ export class KubernetesService {
    */
   async getClusterInfo(): Promise<ClusterInfo> {
     try {
-      // Simulate cluster info for demo purposes
-      // In production, you would make actual API calls
+      // Fetch nodes
+      const nodesRes = await this.k8sApi.listNode();
+      // @ts-ignore
+      const nodesList = nodesRes.items ? nodesRes : (nodesRes as any).body;
+
+      const nodes = (nodesList?.items || []).map((node: k8s.V1Node) => ({
+        name: node.metadata?.name || 'unknown',
+        status: node.status?.conditions?.find((c: k8s.V1NodeCondition) => c.type === 'Ready')?.status === 'True' ? 'Ready' : 'NotReady',
+        roles: Object.keys(node.metadata?.labels || {}).filter(l => l.includes('node-role.kubernetes.io')).map(l => l.split('/')[1] || l),
+        age: node.metadata?.creationTimestamp ? new Date(node.metadata.creationTimestamp).toLocaleDateString() : 'unknown',
+        version: node.status?.nodeInfo?.kubeletVersion || 'unknown',
+        internalIP: node.status?.addresses?.find((a: k8s.V1NodeAddress) => a.type === 'InternalIP')?.address || 'unknown',
+        os: node.status?.nodeInfo?.osImage || 'unknown',
+        kernelVersion: node.status?.nodeInfo?.kernelVersion || 'unknown',
+        containerRuntime: node.status?.nodeInfo?.containerRuntimeVersion || 'unknown',
+        capacity: {
+          cpu: node.status?.capacity?.cpu || '0',
+          memory: node.status?.capacity?.memory || '0',
+          pods: node.status?.capacity?.pods || '0',
+          storage: node.status?.capacity?.['ephemeral-storage'] || '0'
+        },
+        allocatable: {
+          cpu: node.status?.allocatable?.cpu || '0',
+          memory: node.status?.allocatable?.memory || '0',
+          pods: node.status?.allocatable?.pods || '0',
+          storage: node.status?.allocatable?.['ephemeral-storage'] || '0'
+        },
+        conditions: (node.status?.conditions || []).map((c: k8s.V1NodeCondition) => ({
+          type: c.type,
+          status: c.status,
+          lastTransitionTime: c.lastTransitionTime || new Date()
+        }))
+      }));
+
+      // Fetch namespaces
+      const nsRes = await this.k8sApi.listNamespace();
+      // @ts-ignore
+      const nsList = nsRes.items ? nsRes : (nsRes as any).body;
+      const namespaces = (nsList?.items || []).map((ns: k8s.V1Namespace) => ns.metadata?.name || 'unknown');
+
+      // Fetch counts (approximate)
+      const podsRes = await this.k8sApi.listPodForAllNamespaces();
+      // @ts-ignore
+      const podsList = podsRes.items ? podsRes : (podsRes as any).body;
+
+      const svcRes = await this.k8sApi.listServiceForAllNamespaces();
+      // @ts-ignore
+      const svcList = svcRes.items ? svcRes : (svcRes as any).body;
+
+      const deployRes = await this.k8sAppsApi.listDeploymentForAllNamespaces();
+      // @ts-ignore
+      const deployList = deployRes.items ? deployRes : (deployRes as any).body;
+
       return {
-        version: 'v1.28.0',
-        nodes: [
-          {
-            name: 'master-node',
-            status: 'Ready',
-            roles: ['master'],
-            age: '30d',
-            version: 'v1.28.0',
-            internalIP: '192.168.1.10',
-            os: 'linux',
-            kernelVersion: '5.4.0',
-            containerRuntime: 'containerd://1.6.0',
-            capacity: {
-              cpu: '4',
-              memory: '8Gi',
-              pods: '110',
-              storage: '100Gi'
-            },
-            allocatable: {
-              cpu: '3.8',
-              memory: '7.5Gi',
-              pods: '110',
-              storage: '95Gi'
-            },
-            conditions: [
-              {
-                type: 'Ready',
-                status: 'True',
-                lastTransitionTime: new Date()
-              }
-            ]
-          }
-        ],
-        namespaces: ['default', 'kube-system', 'kube-public'],
-        totalPods: 10,
-        totalServices: 5,
-        totalDeployments: 3
+        version: nodes[0]?.version || 'unknown',
+        nodes,
+        namespaces,
+        totalPods: podsList?.items?.length || 0,
+        totalServices: svcList?.items?.length || 0,
+        totalDeployments: deployList?.items?.length || 0
       };
     } catch (error: any) {
       console.error('Error getting cluster info:', error);
+      if (error.message && (error.message.includes('PEM') || error.code === 'ERR_OSSL_PEM_BAD_END_LINE')) {
+        console.error('CRITICAL: Kubeconfig certificate error (bad PEM format). Please check your kubeconfig file.');
+      }
       throw new Error(`Failed to get cluster information: ${error.message}`);
     }
   }
@@ -255,17 +268,15 @@ export class KubernetesService {
   /**
    * Get logs from a specific pod
    */
-  /**
-   * Get logs from a specific pod
-   */
   async getPodLogs(params: PodLogParams): Promise<string> {
     try {
-      const response = await this.k8sApi.readNamespacedPodLog(
-        params.podName,
-        params.namespace,
-        // @ts-ignore - arguments mismatch between versions
-        params.containerName
-      );
+      const response = await this.k8sApi.readNamespacedPodLog({
+        name: params.podName,
+        namespace: params.namespace,
+        container: params.containerName,
+        follow: params.follow,
+        tailLines: params.tailLines
+      });
 
       // @ts-ignore - return type mismatch
       return response.body || response;
@@ -280,13 +291,36 @@ export class KubernetesService {
    */
   async getServiceLogs(namespace: string, serviceName: string, tailLines?: number): Promise<Record<string, string>> {
     try {
-      // For demo purposes, return simulated service logs
-      const timestamp = new Date().toISOString();
-      return {
-        [`${serviceName}-pod-1`]: `${timestamp} [INFO] Service ${serviceName} pod 1 logs`,
-        [`${serviceName}-pod-2`]: `${timestamp} [INFO] Service ${serviceName} pod 2 logs`,
-        [`${serviceName}-pod-3`]: `${timestamp} [INFO] Service ${serviceName} pod 3 logs`
-      };
+      // Find pods for service
+      const svcRes = await this.k8sApi.readNamespacedService({ name: serviceName, namespace });
+      // @ts-ignore
+      const svc = svcRes.metadata ? svcRes : (svcRes as any).body;
+      const selector = svc?.spec?.selector;
+
+      if (!selector) return {};
+
+      const labelSelector = Object.entries(selector).map(([k, v]) => `${k}=${v}`).join(',');
+      const podsRes = await this.k8sApi.listNamespacedPod({ namespace, labelSelector });
+      // @ts-ignore
+      const podsList = podsRes.items ? podsRes : (podsRes as any).body;
+
+      const logs: Record<string, string> = {};
+
+      // Limit to first 3 pods to avoid timeout
+      for (const pod of (podsList?.items || []).slice(0, 3)) {
+        if (!pod.metadata?.name) continue;
+        try {
+          logs[pod.metadata.name] = await this.getPodLogs({
+            namespace,
+            podName: pod.metadata.name,
+            tailLines: tailLines || 50
+          });
+        } catch (e) {
+          logs[pod.metadata.name] = `Failed to fetch logs: ${e}`;
+        }
+      }
+
+      return logs;
     } catch (error: any) {
       console.error('Error getting service logs:', error);
       throw new Error(`Failed to get logs for service ${serviceName}: ${error.message}`);
@@ -298,6 +332,9 @@ export class KubernetesService {
    */
   async getPodMetrics(namespace?: string, podName?: string): Promise<PodMetrics[]> {
     try {
+      // Metrics API is often not available via standard client easily without metrics-server
+      // Keeping mock data for metrics for safety unless we implement raw API call
+      // Returning simulated metrics for now to prevent breaking UI if metrics-server is missing
       // For demo purposes, return simulated metrics
       // In production, you would use metrics-server API
       const timestamp = new Date();
@@ -313,20 +350,6 @@ export class KubernetesService {
               memory: '128Mi',
               cpuUsageNanoCores: 50000000,
               memoryUsageBytes: 134217728
-            }
-          ]
-        },
-        {
-          podName: 'api-deployment-def456',
-          namespace: namespace || 'default',
-          timestamp,
-          containers: [
-            {
-              name: 'api',
-              cpu: '100m',
-              memory: '256Mi',
-              cpuUsageNanoCores: 100000000,
-              memoryUsageBytes: 268435456
             }
           ]
         }
@@ -348,51 +371,39 @@ export class KubernetesService {
    */
   async getPods(namespace?: string): Promise<PodInfo[]> {
     try {
-      // For demo purposes, return simulated pod info
-      const samplePods: PodInfo[] = [
-        {
-          name: 'nginx-deployment-abc123',
-          namespace: namespace || 'default',
-          status: 'Running',
-          restarts: 0,
-          age: '2h',
-          ip: '10.244.1.5',
-          node: 'worker-node-1',
-          containers: [
-            {
-              name: 'nginx',
-              image: 'nginx:1.21',
-              ready: true,
-              restartCount: 0,
-              state: 'Running'
-            }
-          ],
-          labels: { app: 'nginx', version: 'v1' },
-          annotations: { 'kubernetes.io/created-by': 'deployment-controller' }
-        },
-        {
-          name: 'api-deployment-def456',
-          namespace: namespace || 'default',
-          status: 'Running',
-          restarts: 1,
-          age: '1h',
-          ip: '10.244.1.6',
-          node: 'worker-node-2',
-          containers: [
-            {
-              name: 'api',
-              image: 'myapp:latest',
-              ready: true,
-              restartCount: 1,
-              state: 'Running'
-            }
-          ],
-          labels: { app: 'api', version: 'v2' },
-          annotations: { 'kubernetes.io/created-by': 'deployment-controller' }
-        }
-      ];
+      let response;
+      const ns = (namespace && namespace !== 'undefined' && namespace !== 'null') ? namespace : undefined;
 
-      return samplePods;
+      if (ns) {
+        response = await this.k8sApi.listNamespacedPod({ namespace: ns });
+      } else {
+        response = await this.k8sApi.listPodForAllNamespaces();
+      }
+
+      // @ts-ignore
+      const list = response.items ? response : (response as any).body;
+
+      return (list?.items || []).map((pod: k8s.V1Pod) => ({
+        name: pod.metadata?.name || 'unknown',
+        namespace: pod.metadata?.namespace || 'unknown',
+        status: pod.status?.phase || 'Unknown',
+        restarts: pod.status?.containerStatuses?.reduce((acc: number, c: k8s.V1ContainerStatus) => acc + c.restartCount, 0) || 0,
+        age: pod.metadata?.creationTimestamp ? new Date(pod.metadata.creationTimestamp).toISOString() : 'unknown',
+        ip: pod.status?.podIP || 'unknown',
+        node: pod.spec?.nodeName || 'unknown',
+        containers: (pod.spec?.containers || []).map((c: k8s.V1Container) => {
+          const status = pod.status?.containerStatuses?.find((cs: k8s.V1ContainerStatus) => cs.name === c.name);
+          return {
+            name: c.name,
+            image: c.image || 'unknown',
+            ready: status?.ready || false,
+            restartCount: status?.restartCount || 0,
+            state: status?.state?.running ? 'Running' : (status?.state?.waiting ? 'Waiting' : 'Terminated')
+          };
+        }),
+        labels: pod.metadata?.labels || {},
+        annotations: pod.metadata?.annotations || {}
+      }));
     } catch (error: any) {
       console.error('Error getting pods:', error);
       throw new Error(`Failed to get pods: ${error.message}`);
@@ -404,53 +415,33 @@ export class KubernetesService {
    */
   async getServices(namespace?: string): Promise<ServiceInfo[]> {
     try {
-      // For demo purposes, return simulated service info
-      const sampleServices: ServiceInfo[] = [
-        {
-          name: 'nginx-service',
-          namespace: namespace || 'default',
-          type: 'ClusterIP',
-          clusterIP: '10.96.1.100',
-          externalIPs: [],
-          ports: [
-            {
-              port: 80,
-              targetPort: 8080,
-              protocol: 'TCP'
-            }
-          ],
-          selector: { app: 'nginx' },
-          endpoints: [
-            {
-              ip: '10.244.1.5',
-              ready: true
-            }
-          ]
-        },
-        {
-          name: 'api-service',
-          namespace: namespace || 'default',
-          type: 'LoadBalancer',
-          clusterIP: '10.96.1.101',
-          externalIPs: ['203.0.113.1'],
-          ports: [
-            {
-              port: 443,
-              targetPort: 8443,
-              protocol: 'TCP'
-            }
-          ],
-          selector: { app: 'api' },
-          endpoints: [
-            {
-              ip: '10.244.1.6',
-              ready: true
-            }
-          ]
-        }
-      ];
+      let response;
+      const ns = (namespace && namespace !== 'undefined' && namespace !== 'null') ? namespace : undefined;
 
-      return sampleServices;
+      if (ns) {
+        response = await this.k8sApi.listNamespacedService({ namespace: ns });
+      } else {
+        response = await this.k8sApi.listServiceForAllNamespaces();
+      }
+
+      // @ts-ignore
+      const list = response.items ? response : (response as any).body;
+
+      return (list?.items || []).map((svc: k8s.V1Service) => ({
+        name: svc.metadata?.name || 'unknown',
+        namespace: svc.metadata?.namespace || 'unknown',
+        type: svc.spec?.type || 'Unknown',
+        clusterIP: svc.spec?.clusterIP || 'None',
+        externalIPs: svc.spec?.externalIPs || [],
+        ports: (svc.spec?.ports || []).map((p: k8s.V1ServicePort) => ({
+          name: p.name || '',
+          port: p.port,
+          targetPort: p.targetPort || 0,
+          protocol: p.protocol || 'TCP'
+        })),
+        selector: svc.spec?.selector || {},
+        endpoints: [] // Endpoints would require another call to listEndpoints
+      }));
     } catch (error: any) {
       console.error('Error getting services:', error);
       throw new Error(`Failed to get services: ${error.message}`);
@@ -462,35 +453,30 @@ export class KubernetesService {
    */
   async getDeployments(namespace?: string): Promise<DeploymentInfo[]> {
     try {
-      // For demo purposes, return simulated deployment info
-      const sampleDeployments: DeploymentInfo[] = [
-        {
-          name: 'nginx-deployment',
-          namespace: namespace || 'default',
-          replicas: 3,
-          readyReplicas: 3,
-          availableReplicas: 3,
-          updatedReplicas: 3,
-          strategy: 'RollingUpdate',
-          age: '2h',
-          labels: { app: 'nginx' },
-          selector: { app: 'nginx' }
-        },
-        {
-          name: 'api-deployment',
-          namespace: namespace || 'default',
-          replicas: 2,
-          readyReplicas: 2,
-          availableReplicas: 2,
-          updatedReplicas: 2,
-          strategy: 'RollingUpdate',
-          age: '1h',
-          labels: { app: 'api' },
-          selector: { app: 'api' }
-        }
-      ];
+      let response;
+      const ns = (namespace && namespace !== 'undefined' && namespace !== 'null') ? namespace : undefined;
 
-      return sampleDeployments;
+      if (ns) {
+        response = await this.k8sAppsApi.listNamespacedDeployment({ namespace: ns });
+      } else {
+        response = await this.k8sAppsApi.listDeploymentForAllNamespaces();
+      }
+
+      // @ts-ignore
+      const list = response.items ? response : (response as any).body;
+
+      return (list?.items || []).map((dep: k8s.V1Deployment) => ({
+        name: dep.metadata?.name || 'unknown',
+        namespace: dep.metadata?.namespace || 'unknown',
+        replicas: dep.spec?.replicas || 0,
+        readyReplicas: dep.status?.readyReplicas || 0,
+        availableReplicas: dep.status?.availableReplicas || 0,
+        updatedReplicas: dep.status?.updatedReplicas || 0,
+        strategy: dep.spec?.strategy?.type || 'RollingUpdate',
+        age: dep.metadata?.creationTimestamp ? new Date(dep.metadata.creationTimestamp).toISOString() : 'unknown',
+        labels: dep.metadata?.labels || {},
+        selector: dep.spec?.selector?.matchLabels || {}
+      }));
     } catch (error: any) {
       console.error('Error getting deployments:', error);
       throw new Error(`Failed to get deployments: ${error.message}`);

@@ -342,11 +342,15 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       });
 
       const initialStatus = "active";
-      const componentType = type.replace(/-/g, "_");
+      // Try exact match first, then fallback to replacing hyphens with underscores
+      // This supports both k8s-service (hyphenated) and older types that might expect underscores
       const components = getCloudComponents();
-      const componentDefinition = components.find(
-        (comp) => comp.type === componentType,
-      );
+      let componentDefinition = components.find((comp) => comp.type === type);
+
+      if (!componentDefinition) {
+        const componentType = type.replace(/-/g, "_");
+        componentDefinition = components.find((comp) => comp.type === componentType);
+      }
 
       const customFields =
         componentDefinition?.fields?.map((field: any) => ({
@@ -368,12 +372,11 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       // Initialize Kubernetes-specific fields for Kubernetes nodes
       const isKubernetesNode = type.startsWith('k8s-');
       const kubernetesFields = isKubernetesNode ? {
-        namespace: 'default',
+        // namespace and containerName are now in customFields from component definition
         resourceName: '',
         clusterName: '',
         clusterEndpoint: '',
         serviceAccount: '',
-        containerName: ''
       } : {};
 
       // Initialize Kafka-specific fields for Kafka nodes

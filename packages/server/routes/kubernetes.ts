@@ -41,6 +41,33 @@ router.get("/health", ensureKubernetesService, async (req: Request, res: Respons
   }
 });
 
+// GET /api/kubernetes/options - Get all dropdown options for node configuration
+router.get("/options", ensureKubernetesService, async (req: Request, res: Response) => {
+  try {
+    const namespace = req.query.namespace as string | undefined;
+
+    const [clusterInfo, pods, services, deployments] = await Promise.all([
+      k8sService!.getClusterInfo(),
+      k8sService!.getPods(namespace),
+      k8sService!.getServices(namespace),
+      k8sService!.getDeployments(namespace)
+    ]);
+
+    res.json({
+      namespaces: clusterInfo.namespaces,
+      pods: pods.map(p => ({ name: p.name, namespace: p.namespace })),
+      services: services.map(s => ({ name: s.name, namespace: s.namespace })),
+      deployments: deployments.map(d => ({ name: d.name, namespace: d.namespace }))
+    });
+  } catch (error: any) {
+    console.error('Error getting Kubernetes options:', error);
+    res.status(500).json({
+      error: 'Failed to retrieve Kubernetes options',
+      details: error.message
+    });
+  }
+});
+
 // Get cluster information
 router.get("/cluster", ensureKubernetesService, async (req: Request, res: Response) => {
   try {

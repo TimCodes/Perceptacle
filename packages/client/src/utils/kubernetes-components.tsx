@@ -68,19 +68,33 @@ export const KubernetesComponents = [
     type: 'k8s-pod',
     name: 'Pod',
     icon: PodIcon,
-    category: 'Kubernetes'
+    category: 'Kubernetes',
+    fields: [
+      { name: 'namespace', type: 'k8s-select', source: 'namespaces', placeholder: 'Select namespace', defaultValue: 'default' },
+      { name: 'podName', type: 'k8s-select', source: 'pods', dependsOn: 'namespace', placeholder: 'Select pod' },
+      { name: 'containerName', type: 'text', placeholder: 'Container name' }
+    ]
   },
   {
     type: 'k8s-service',
     name: 'Service',
     icon: ServiceIcon,
-    category: 'Kubernetes'
+    category: 'Kubernetes',
+    fields: [
+      { name: 'namespace', type: 'k8s-select', source: 'namespaces', placeholder: 'Select namespace', defaultValue: 'default' },
+      { name: 'serviceName', type: 'k8s-select', source: 'services', dependsOn: 'namespace', placeholder: 'Select service' },
+      { name: 'port', type: 'number', placeholder: 'Service port' }
+    ]
   },
   {
     type: 'k8s-cronjob',
     name: 'CronJob',
     icon: CronJobIcon,
-    category: 'Kubernetes'
+    category: 'Kubernetes',
+    fields: [
+      { name: 'namespace', type: 'k8s-select', source: 'namespaces', placeholder: 'Select namespace', defaultValue: 'default' },
+      { name: 'schedule', type: 'text', placeholder: '*/5 * * * *' }
+    ]
   },
 
   {
