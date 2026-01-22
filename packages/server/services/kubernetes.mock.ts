@@ -32,10 +32,19 @@ export class MockKubernetesService {
   }
 
   /**
-   * Create mock Kubernetes service instance with custom kubeconfig
+   * Create mock Kubernetes service instance from a kubeconfig file path
+   * (In mock mode, the file is not actually read)
    */
-  static fromKubeconfig(kubeconfig: string, context?: string): MockKubernetesService {
-    return new MockKubernetesService({ kubeconfig, context });
+  static fromFile(kubeconfigPath: string, context?: string): MockKubernetesService {
+    return new MockKubernetesService({ kubeconfigPath, context });
+  }
+
+  /**
+   * Create mock Kubernetes service instance from kubeconfig content string
+   * @deprecated Use fromFile() for file paths or pass kubeconfigContent in config
+   */
+  static fromKubeconfig(kubeconfigContent: string, context?: string): MockKubernetesService {
+    return new MockKubernetesService({ kubeconfigContent, context });
   }
 
   /**

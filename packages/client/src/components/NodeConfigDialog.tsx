@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Node } from 'reactflow';
 
+
 interface NodeConfigDialogProps {
     isOpen: boolean;
     onClose: () => void;

@@ -1,5 +1,5 @@
-import { 
-  ServiceFactory, 
+import {
+  ServiceFactory,
   createServiceFactoryFromEnv,
   isKubernetesService,
   isMockKubernetesService,
@@ -9,7 +9,7 @@ import {
   isMockGitHubService,
   isAIChatService,
   isMockAIChatService,
-  ServiceFactoryConfig 
+  ServiceFactoryConfig
 } from '../services/service-factory';
 import { KubernetesService } from '../services/kubernetes';
 import { MockKubernetesService } from '../services/kubernetes.mock';
@@ -63,7 +63,7 @@ describe('ServiceFactory', () => {
       const factory = new ServiceFactory({
         useMocks: true,
         kubernetes: {
-          kubeconfig: '/path/to/kubeconfig',
+          kubeconfigPath: '/path/to/kubeconfig',
           context: 'test-context',
         },
       });
@@ -323,7 +323,7 @@ describe('ServiceFactory', () => {
       const factory = createServiceFactoryFromEnv();
       const config = factory.getConfig();
 
-      expect(config.kubernetes?.kubeconfig).toBe('/path/to/kubeconfig');
+      expect(config.kubernetes?.kubeconfigPath).toBe('/path/to/kubeconfig');
       expect(config.kubernetes?.context).toBe('test-context');
     });
 

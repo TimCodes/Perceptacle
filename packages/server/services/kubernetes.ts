@@ -1,9 +1,11 @@
 import * as k8s from '@kubernetes/client-node';
+import * as fs from 'fs';
 
 // Types for the Kubernetes service
 export interface KubernetesConfig {
-  kubeconfig?: string;
-  context?: string;
+  kubeconfigPath?: string;      // Path to kubeconfig file on the server
+  kubeconfigContent?: string;   // Raw kubeconfig YAML content (e.g., base64 decoded)
+  context?: string;             // Kubernetes context to use
 }
 
 export interface PodLogParams {
@@ -146,15 +148,25 @@ export class KubernetesService {
   constructor(config?: KubernetesConfig) {
     this.kc = new k8s.KubeConfig();
 
-    if (config?.kubeconfig) {
-      this.kc.loadFromString(config.kubeconfig);
+    if (config?.kubeconfigPath) {
+      // Load from file path on the server
+      try {
+        const kubeconfigContent = fs.readFileSync(config.kubeconfigPath, 'utf8');
+        this.kc.loadFromString(kubeconfigContent);
+      } catch (error: any) {
+        console.error(`Failed to read kubeconfig from path: ${config.kubeconfigPath}`, error.message);
+        throw new Error(`Failed to load kubeconfig from ${config.kubeconfigPath}: ${error.message}`);
+      }
+    } else if (config?.kubeconfigContent) {
+      // Load from raw YAML content string
+      this.kc.loadFromString(config.kubeconfigContent);
     } else {
-      // Try to load from default locations
+      // Try to load from default locations (~/.kube/config, etc.)
       try {
         this.kc.loadFromDefault();
       } catch (error) {
         console.warn('Could not load kubeconfig from default location. Make sure kubectl is configured or provide kubeconfig.');
-        throw new Error('Kubernetes configuration not found. Please ensure kubectl is configured or provide kubeconfig.');
+        throw new Error('Kubernetes configuration not found. Please ensure kubectl is configured or provide kubeconfigPath/kubeconfigContent.');
       }
     }
 
@@ -174,10 +186,18 @@ export class KubernetesService {
   }
 
   /**
-   * Create Kubernetes service instance with custom kubeconfig
+   * Create Kubernetes service instance from a kubeconfig file path
    */
-  static fromKubeconfig(kubeconfig: string, context?: string): KubernetesService {
-    return new KubernetesService({ kubeconfig, context });
+  static fromFile(kubeconfigPath: string, context?: string): KubernetesService {
+    return new KubernetesService({ kubeconfigPath, context });
+  }
+
+  /**
+   * Create Kubernetes service instance from kubeconfig content string
+   * @deprecated Use fromFile() for file paths or pass kubeconfigContent in config
+   */
+  static fromKubeconfig(kubeconfigContent: string, context?: string): KubernetesService {
+    return new KubernetesService({ kubeconfigContent, context });
   }
 
   /**

@@ -30,7 +30,11 @@ export interface ServiceFactoryConfig {
     serviceBusNamespace?: string;
     credentials?: AzureCredentials;
   };
-  kubernetes?: KubernetesConfig;
+  kubernetes?: {
+    kubeconfigPath?: string;     // Path to kubeconfig file
+    kubeconfigContent?: string;  // Raw kubeconfig content
+    context?: string;
+  };
   github?: {
     token: string;
   };
@@ -69,17 +73,27 @@ export class ServiceFactory {
    */
   createKubernetesService(): KubernetesService | MockKubernetesService {
     if (this.config.useMocks) {
-      if (this.config.kubernetes?.kubeconfig) {
+      if (this.config.kubernetes?.kubeconfigPath) {
+        return MockKubernetesService.fromFile(
+          this.config.kubernetes.kubeconfigPath,
+          this.config.kubernetes.context
+        );
+      } else if (this.config.kubernetes?.kubeconfigContent) {
         return MockKubernetesService.fromKubeconfig(
-          this.config.kubernetes.kubeconfig,
+          this.config.kubernetes.kubeconfigContent,
           this.config.kubernetes.context
         );
       }
       return MockKubernetesService.fromDefaultConfig();
     } else {
-      if (this.config.kubernetes?.kubeconfig) {
+      if (this.config.kubernetes?.kubeconfigPath) {
+        return KubernetesService.fromFile(
+          this.config.kubernetes.kubeconfigPath,
+          this.config.kubernetes.context
+        );
+      } else if (this.config.kubernetes?.kubeconfigContent) {
         return KubernetesService.fromKubeconfig(
-          this.config.kubernetes.kubeconfig,
+          this.config.kubernetes.kubeconfigContent,
           this.config.kubernetes.context
         );
       }
@@ -261,7 +275,8 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
       } : undefined
     },
     kubernetes: {
-      kubeconfig: process.env.KUBECONFIG,
+      kubeconfigPath: process.env.KUBECONFIG,
+      kubeconfigContent: process.env.KUBECONFIG_CONTENT,
       context: process.env.KUBE_CONTEXT
     },
     github: {
