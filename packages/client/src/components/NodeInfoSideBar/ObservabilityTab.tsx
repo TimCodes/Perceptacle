@@ -4,6 +4,8 @@ import { SendMessageDialog } from "@/components/ui/SendMessageDialog";
 import { Button } from "@/components/ui/button";
 import { Play, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
+import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
+import { NodeTypeDefinition } from "@/types/nodeTypes";
 
 interface ObservabilityTabProps {
   editedNode: any;
@@ -16,6 +18,14 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
 
   console.log('[ObservabilityTab] editedNode.data:', editedNode.data);
 
+  // Get the node type - support both legacy string format and new NodeTypeDefinition
+  const nodeType: NodeTypeDefinition = typeof editedNode.data.type === 'string'
+    ? NodeTypeHelper.fromLegacyType(editedNode.data.type)
+    : editedNode.data.type || { type: 'generic', subtype: 'application' };
+
+  // Get capabilities from the type registry
+  const capabilities = NodeTypeHelper.getCapabilities(nodeType);
+
   // Extract namespace and serviceName from customFields if they exist there
   const namespaceField = editedNode.data.customFields?.find((f: any) => f.name === 'namespace');
   const serviceNameField = editedNode.data.customFields?.find((f: any) => f.name === 'serviceName');
@@ -23,13 +33,11 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
   const namespace = editedNode.data.namespace || namespaceField?.value;
   const serviceName = editedNode.data.serviceName || serviceNameField?.value;
 
-  const isServiceBusNode =
-    editedNode.data.type?.includes('service-bus') ||
-    editedNode.data.type === 'azure-service-bus';
+  // Use NodeTypeHelper for type detection
+  const isServiceBusNode = NodeTypeHelper.isAzure(nodeType) && 
+    (nodeType.subtype === 'service-bus' || nodeType.subtype === 'service-bus-queue' || nodeType.subtype === 'service-bus-topic');
 
-  const isKubernetesService = editedNode.data.type === 'kubernetes-service' || 
-    editedNode.data.type?.startsWith('k8s-') || 
-    (namespace && serviceName);
+  const isKubernetesService = NodeTypeHelper.isKubernetes(nodeType) || (namespace && serviceName);
 
   console.log('[ObservabilityTab] isKubernetesService check:', {
     type: editedNode.data.type,
@@ -37,7 +45,8 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
     serviceName,
     namespaceField,
     serviceNameField,
-    isKubernetesService
+    isKubernetesService,
+    capabilities
   });
 
   const resourceName = editedNode.data.resourceName || editedNode.data.label;
@@ -123,8 +132,6 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
       }]);
     } finally {
       setIsLoadingLogs(false);
-    }
-  };
     }
   };
 

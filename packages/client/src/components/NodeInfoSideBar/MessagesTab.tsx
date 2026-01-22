@@ -4,6 +4,8 @@ import { MessageSquare } from "lucide-react";
 import { RestMessageForm } from "./MessagesTab/RestMessageForm";
 import { KafkaMessageForm } from "./MessagesTab/KafkaMessageForm";
 import { ServiceBusMessageForm } from "./MessagesTab/ServiceBusMessageForm";
+import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
+import { NodeTypeDefinition } from "@/types/nodeTypes";
 
 export function MessagesTab() {
     const { selectedNode } = useDiagramStore();
@@ -17,26 +19,23 @@ export function MessagesTab() {
         );
     }
 
-    const nodeType = selectedNode.data.type || selectedNode.type;
+    const nodeTypeValue = selectedNode.data.type || selectedNode.type;
     const nodeLabel = selectedNode.data.label || selectedNode.id;
 
-    const isKafkaNode = nodeType === "KafkaTopic" || nodeType.toLowerCase().includes("kafka") || nodeLabel.toLowerCase().includes("kafka");
-    const isServiceBusNode = nodeType === "ServiceBusQueue" || nodeType === "ServiceBusTopic" || nodeType.toLowerCase().includes("servicebus") || nodeLabel.toLowerCase().includes("service-bus") || nodeLabel.toLowerCase().includes("service bus") || nodeLabel.toLowerCase().includes("servicebus");
-    const isTopic = nodeType === "ServiceBusTopic" || nodeLabel.toLowerCase().includes("topic");
+    // Convert to NodeTypeDefinition if needed
+    const nodeType: NodeTypeDefinition = typeof nodeTypeValue === 'string'
+        ? NodeTypeHelper.fromLegacyType(nodeTypeValue)
+        : nodeTypeValue || { type: 'generic', subtype: 'application' };
 
-    const isHttpNode = (
-        [
-            "AzureFunction",
-            "GoogleCloudFunction",
-            "KubernetesService",
-            "KubernetesPod",
-            "AppGateway",
-            "Pod",
-            "Service"
-        ].includes(nodeType) ||
-        nodeType.toLowerCase().includes("function") ||
-        (nodeType.toLowerCase().includes("service") && !nodeType.toLowerCase().includes("servicebus") && !nodeType.toLowerCase().includes("service-bus"))
-    ) && !isKafkaNode && !isServiceBusNode;
+    // Use NodeTypeHelper to determine message protocol
+    const messageProtocol = NodeTypeHelper.getMessageProtocol(nodeType);
+    const capabilities = NodeTypeHelper.getCapabilities(nodeType);
+
+    const isKafkaNode = messageProtocol === 'kafka' || NodeTypeHelper.isKafka(nodeType);
+    const isServiceBusNode = messageProtocol === 'service-bus' || 
+        (NodeTypeHelper.isAzure(nodeType) && (nodeType.subtype === 'service-bus-queue' || nodeType.subtype === 'service-bus-topic'));
+    const isTopic = nodeType.subtype === 'service-bus-topic' || nodeType.subtype === 'topic';
+    const isHttpNode = messageProtocol === 'http' && !isKafkaNode && !isServiceBusNode;
 
     return (
         <ScrollArea className="h-full">
@@ -70,8 +69,12 @@ export function MessagesTab() {
 
                 {!isHttpNode && !isKafkaNode && !isServiceBusNode && (
                     <div className="rounded-md border p-4 bg-muted/20 text-center text-sm text-muted-foreground">
-                        <p className="mb-2">Messaging interface for <strong>{nodeType}</strong></p>
-                        <p className="text-xs">No messaging protocol supported for this node type.</p>
+                        <p className="mb-2">Messaging interface for <strong>{NodeTypeHelper.getDisplayName(nodeType)}</strong></p>
+                        {!capabilities.hasMessages ? (
+                            <p className="text-xs">No messaging protocol supported for this node type.</p>
+                        ) : (
+                            <p className="text-xs">Protocol: {messageProtocol || 'Not configured'}</p>
+                        )}
                     </div>
                 )}
             </div>

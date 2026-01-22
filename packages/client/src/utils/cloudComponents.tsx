@@ -1,6 +1,11 @@
 /**
  * Cloud component registry for diagram builder.
  * Defines available infrastructure components (GCP, Azure, Kubernetes, generic).
+ * 
+ * NOTE: This module is being gradually migrated to the new type system.
+ * See @/types/nodeTypeRegistry for the centralized type registry.
+ * Components defined here are used for legacy compatibility and will
+ * eventually be consolidated with NODE_TYPE_REGISTRY.
  */
 import {
   Server,

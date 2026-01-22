@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/tooltip";
 import CustomFieldsSection from "@/components/CustomFieldsSection";
 import { getConfigFieldsForNodeType, ConfigField } from "@/utils/nodeConfigFields";
+import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
+import { NodeTypeDefinition } from "@/types/nodeTypes";
 
 interface ConfigurationTabProps {
   editedNode: any;
@@ -31,18 +33,18 @@ export const ConfigurationTab = ({
   handleChange,
   handleCustomFieldChange,
 }: ConfigurationTabProps) => {
-  const configFields = getConfigFieldsForNodeType(editedNode.data.type || '');
-  const isAzureNode = editedNode.data.type?.startsWith('azure-');
-  const isKubernetesNode = editedNode.data.type?.startsWith('k8s-');
-  const isKafkaNode = editedNode.data.type?.startsWith('kafka-');
+  // Get the node type - support both legacy string format and new NodeTypeDefinition
+  const nodeType: NodeTypeDefinition = typeof editedNode.data.type === 'string'
+    ? NodeTypeHelper.fromLegacyType(editedNode.data.type)
+    : editedNode.data.type || { type: 'generic', subtype: 'application' };
 
-  // Check if it's a GCP node by checking against known GCP component types
-  const gcpComponentTypes = [
-    'compute-engine', 'cloud-storage', 'cloud-sql', 'kubernetes-engine',
-    'cloud-functions', 'cloud-run', 'load-balancer', 'cloud-armor',
-    'app-engine', 'vpc-network'
-  ];
-  const isGCPNode = gcpComponentTypes.includes(editedNode.data.type || '');
+  const configFields = getConfigFieldsForNodeType(nodeType);
+  
+  // Use NodeTypeHelper for type detection instead of string matching
+  const isAzureNode = NodeTypeHelper.isAzure(nodeType);
+  const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeType);
+  const isKafkaNode = NodeTypeHelper.isKafka(nodeType);
+  const isGCPNode = NodeTypeHelper.isGCP(nodeType);
 
   const renderField = (field: ConfigField) => {
     const value = editedNode.data[field.name] || "";
@@ -107,28 +109,28 @@ export const ConfigurationTab = ({
     if (isAzureNode) {
       return {
         text: 'Azure Resource',
-        className: 'bg-blue-100 text-blue-800',
+        className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
         description: 'Additional fields for Azure metrics and logs'
       };
     }
     if (isKubernetesNode) {
       return {
         text: 'Kubernetes Resource',
-        className: 'bg-green-100 text-green-800',
+        className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
         description: 'Additional fields for Kubernetes metrics and logs'
       };
     }
     if (isKafkaNode) {
       return {
         text: 'Kafka Resource',
-        className: 'bg-orange-100 text-orange-800',
+        className: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
         description: 'Additional fields for Kafka monitoring'
       };
     }
     if (isGCPNode) {
       return {
         text: 'Google Cloud Resource',
-        className: 'bg-purple-100 text-purple-800',
+        className: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
         description: 'Additional fields for GCP monitoring and logging'
       };
     }

@@ -23,6 +23,8 @@ import { useToast } from "@/hooks/use-toast";
 import CustomNode from "./CustomNode";
 import { NodeConfigDialog } from "../NodeConfigDialog";
 import { NewMapDialog, NewMapData } from "../NewMapDialog";
+import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
+import { NodeTypeDefinition } from "@/types/nodeTypes";
 
 // Extended metadata to include isPublic for map updates
 interface MapMetadata extends NewMapData {
@@ -358,8 +360,16 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
           value: field.defaultValue || "",
         })) || [];
 
-      // Initialize Azure-specific fields for Azure nodes
-      const isAzureNode = type.startsWith('azure-') || type === 'ServiceBusQueue';
+      // Convert legacy type to new NodeTypeDefinition structure
+      const nodeTypeDefinition: NodeTypeDefinition = NodeTypeHelper.fromLegacyType(type);
+      
+      // Use NodeTypeHelper for type detection
+      const isAzureNode = NodeTypeHelper.isAzure(nodeTypeDefinition);
+      const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeTypeDefinition);
+      const isKafkaNode = NodeTypeHelper.isKafka(nodeTypeDefinition);
+      const isGCPNode = NodeTypeHelper.isGCP(nodeTypeDefinition);
+
+      // Initialize provider-specific fields based on type
       const azureFields = isAzureNode ? {
         subscriptionId: '',
         resourceGroup: '',
@@ -369,18 +379,13 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         instrumentationKey: ''
       } : {};
 
-      // Initialize Kubernetes-specific fields for Kubernetes nodes
-      const isKubernetesNode = type.startsWith('k8s-');
       const kubernetesFields = isKubernetesNode ? {
-        // namespace and containerName are now in customFields from component definition
         resourceName: '',
         clusterName: '',
         clusterEndpoint: '',
         serviceAccount: '',
       } : {};
 
-      // Initialize Kafka-specific fields for Kafka nodes
-      const isKafkaNode = type.startsWith('kafka-');
       const kafkaFields = isKafkaNode ? {
         brokerList: '',
         topicName: '',
@@ -388,13 +393,6 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         securityProtocol: 'PLAINTEXT'
       } : {};
 
-      // Initialize GCP-specific fields for GCP nodes
-      const gcpComponentTypes = [
-        'compute-engine', 'cloud-storage', 'cloud-sql', 'kubernetes-engine',
-        'cloud-functions', 'cloud-run', 'load-balancer', 'cloud-armor',
-        'app-engine', 'vpc-network'
-      ];
-      const isGCPNode = gcpComponentTypes.includes(type);
       const gcpFields = isGCPNode ? {
         projectId: '',
         resourceName: '',
@@ -411,7 +409,8 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         position,
         data: {
           label: componentDefinition?.label || type,
-          type: type,
+          type: nodeTypeDefinition, // Store the new type structure
+          _legacyType: type, // Keep legacy type for backward compatibility
           status: initialStatus,
           description:
             componentDefinition?.description || "Example component description",
