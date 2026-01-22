@@ -13,8 +13,8 @@ import KafkaTopicIconSvg from '@/assets/kubernetes-icons/kafka-topic.svg';
 
 // Create React components for Kubernetes SVG icons
 export const PodIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
-  <img 
-    src={PodIconSvg} 
+  <img
+    src={PodIconSvg}
     alt="Kubernetes Pod"
     width={size}
     height={size}
@@ -23,8 +23,8 @@ export const PodIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
 );
 
 export const ServiceIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
-  <img 
-    src={ServiceIconSvg} 
+  <img
+    src={ServiceIconSvg}
     alt="Kubernetes Service"
     width={size}
     height={size}
@@ -33,8 +33,8 @@ export const ServiceIcon = ({ size = 24, className = "" }: KubernetesIconProps) 
 );
 
 export const CronJobIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
-  <img 
-    src={CronJobIconSvg} 
+  <img
+    src={CronJobIconSvg}
     alt="Kubernetes CronJob"
     width={size}
     height={size}
@@ -43,8 +43,8 @@ export const CronJobIcon = ({ size = 24, className = "" }: KubernetesIconProps) 
 );
 
 export const KafkaClusterIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
-  <img 
-    src={KafkaClusterIconSvg} 
+  <img
+    src={KafkaClusterIconSvg}
     alt="Kafka Cluster"
     width={size}
     height={size}
@@ -53,8 +53,8 @@ export const KafkaClusterIcon = ({ size = 24, className = "" }: KubernetesIconPr
 );
 
 export const KafkaTopicIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
-  <img 
-    src={KafkaTopicIconSvg} 
+  <img
+    src={KafkaTopicIconSvg}
     alt="Kafka Topic"
     width={size}
     height={size}
@@ -68,20 +68,35 @@ export const KubernetesComponents = [
     type: 'k8s-pod',
     name: 'Pod',
     icon: PodIcon,
-    category: 'Kubernetes'
+    category: 'Kubernetes',
+    fields: [
+      { name: 'namespace', type: 'k8s-select', source: 'namespaces', placeholder: 'Select namespace', defaultValue: 'default' },
+      { name: 'podName', type: 'k8s-select', source: 'pods', dependsOn: 'namespace', placeholder: 'Select pod' },
+      { name: 'containerName', type: 'text', placeholder: 'Container name' }
+    ]
   },
   {
     type: 'k8s-service',
     name: 'Service',
     icon: ServiceIcon,
-    category: 'Kubernetes'
+    category: 'Kubernetes',
+    fields: [
+      { name: 'namespace', type: 'k8s-select', source: 'namespaces', placeholder: 'Select namespace', defaultValue: 'default' },
+      { name: 'serviceName', type: 'k8s-select', source: 'services', dependsOn: 'namespace', placeholder: 'Select service' },
+      { name: 'port', type: 'number', placeholder: 'Service port' }
+    ]
   },
   {
     type: 'k8s-cronjob',
     name: 'CronJob',
     icon: CronJobIcon,
-    category: 'Kubernetes'
+    category: 'Kubernetes',
+    fields: [
+      { name: 'namespace', type: 'k8s-select', source: 'namespaces', placeholder: 'Select namespace', defaultValue: 'default' },
+      { name: 'schedule', type: 'text', placeholder: '*/5 * * * *' }
+    ]
   },
+
   {
     type: 'kafka-cluster',
     name: 'Kafka Cluster',

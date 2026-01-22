@@ -10,6 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Node } from 'reactflow';
+import { useKubernetesOptions } from '@/hooks/useKubernetesOptions';
+import { K8sCombobox } from './K8sCombobox';
+
 
 interface NodeConfigDialogProps {
     isOpen: boolean;
@@ -30,6 +33,18 @@ export function NodeConfigDialog({
     // Store other specific fields dynamically
     const [dynamicFields, setDynamicFields] = useState<Record<string, any>>({});
 
+    // Get current namespace for K8s options fetching
+    const namespaceField = customFields.find((f: any) => f.name === 'namespace');
+    const currentNamespace = namespaceField?.value;
+
+    // Fetch Kubernetes options - only if we have k8s fields
+    const hasK8sFields = customFields.some((f: any) => f.type === 'k8s-select');
+    const { options: k8sOptions, loading: k8sLoading } = useKubernetesOptions(
+        // Only pass namespace if we are looking for dependent resources
+        // But we always want to fetch namespaces list, so effectively we always fetch if it's a k8s node
+        hasK8sFields ? currentNamespace : undefined
+    );
+
     useEffect(() => {
         if (initialNode) {
             setLabel(initialNode.data.label || '');
@@ -46,6 +61,8 @@ export function NodeConfigDialog({
         const newFields = [...customFields];
         newFields[index] = { ...newFields[index], value };
         setCustomFields(newFields);
+
+        // If namespace changed, it will trigger re-fetch via the currentNamespace variable dependency in the hook
     };
 
     const handleDynamicFieldChange = (key: string, value: string) => {
@@ -67,6 +84,22 @@ export function NodeConfigDialog({
         };
 
         onSave(updatedData);
+    };
+
+    // Helper to get options for a specific source
+    const getOptionsForSource = (source: string): string[] => {
+        switch (source) {
+            case 'namespaces':
+                return k8sOptions.namespaces;
+            case 'pods':
+                return k8sOptions.pods.map(p => p.name);
+            case 'services':
+                return k8sOptions.services.map(s => s.name);
+            case 'deployments':
+                return k8sOptions.deployments.map(d => d.name);
+            default:
+                return [];
+        }
     };
 
     if (!initialNode) return null;
@@ -115,6 +148,14 @@ export function NodeConfigDialog({
                                                 <option key={opt} value={opt}>{opt}</option>
                                             ))}
                                         </select>
+                                    ) : field.type === 'k8s-select' ? (
+                                        <K8sCombobox
+                                            value={field.value}
+                                            onChange={(value) => handleCustomFieldChange(index, value)}
+                                            options={getOptionsForSource(field.source)}
+                                            placeholder={field.placeholder || `Select ${field.name}`}
+                                            loading={k8sLoading}
+                                        />
                                     ) : (
                                         <Input
                                             type={field.type || 'text'}

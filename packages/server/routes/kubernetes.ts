@@ -15,9 +15,9 @@ const ensureKubernetesService = (req: Request, res: Response, next: any) => {
       console.log(`Kubernetes service initialized (using ${serviceFactory.isUsingMocks() ? 'mock' : 'real'} implementation)`);
     } catch (error: any) {
       console.error('Failed to initialize Kubernetes service:', error.message);
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'Kubernetes service not available',
-        details: serviceFactory.isUsingMocks() 
+        details: serviceFactory.isUsingMocks()
           ? 'Failed to initialize mock Kubernetes service'
           : 'Could not connect to Kubernetes cluster. Ensure kubectl is configured properly.',
         message: error.message
@@ -34,9 +34,36 @@ router.get("/health", ensureKubernetesService, async (req: Request, res: Respons
     res.json(health);
   } catch (error: any) {
     console.error('Kubernetes health check failed:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Health check failed',
-      details: error.message 
+      details: error.message
+    });
+  }
+});
+
+// GET /api/kubernetes/options - Get all dropdown options for node configuration
+router.get("/options", ensureKubernetesService, async (req: Request, res: Response) => {
+  try {
+    const namespace = req.query.namespace as string | undefined;
+
+    const [clusterInfo, pods, services, deployments] = await Promise.all([
+      k8sService!.getClusterInfo(),
+      k8sService!.getPods(namespace),
+      k8sService!.getServices(namespace),
+      k8sService!.getDeployments(namespace)
+    ]);
+
+    res.json({
+      namespaces: clusterInfo.namespaces,
+      pods: pods.map(p => ({ name: p.name, namespace: p.namespace })),
+      services: services.map(s => ({ name: s.name, namespace: s.namespace })),
+      deployments: deployments.map(d => ({ name: d.name, namespace: d.namespace }))
+    });
+  } catch (error: any) {
+    console.error('Error getting Kubernetes options:', error);
+    res.status(500).json({
+      error: 'Failed to retrieve Kubernetes options',
+      details: error.message
     });
   }
 });
@@ -48,9 +75,9 @@ router.get("/cluster", ensureKubernetesService, async (req: Request, res: Respon
     res.json(clusterInfo);
   } catch (error: any) {
     console.error('Error getting cluster info:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve cluster information',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -63,9 +90,9 @@ router.get("/pods", ensureKubernetesService, async (req: Request, res: Response)
     res.json(pods);
   } catch (error: any) {
     console.error('Error getting pods:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve pods',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -78,9 +105,9 @@ router.get("/services", ensureKubernetesService, async (req: Request, res: Respo
     res.json(services);
   } catch (error: any) {
     console.error('Error getting services:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve services',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -93,9 +120,9 @@ router.get("/deployments", ensureKubernetesService, async (req: Request, res: Re
     res.json(deployments);
   } catch (error: any) {
     console.error('Error getting deployments:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve deployments',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -110,6 +137,9 @@ router.get("/pods/:namespace/:podName/logs", ensureKubernetesService, async (req
       return res.status(400).json({ error: 'Namespace and pod name are required' });
     }
 
+    const isUsingMocks = serviceFactory.isUsingMocks();
+    console.log(`[Kubernetes Routes] Fetching pod logs using ${isUsingMocks ? 'MOCK' : 'LIVE'} data`);
+
     const logParams = {
       namespace,
       podName,
@@ -120,12 +150,21 @@ router.get("/pods/:namespace/:podName/logs", ensureKubernetesService, async (req
     };
 
     const logs = await k8sService!.getPodLogs(logParams);
-    res.json({ logs });
+    res.json({ 
+      logs,
+      metadata: {
+        namespace,
+        podName,
+        container: container as string,
+        source: isUsingMocks ? 'mock' : 'live',
+        timestamp: new Date().toISOString()
+      }
+    });
   } catch (error: any) {
-    console.error('Error getting pod logs:', error);
-    res.status(500).json({ 
+    console.error('[Kubernetes Routes] Error getting pod logs:', error);
+    res.status(500).json({
       error: 'Failed to retrieve pod logs',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -140,17 +179,29 @@ router.get("/services/:namespace/:serviceName/logs", ensureKubernetesService, as
       return res.status(400).json({ error: 'Namespace and service name are required' });
     }
 
+    const isUsingMocks = serviceFactory.isUsingMocks();
+    console.log(`[Kubernetes Routes] Fetching service logs using ${isUsingMocks ? 'MOCK' : 'LIVE'} data`);
+
     const logs = await k8sService!.getServiceLogs(
-      namespace, 
-      serviceName, 
+      namespace,
+      serviceName,
       tailLines ? parseInt(tailLines as string) : undefined
     );
-    res.json({ logs });
+    
+    res.json({ 
+      logs,
+      metadata: {
+        namespace,
+        serviceName,
+        source: isUsingMocks ? 'mock' : 'live',
+        timestamp: new Date().toISOString()
+      }
+    });
   } catch (error: any) {
-    console.error('Error getting service logs:', error);
-    res.status(500).json({ 
+    console.error('[Kubernetes Routes] Error getting service logs:', error);
+    res.status(500).json({
       error: 'Failed to retrieve service logs',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -159,15 +210,15 @@ router.get("/services/:namespace/:serviceName/logs", ensureKubernetesService, as
 router.get("/metrics/pods", ensureKubernetesService, async (req: Request, res: Response) => {
   try {
     const { namespace, podName } = req.query;
-    
+
     const metrics = await k8sService!.getPodMetrics(
-      namespace as string, 
+      namespace as string,
       podName as string
     );
     res.json(metrics);
   } catch (error: any) {
     console.error('Error getting pod metrics:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve pod metrics',
       details: error.message,
       note: 'Make sure the metrics-server is installed and running in your cluster'
@@ -182,9 +233,9 @@ router.get("/namespaces/usage", ensureKubernetesService, async (req: Request, re
     res.json(usage);
   } catch (error: any) {
     console.error('Error getting namespace usage:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve namespace usage',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -208,9 +259,9 @@ router.get("/pods/:namespace/:podName", ensureKubernetesService, async (req: Req
     res.json(pod);
   } catch (error: any) {
     console.error('Error getting pod details:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve pod details',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -234,9 +285,9 @@ router.get("/services/:namespace/:serviceName", ensureKubernetesService, async (
     res.json(service);
   } catch (error: any) {
     console.error('Error getting service details:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to retrieve service details',
-      details: error.message 
+      details: error.message
     });
   }
 });
@@ -281,11 +332,13 @@ router.get("/pods/:namespace/:podName/logs/stream", ensureKubernetesService, asy
 
   } catch (error: any) {
     console.error('Error streaming pod logs:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to stream pod logs',
-      details: error.message 
+      details: error.message
     });
   }
 });
+
+
 
 export default router;
