@@ -267,9 +267,12 @@ export class KubernetesService {
 
   /**
    * Get logs from a specific pod
+   * Pulls LIVE logs from the Kubernetes cluster when namespace and pod are configured
    */
   async getPodLogs(params: PodLogParams): Promise<string> {
     try {
+      console.log(`[Kubernetes Service] Fetching LIVE logs for pod: ${params.podName} in namespace: ${params.namespace}${params.containerName ? `, container: ${params.containerName}` : ''}`);
+      
       const response = await this.k8sApi.readNamespacedPodLog({
         name: params.podName,
         namespace: params.namespace,
@@ -279,51 +282,76 @@ export class KubernetesService {
       });
 
       // @ts-ignore - return type mismatch
-      return response.body || response;
+      const logs = response.body || response;
+      console.log(`[Kubernetes Service] Successfully retrieved logs for pod ${params.podName} (${logs.split('\n').length} lines)`);
+      return logs;
     } catch (error: any) {
-      console.error('Error getting pod logs:', error);
+      console.error(`[Kubernetes Service] Error getting pod logs for ${params.podName}:`, error.message || error);
       throw new Error(`Failed to get logs for pod ${params.podName}: ${error.body?.message || error.message}`);
     }
   }
 
   /**
    * Get logs from all pods in a service
+   * Pulls LIVE logs from the Kubernetes cluster when namespace and service are configured
    */
   async getServiceLogs(namespace: string, serviceName: string, tailLines?: number): Promise<Record<string, string>> {
     try {
+      console.log(`[Kubernetes Service] Fetching LIVE logs for service: ${serviceName} in namespace: ${namespace}`);
+      
       // Find pods for service
       const svcRes = await this.k8sApi.readNamespacedService({ name: serviceName, namespace });
       // @ts-ignore
       const svc = svcRes.metadata ? svcRes : (svcRes as any).body;
       const selector = svc?.spec?.selector;
 
-      if (!selector) return {};
+      if (!selector) {
+        console.warn(`[Kubernetes Service] No selector found for service ${serviceName} in namespace ${namespace}`);
+        return {};
+      }
 
+      console.log(`[Kubernetes Service] Service selector: ${JSON.stringify(selector)}`);
       const labelSelector = Object.entries(selector).map(([k, v]) => `${k}=${v}`).join(',');
       const podsRes = await this.k8sApi.listNamespacedPod({ namespace, labelSelector });
       // @ts-ignore
       const podsList = podsRes.items ? podsRes : (podsRes as any).body;
+      const pods = podsList?.items || [];
+
+      console.log(`[Kubernetes Service] Found ${pods.length} pod(s) for service ${serviceName}`);
 
       const logs: Record<string, string> = {};
 
-      // Limit to first 3 pods to avoid timeout
-      for (const pod of (podsList?.items || []).slice(0, 3)) {
+      // Limit to first 5 pods to avoid timeout (increased from 3)
+      const podsToProcess = pods.slice(0, 5);
+      console.log(`[Kubernetes Service] Processing logs for ${podsToProcess.length} pod(s)`);
+
+      for (const pod of podsToProcess) {
         if (!pod.metadata?.name) continue;
+        const podName = pod.metadata.name;
+        
         try {
-          logs[pod.metadata.name] = await this.getPodLogs({
+          console.log(`[Kubernetes Service] Fetching logs for pod: ${podName}`);
+          logs[podName] = await this.getPodLogs({
             namespace,
-            podName: pod.metadata.name,
-            tailLines: tailLines || 50
+            podName,
+            tailLines: tailLines || 100
           });
-        } catch (e) {
-          logs[pod.metadata.name] = `Failed to fetch logs: ${e}`;
+          console.log(`[Kubernetes Service] Successfully retrieved ${logs[podName].split('\n').length} log lines for pod ${podName}`);
+        } catch (e: any) {
+          const errorMsg = `Failed to fetch logs: ${e.message || e}`;
+          console.error(`[Kubernetes Service] ${errorMsg} for pod ${podName}`);
+          logs[podName] = errorMsg;
         }
+      }
+
+      if (pods.length > 5) {
+        logs['_info'] = `Showing logs from first 5 pods out of ${pods.length} total pods`;
       }
 
       return logs;
     } catch (error: any) {
-      console.error('Error getting service logs:', error);
-      throw new Error(`Failed to get logs for service ${serviceName}: ${error.message}`);
+      console.error('[Kubernetes Service] Error getting service logs:', error);
+      throw new Error(`Failed to get logs for service ${serviceName} in namespace ${namespace}: ${error.body?.message || error.message}`);
     }
   }
 

@@ -137,6 +137,9 @@ router.get("/pods/:namespace/:podName/logs", ensureKubernetesService, async (req
       return res.status(400).json({ error: 'Namespace and pod name are required' });
     }
 
+    const isUsingMocks = serviceFactory.isUsingMocks();
+    console.log(`[Kubernetes Routes] Fetching pod logs using ${isUsingMocks ? 'MOCK' : 'LIVE'} data`);
+
     const logParams = {
       namespace,
       podName,
@@ -147,9 +150,18 @@ router.get("/pods/:namespace/:podName/logs", ensureKubernetesService, async (req
     };
 
     const logs = await k8sService!.getPodLogs(logParams);
-    res.json({ logs });
+    res.json({ 
+      logs,
+      metadata: {
+        namespace,
+        podName,
+        container: container as string,
+        source: isUsingMocks ? 'mock' : 'live',
+        timestamp: new Date().toISOString()
+      }
+    });
   } catch (error: any) {
-    console.error('Error getting pod logs:', error);
+    console.error('[Kubernetes Routes] Error getting pod logs:', error);
     res.status(500).json({
       error: 'Failed to retrieve pod logs',
       details: error.message
@@ -167,14 +179,26 @@ router.get("/services/:namespace/:serviceName/logs", ensureKubernetesService, as
       return res.status(400).json({ error: 'Namespace and service name are required' });
     }
 
+    const isUsingMocks = serviceFactory.isUsingMocks();
+    console.log(`[Kubernetes Routes] Fetching service logs using ${isUsingMocks ? 'MOCK' : 'LIVE'} data`);
+
     const logs = await k8sService!.getServiceLogs(
       namespace,
       serviceName,
       tailLines ? parseInt(tailLines as string) : undefined
     );
-    res.json({ logs });
+    
+    res.json({ 
+      logs,
+      metadata: {
+        namespace,
+        serviceName,
+        source: isUsingMocks ? 'mock' : 'live',
+        timestamp: new Date().toISOString()
+      }
+    });
   } catch (error: any) {
-    console.error('Error getting service logs:', error);
+    console.error('[Kubernetes Routes] Error getting service logs:', error);
     res.status(500).json({
       error: 'Failed to retrieve service logs',
       details: error.message
