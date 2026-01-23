@@ -32,9 +32,9 @@ export function MessagesTab() {
     const capabilities = NodeTypeHelper.getCapabilities(nodeType);
 
     const isKafkaNode = messageProtocol === 'kafka' || NodeTypeHelper.isKafka(nodeType);
-    const isServiceBusNode = messageProtocol === 'service-bus' || 
-        (NodeTypeHelper.isAzure(nodeType) && (nodeType.subtype === 'service-bus-queue' || nodeType.subtype === 'service-bus-topic'));
-    const isTopic = nodeType.subtype === 'service-bus-topic' || nodeType.subtype === 'topic';
+    const isServiceBusNode = messageProtocol === 'service-bus' ||
+        (NodeTypeHelper.isAzure(nodeType) && nodeType.subtype === 'service-bus');
+    const isTopic = (nodeType.subtype === 'service-bus' && nodeType.variant === 'topic') || nodeType.subtype === 'topic';
     const isHttpNode = messageProtocol === 'http' && !isKafkaNode && !isServiceBusNode;
 
     return (
