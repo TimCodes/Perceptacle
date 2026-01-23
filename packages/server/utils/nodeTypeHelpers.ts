@@ -9,10 +9,6 @@
 
 import {
   NodeTypes,
-  AzureSubtypes,
-  KubernetesSubtypes,
-  KafkaSubtypes,
-  GCPSubtypes,
   LEGACY_TYPE_MAP,
   type NodeTypeDefinition,
   isNodeTypeDefinition,
