@@ -71,9 +71,6 @@ const CustomNode = ({ data }: { data: any }) => {
     // Use registry icon if available, otherwise fall back to legacy component icon
     const Component = registryEntry?.icon || componentDef?.icon;
 
-    // Get category for styling from registry
-    const category = registryEntry?.category || 'generic';
-
     // Data extraction
     const activeAlerts = data.metrics?.activeAlerts || 0;
     const alertSeverity = data.metrics?.alertSeverity || 'warning';
@@ -83,9 +80,9 @@ const CustomNode = ({ data }: { data: any }) => {
 
     const borderClasses = getStatusClasses(status, activeAlerts, alertSeverity);
 
-    // Get category-specific background color
+    // Get category-specific background color based on node type
     const getCategoryColor = () => {
-        switch (category) {
+        switch (nodeType.type) {
             case 'azure':
                 return 'bg-blue-900/50';
             case 'kubernetes':
