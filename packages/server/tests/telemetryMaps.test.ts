@@ -145,7 +145,6 @@ describe('TelemetryMap API Integration', () => {
   describe('Type Conversion in API Responses', () => {
     it('should convert legacy types to NodeTypeDefinition on read', () => {
       // Simulate API converting old data on read
-      const legacyNodeType = 'azure-function-app';
       
       // Conversion logic (simulated)
       const converted: NodeTypeDefinition = {
