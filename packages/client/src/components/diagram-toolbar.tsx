@@ -5,6 +5,7 @@ import { useDiagramStore } from "@/utils/diagram-store";
 import { useToast } from "@/hooks/use-toast";
 import Fuse from "fuse.js";
 import { getComponentSuggestions } from "@/utils/suggestions";
+import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
 import {
   Dialog,
   DialogContent,
@@ -135,20 +136,27 @@ export default function DiagramToolbar() {
         <CommandList>
           <CommandEmpty>No nodes found.</CommandEmpty>
           <CommandGroup heading="Nodes">
-            {searchResults.map((node) => (
-              <CommandItem
-                key={node.id}
-                value={node.data.label}
-                onSelect={() => handleNodeSelect(node)}
-              >
-                <div className="flex items-center">
-                  {node.data.label}
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    ({node.data.type})
-                  </span>
-                </div>
-              </CommandItem>
-            ))}
+            {searchResults.map((node) => {
+              // Convert type to display string
+              const displayType = typeof node.data.type === 'string'
+                ? node.data.type
+                : NodeTypeHelper.getDisplayName(node.data.type);
+              
+              return (
+                <CommandItem
+                  key={node.id}
+                  value={node.data.label}
+                  onSelect={() => handleNodeSelect(node)}
+                >
+                  <div className="flex items-center">
+                    {node.data.label}
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      ({displayType})
+                    </span>
+                  </div>
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
         </CommandList>
       </CommandDialog>

@@ -1,3 +1,6 @@
+import { NodeTypeHelper } from './nodeTypeHelpers';
+import { NodeTypeDefinition } from '../types/nodeTypes';
+
 // Application node configuration field definitions
 export interface ConfigField {
   name: string;
@@ -228,7 +231,7 @@ export const GCP_FIELDS: ConfigField[] = [
   }
 ];
 
-// List of GCP component types for identification
+// List of GCP component types for identification (DEPRECATED - use NodeTypeHelper instead)
 const GCP_COMPONENT_TYPES = [
   'compute-engine',
   'cloud-storage',
@@ -242,26 +245,31 @@ const GCP_COMPONENT_TYPES = [
   'vpc-network'
 ];
 
-// Function to get configuration fields for a specific node type
-export function getConfigFieldsForNodeType(nodeType: string): ConfigField[] {
-  const isAzureNode = nodeType.startsWith('azure-') || nodeType === 'ServiceBusQueue';
-  const isKubernetesNode = nodeType.startsWith('k8s-');
-  const isKafkaNode = nodeType.startsWith('kafka-');
-  const isGCPNode = GCP_COMPONENT_TYPES.includes(nodeType);
+/**
+ * Get configuration fields for a specific node type
+ * Now uses the type registry for accurate type detection
+ * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ */
+export function getConfigFieldsForNodeType(nodeTypeOrLegacy: string | NodeTypeDefinition): ConfigField[] {
+  // Convert legacy string to NodeTypeDefinition if needed
+  const nodeType = typeof nodeTypeOrLegacy === 'string' 
+    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
+    : nodeTypeOrLegacy;
 
-  if (isAzureNode) {
+  // Use NodeTypeHelper for type detection
+  if (NodeTypeHelper.isAzure(nodeType)) {
     return [...DEFAULT_FIELDS, ...AZURE_FIELDS];
   }
 
-  if (isKubernetesNode) {
+  if (NodeTypeHelper.isKubernetes(nodeType)) {
     return [...DEFAULT_FIELDS, ...KUBERNETES_FIELDS];
   }
 
-  if (isKafkaNode) {
+  if (NodeTypeHelper.isKafka(nodeType)) {
     return [...DEFAULT_FIELDS, ...KAFKA_FIELDS];
   }
 
-  if (isGCPNode) {
+  if (NodeTypeHelper.isGCP(nodeType)) {
     return [...DEFAULT_FIELDS, ...GCP_FIELDS];
   }
 
@@ -316,115 +324,114 @@ export function getGCPDefaultValues(): Record<string, string> {
   };
 }
 
-// Function to build Azure resource ID from component fields
-export function buildAzureResourceId(data: any, nodeType: string): string {
+/**
+ * Build Azure resource ID from component fields
+ * Now uses NodeTypeHelper for resource type mapping
+ * @param data - Node data containing Azure configuration
+ * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ */
+export function buildAzureResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
   const { subscriptionId, resourceGroup, resourceName } = data;
 
   if (!subscriptionId || !resourceGroup || !resourceName) {
     return '';
   }
 
-  // Map node types to Azure resource provider types
-  const resourceTypeMap: Record<string, string> = {
-    'azure-function-app': 'Microsoft.Web/sites',
-    'azure-service-bus': 'Microsoft.ServiceBus/namespaces',
-    'ServiceBusQueue': 'Microsoft.ServiceBus/namespaces',
-    'azure-application-insights': 'Microsoft.Insights/components',
-    'azure-virtual-network': 'Microsoft.Network/virtualNetworks',
-    'azure-app-service': 'Microsoft.Web/sites',
-    'azure-firewall': 'Microsoft.Network/azureFirewalls',
-    'azure-application-gateway': 'Microsoft.Network/applicationGateways',
-    'azure-key-vault': 'Microsoft.KeyVault/vaults',
-    'azure-cosmos-db': 'Microsoft.DocumentDB/databaseAccounts'
-  };
+  // Convert to NodeTypeDefinition if needed
+  const nodeType = typeof nodeTypeOrLegacy === 'string' 
+    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
+    : nodeTypeOrLegacy;
 
-  const resourceType = resourceTypeMap[nodeType];
-  if (!resourceType) {
-    return '';
-  }
+  // Use NodeTypeHelper to build the resource ID
+  const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
+    subscriptionId,
+    resourceGroup,
+    resourceName
+  });
 
-  return `/subscriptions/${subscriptionId}/resourceGroups/${resourceGroup}/providers/${resourceType}/${resourceName}`;
+  return resourceId || '';
 }
 
-// Function to build Kubernetes resource identifier from component fields
-export function buildKubernetesResourceId(data: any, nodeType: string): string {
+/**
+ * Build Kubernetes resource identifier from component fields
+ * Now uses NodeTypeHelper for resource type mapping
+ * @param data - Node data containing Kubernetes configuration
+ * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ */
+export function buildKubernetesResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
   const { namespace, resourceName, clusterName } = data;
 
   if (!namespace || !resourceName) {
     return '';
   }
 
-  // Map node types to Kubernetes resource types
-  const resourceTypeMap: Record<string, string> = {
-    'k8s-pod': 'pods',
-    'k8s-service': 'services',
-    'k8s-cronjob': 'cronjobs'
-  };
+  // Convert to NodeTypeDefinition if needed
+  const nodeType = typeof nodeTypeOrLegacy === 'string' 
+    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
+    : nodeTypeOrLegacy;
 
-  const resourceType = resourceTypeMap[nodeType];
-  if (!resourceType) {
-    return '';
-  }
+  // Use NodeTypeHelper to build the resource ID
+  const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
+    namespace,
+    resourceName,
+    clusterName
+  });
 
-  // Build resource identifier in the format: [cluster]/namespace/resourceType/resourceName
-  const clusterPrefix = clusterName ? `${clusterName}/` : '';
-  return `${clusterPrefix}${namespace}/${resourceType}/${resourceName}`;
+  return resourceId || '';
 }
 
-// Function to build Kafka resource identifier from component fields
-export function buildKafkaResourceId(data: any, nodeType: string): string {
+/**
+ * Build Kafka resource identifier from component fields
+ * Now uses NodeTypeHelper for resource type mapping
+ * @param data - Node data containing Kafka configuration
+ * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ */
+export function buildKafkaResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
   const { brokerList, topicName } = data;
 
   if (!brokerList) {
     return '';
   }
 
-  if (nodeType === 'kafka-cluster') {
-    return brokerList;
-  }
+  // Convert to NodeTypeDefinition if needed
+  const nodeType = typeof nodeTypeOrLegacy === 'string' 
+    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
+    : nodeTypeOrLegacy;
 
-  if (nodeType === 'kafka-topic' && topicName) {
-    const cluster = brokerList.split(',')[0]; // Use first broker as cluster identifier
-    return `${cluster}/${topicName}`;
-  }
+  // Use NodeTypeHelper to build the resource ID
+  const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
+    brokerList,
+    topicName
+  });
 
-  return brokerList;
+  return resourceId || '';
 }
 
-// Function to build GCP resource identifier from component fields
-export function buildGCPResourceId(data: any, nodeType: string): string {
+/**
+ * Build GCP resource identifier from component fields
+ * Now uses NodeTypeHelper for resource type mapping
+ * @param data - Node data containing GCP configuration
+ * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ */
+export function buildGCPResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
   const { projectId, resourceName, zone, region } = data;
 
   if (!projectId || !resourceName) {
     return '';
   }
 
-  // Map node types to GCP resource types and determine if zonal or regional
-  const resourceConfig: Record<string, { type: string; isZonal: boolean }> = {
-    'compute-engine': { type: 'instances', isZonal: true },
-    'cloud-storage': { type: 'buckets', isZonal: false },
-    'cloud-sql': { type: 'instances', isZonal: false },
-    'kubernetes-engine': { type: 'clusters', isZonal: true },
-    'cloud-functions': { type: 'functions', isZonal: false },
-    'cloud-run': { type: 'services', isZonal: false },
-    'load-balancer': { type: 'forwardingRules', isZonal: false },
-    'cloud-armor': { type: 'securityPolicies', isZonal: false },
-    'app-engine': { type: 'services', isZonal: false },
-    'vpc-network': { type: 'networks', isZonal: false }
-  };
+  // Convert to NodeTypeDefinition if needed
+  const nodeType = typeof nodeTypeOrLegacy === 'string' 
+    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
+    : nodeTypeOrLegacy;
 
-  const config = resourceConfig[nodeType];
-  if (!config) {
-    return `projects/${projectId}`;
-  }
+  // Use NodeTypeHelper to build the resource ID
+  const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
+    projectId,
+    resourceName,
+    zone,
+    region
+  });
 
-  // Build resource path based on whether it's zonal or regional
-  if (config.isZonal && zone) {
-    return `projects/${projectId}/zones/${zone}/${config.type}/${resourceName}`;
-  } else if (!config.isZonal && region) {
-    return `projects/${projectId}/regions/${region}/${config.type}/${resourceName}`;
-  } else {
-    // Global resource
-    return `projects/${projectId}/global/${config.type}/${resourceName}`;
-  }
+  return resourceId || '';
 }

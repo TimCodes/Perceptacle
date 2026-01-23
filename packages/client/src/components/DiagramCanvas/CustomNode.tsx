@@ -10,6 +10,9 @@ import { AlertCircle, Bell, AlertTriangle, Info } from "lucide-react";
 import { getCloudComponents } from "@/utils/cloudComponents";
 import { cn } from "@/utils/cn";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
+import { NodeTypeDefinition } from "@/types/nodeTypes";
+import { NODE_TYPE_REGISTRY } from "@/types/nodeTypeRegistry";
 
 // Helper for log icons
 const getLogIcon = (level: string) => {
@@ -49,8 +52,27 @@ const getStatusClasses = (status: string, activeAlerts: number, alertSeverity: s
 
 const CustomNode = ({ data }: { data: any }) => {
     const [isHovered, setIsHovered] = useState(false);
+    
+    // Get node type - support both legacy string format and new NodeTypeDefinition
+    const nodeType: NodeTypeDefinition = typeof data.type === 'string'
+        ? NodeTypeHelper.fromLegacyType(data.type)
+        : data.type || { type: 'generic', subtype: 'application' };
+
+    // Try to get icon from registry first
+    const registryEntry = NODE_TYPE_REGISTRY.find(entry => 
+        entry.type === nodeType.type && entry.subtype === nodeType.subtype
+    );
+
+    // Fallback to legacy component lookup if not found in registry
     const components = getCloudComponents();
-    const Component = components.find((comp) => comp.type === data.type)?.icon;
+    const legacyType = data._legacyType || NodeTypeHelper.toLegacyType(nodeType);
+    const componentDef = components.find((comp) => comp.type === legacyType);
+    
+    // Use registry icon if available, otherwise fall back to legacy component icon
+    const Component = registryEntry?.icon || componentDef?.icon;
+
+    // Get category for styling from registry
+    const category = registryEntry?.category || 'generic';
 
     // Data extraction
     const activeAlerts = data.metrics?.activeAlerts || 0;
@@ -61,13 +83,30 @@ const CustomNode = ({ data }: { data: any }) => {
 
     const borderClasses = getStatusClasses(status, activeAlerts, alertSeverity);
 
+    // Get category-specific background color
+    const getCategoryColor = () => {
+        switch (category) {
+            case 'azure':
+                return 'bg-blue-900/50';
+            case 'kubernetes':
+                return 'bg-green-900/50';
+            case 'kafka':
+                return 'bg-orange-900/50';
+            case 'gcp':
+                return 'bg-purple-900/50';
+            default:
+                return 'bg-sky-900';
+        }
+    };
+
     return (
         <TooltipProvider>
             <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>
                     <div 
                         className={cn(
-                            "relative p-3 rounded-md bg-background border-2 text-foreground min-w-[180px] transition-all duration-300 bg-sky-900 overflow-visible",
+                            "relative p-3 rounded-md bg-background border-2 text-foreground min-w-[180px] transition-all duration-300 overflow-visible",
+                            getCategoryColor(),
                             borderClasses
                         )}
                         onMouseEnter={() => setIsHovered(true)}

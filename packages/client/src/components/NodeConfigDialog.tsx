@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Node } from 'reactflow';
 import { useKubernetesOptions } from '@/hooks/useKubernetesOptions';
 import { K8sCombobox } from './K8sCombobox';
+import { NodeTypeHelper } from '@/utils/nodeTypeHelpers';
 
 
 interface NodeConfigDialogProps {
@@ -104,11 +105,16 @@ export function NodeConfigDialog({
 
     if (!initialNode) return null;
 
+    // Convert type to display string
+    const displayType = typeof initialNode.data.type === 'string' 
+        ? initialNode.data.type 
+        : NodeTypeHelper.getDisplayName(initialNode.data.type);
+
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Configure {initialNode.data.type}</DialogTitle>
+                    <DialogTitle>Configure {displayType}</DialogTitle>
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">

@@ -1,5 +1,7 @@
 import { Router, type Request, Response } from "express";
 import { TelemetryMap } from "../types/telemetryMap.js";
+import { NodeTypeHelper } from "../utils/nodeTypeHelpers.js";
+import { validateNodeType, type NodeTypeDefinition } from "../types/nodeTypes.js";
 
 const router = Router();
 
@@ -20,7 +22,8 @@ const mockMaps: TelemetryMap[] = [
         id: "node-1",
         mapId: "map-1",
         nodeId: "azure-function-app-1",
-        nodeType: "azure-function-app",
+        nodeType: { type: "azure", subtype: "function-app" },
+        _legacyType: "azure-function-app",
         label: "Order Processing Function",
         status: "active",
         description: "Processes customer orders",
@@ -38,7 +41,8 @@ const mockMaps: TelemetryMap[] = [
         id: "node-2",
         mapId: "map-1",
         nodeId: "azure-service-bus-1",
-        nodeType: "ServiceBusQueue",
+        nodeType: { type: "azure", subtype: "service-bus", variant: "queue" },
+        _legacyType: "ServiceBusQueue",
         label: "Order Queue",
         status: "active",
         description: "Queues order messages",
@@ -79,7 +83,8 @@ const mockMaps: TelemetryMap[] = [
         id: "node-3",
         mapId: "map-2",
         nodeId: "k8s-pod-1",
-        nodeType: "k8s-pod",
+        nodeType: { type: "kubernetes", subtype: "pod" },
+        _legacyType: "k8s-pod",
         label: "API Gateway",
         status: "warning",
         description: "Main API gateway pod",
@@ -169,19 +174,34 @@ router.post("/", async (req: Request, res: Response) => {
       isPublic: isPublic || false,
       tags: tags || [],
       metadata: {},
-      nodes: (nodes || []).map((node: any, index: number) => ({
-        id: `node-${Date.now()}-${index}`,
-        mapId: `map-${Date.now()}`,
-        nodeId: node.nodeId,
-        nodeType: node.nodeType,
-        label: node.label,
-        status: node.status || 'active',
-        description: node.description,
-        positionX: node.positionX,
-        positionY: node.positionY,
-        config: node.config || {},
-        createdAt: new Date().toISOString(),
-      })),
+      nodes: (nodes || []).map((node: any, index: number) => {
+        // Normalize and validate nodeType
+        const normalizedType = NodeTypeHelper.normalize(node.nodeType);
+        const validation = validateNodeType(normalizedType);
+        
+        if (!validation.valid) {
+          throw new Error(`Invalid node type for node ${node.nodeId}: ${validation.error}`);
+        }
+        
+        // Store legacy type for backward compatibility
+        const legacyType = node._legacyType || 
+          (typeof node.nodeType === 'string' ? node.nodeType : NodeTypeHelper.toLegacyType(normalizedType));
+        
+        return {
+          id: `node-${Date.now()}-${index}`,
+          mapId: `map-${Date.now()}`,
+          nodeId: node.nodeId,
+          nodeType: normalizedType,
+          _legacyType: legacyType,
+          label: node.label,
+          status: node.status || 'active',
+          description: node.description,
+          positionX: node.positionX,
+          positionY: node.positionY,
+          config: node.config || {},
+          createdAt: new Date().toISOString(),
+        };
+      }),
       connections: (connections || []).map((conn: any, index: number) => ({
         id: `conn-${Date.now()}-${index}`,
         mapId: `map-${Date.now()}`,
@@ -232,19 +252,34 @@ router.put("/:id", async (req: Request, res: Response) => {
       isPublic: isPublic !== undefined ? isPublic : existingMap.isPublic,
       tags: tags !== undefined ? tags : existingMap.tags,
       updatedAt: new Date().toISOString(),
-      nodes: nodes !== undefined ? nodes.map((node: any, index: number) => ({
-        id: `node-${Date.now()}-${index}`,
-        mapId: id,
-        nodeId: node.nodeId,
-        nodeType: node.nodeType,
-        label: node.label,
-        status: node.status || 'active',
-        description: node.description,
-        positionX: node.positionX,
-        positionY: node.positionY,
-        config: node.config || {},
-        createdAt: new Date().toISOString(),
-      })) : existingMap.nodes,
+      nodes: nodes !== undefined ? nodes.map((node: any, index: number) => {
+        // Normalize and validate nodeType
+        const normalizedType = NodeTypeHelper.normalize(node.nodeType);
+        const validation = validateNodeType(normalizedType);
+        
+        if (!validation.valid) {
+          throw new Error(`Invalid node type for node ${node.nodeId}: ${validation.error}`);
+        }
+        
+        // Store legacy type for backward compatibility
+        const legacyType = node._legacyType || 
+          (typeof node.nodeType === 'string' ? node.nodeType : NodeTypeHelper.toLegacyType(normalizedType));
+        
+        return {
+          id: `node-${Date.now()}-${index}`,
+          mapId: id,
+          nodeId: node.nodeId,
+          nodeType: normalizedType,
+          _legacyType: legacyType,
+          label: node.label,
+          status: node.status || 'active',
+          description: node.description,
+          positionX: node.positionX,
+          positionY: node.positionY,
+          config: node.config || {},
+          createdAt: new Date().toISOString(),
+        };
+      }) : existingMap.nodes,
       connections: connections !== undefined ? connections.map((conn: any, index: number) => ({
         id: `conn-${Date.now()}-${index}`,
         mapId: id,

@@ -4,6 +4,8 @@ import { SendMessageDialog } from "@/components/ui/SendMessageDialog";
 import { Button } from "@/components/ui/button";
 import { Play, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
+import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
+import { NodeTypeDefinition } from "@/types/nodeTypes";
 
 interface ObservabilityTabProps {
   editedNode: any;
@@ -16,47 +18,91 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
 
   console.log('[ObservabilityTab] editedNode.data:', editedNode.data);
 
+  // Get the node type - support both legacy string format and new NodeTypeDefinition
+  const nodeType: NodeTypeDefinition = typeof editedNode.data.type === 'string'
+    ? NodeTypeHelper.fromLegacyType(editedNode.data.type)
+    : editedNode.data.type || { type: 'generic', subtype: 'application' };
+
+  // Get capabilities from the type registry
+  const capabilities = NodeTypeHelper.getCapabilities(nodeType);
+
   // Extract namespace and serviceName from customFields if they exist there
   const namespaceField = editedNode.data.customFields?.find((f: any) => f.name === 'namespace');
   const serviceNameField = editedNode.data.customFields?.find((f: any) => f.name === 'serviceName');
+  const podNameField = editedNode.data.customFields?.find((f: any) => f.name === 'podName');
   
   const namespace = editedNode.data.namespace || namespaceField?.value;
   const serviceName = editedNode.data.serviceName || serviceNameField?.value;
+  const podName = editedNode.data.podName || podNameField?.value;
+  const resourceName = editedNode.data.resourceName || editedNode.data.label;
 
-  const isServiceBusNode =
-    editedNode.data.type?.includes('service-bus') ||
-    editedNode.data.type === 'azure-service-bus';
+  // Use NodeTypeHelper for type detection
+  const isServiceBusNode = NodeTypeHelper.isAzure(nodeType) &&
+    nodeType.subtype === 'service-bus';
 
-  const isKubernetesService = editedNode.data.type === 'kubernetes-service' || 
-    editedNode.data.type?.startsWith('k8s-') || 
-    (namespace && serviceName);
+  const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeType);
+  const isKubernetesService = isKubernetesNode && nodeType.subtype === 'service';
+  const isKubernetesPod = isKubernetesNode && nodeType.subtype === 'pod';
+  
+  // Determine if this is a Kubernetes Pod-like resource (Deployment, StatefulSet, etc.)
+  const isPodLikeResource = isKubernetesNode && (
+    nodeType.subtype === 'deployment' || 
+    nodeType.subtype === 'statefulset' ||
+    nodeType.subtype === 'daemonset' ||
+    nodeType.subtype === 'replicaset'
+  );
 
-  console.log('[ObservabilityTab] isKubernetesService check:', {
+  console.log('[ObservabilityTab] Kubernetes type check:', {
     type: editedNode.data.type,
     namespace,
     serviceName,
-    namespaceField,
-    serviceNameField,
-    isKubernetesService
+    podName,
+    resourceName,
+    isKubernetesNode,
+    isKubernetesService,
+    isKubernetesPod,
+    isPodLikeResource,
+    capabilities
   });
 
-  const resourceName = editedNode.data.resourceName || editedNode.data.label;
-
-  // Fetch Kubernetes service logs
+  // Fetch Kubernetes logs - works for pods, services, and pod-like resources
   const fetchKubernetesLogs = async () => {
     console.log('[ObservabilityTab] Checking if should fetch logs:', {
+      isKubernetesNode,
       isKubernetesService,
+      isKubernetesPod,
+      isPodLikeResource,
       namespace,
       serviceName,
+      podName,
+      resourceName,
       type: editedNode.data.type
     });
 
-    if (!isKubernetesService || !namespace || !serviceName) {
-      console.log('[ObservabilityTab] Not fetching logs - missing requirements');
+    if (!isKubernetesNode || !namespace) {
+      console.log('[ObservabilityTab] Not fetching logs - not a Kubernetes node or missing namespace');
       return;
     }
 
-    const url = `/api/kubernetes/services/${encodeURIComponent(namespace)}/${encodeURIComponent(serviceName)}/logs?tailLines=100`;
+    let url: string;
+    
+    // For Kubernetes Pods, use the pod-specific endpoint
+    if (isKubernetesPod && podName) {
+      url = `/api/kubernetes/pods/${encodeURIComponent(namespace)}/${encodeURIComponent(podName)}/logs?tailLines=100`;
+    }
+    // For Kubernetes services, fetch service logs
+    else if (isKubernetesService && serviceName) {
+      url = `/api/kubernetes/services/${encodeURIComponent(namespace)}/${encodeURIComponent(serviceName)}/logs?tailLines=100`;
+    } 
+    // For Pod-like resources (Deployments, StatefulSets, etc.), fetch logs by resource name
+    else if (isPodLikeResource && resourceName) {
+      url = `/api/kubernetes/services/${encodeURIComponent(namespace)}/${encodeURIComponent(resourceName)}/logs?tailLines=100`;
+    } 
+    else {
+      console.log('[ObservabilityTab] Missing required fields for log fetching');
+      return;
+    }
+
     console.log('[ObservabilityTab] Fetching from URL:', url);
 
     setIsLoadingLogs(true);
@@ -74,7 +120,30 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
       // Convert Kubernetes logs to the expected format
       const formattedLogs: any[] = [];
       
-      if (data.logs) {
+      // Handle pod-specific logs (direct string response)
+      if (typeof data.logs === 'string') {
+        const lines = data.logs.split('\n').filter(line => line.trim());
+        lines.forEach(line => {
+          // Try to parse timestamp and level from log line
+          const match = line.match(/^(\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2}[^\s]*)\s+(INFO|WARN|ERROR|DEBUG)?\s*(.*)$/i);
+          
+          if (match) {
+            formattedLogs.push({
+              timestamp: match[1],
+              level: match[2]?.toLowerCase() || 'info',
+              message: match[3],
+            });
+          } else {
+            formattedLogs.push({
+              timestamp: new Date().toISOString(),
+              level: 'info',
+              message: line,
+            });
+          }
+        });
+      }
+      // Handle service/deployment logs (object with pod names as keys)
+      else if (data.logs && typeof data.logs === 'object') {
         Object.entries(data.logs).forEach(([podName, logContent]: [string, any]) => {
           if (typeof logContent === 'string' && !podName.startsWith('_')) {
             // Parse log lines
@@ -125,25 +194,25 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
       setIsLoadingLogs(false);
     }
   };
-    }
-  };
 
   // Fetch logs on mount and when node changes
   useEffect(() => {
     console.log('[ObservabilityTab] useEffect triggered', {
-      isKubernetesService,
+      isKubernetesNode,
       nodeId: editedNode.id,
       namespace,
-      serviceName
+      serviceName,
+      podName,
+      resourceName
     });
 
-    if (isKubernetesService) {
+    if (isKubernetesNode && namespace && (serviceName || podName || resourceName)) {
       fetchKubernetesLogs();
     } else {
       setLogs(editedNode.data.logs || []);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editedNode.id, namespace, serviceName, isKubernetesService]);
+  }, [editedNode.id, namespace, serviceName, podName, resourceName, isKubernetesNode]);
 
   return (
     <div className="space-y-4">
@@ -213,7 +282,7 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
         <div className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium">Logs</h3>
-            {isKubernetesService && (
+            {isKubernetesNode && namespace && (serviceName || podName || resourceName) && (
               <Button
                 size="sm"
                 variant="outline"

@@ -1,6 +1,8 @@
 /**
  * API service for telemetry map operations.
  * Handles CRUD operations for saving and loading infrastructure diagrams.
+ * 
+ * Updated to support the new NodeTypeDefinition structure with backward compatibility.
  */
 import { 
   TelemetryMap, 
@@ -9,6 +11,8 @@ import {
   ReactFlowNode,
   ReactFlowEdge 
 } from '@/types/telemetryMap';
+import { NodeTypeDefinition } from '@/types/nodeTypes';
+import { NodeTypeHelper } from '@/utils/nodeTypeHelpers';
 
 const API_BASE = '/api/telemetry-maps';
 
@@ -117,6 +121,7 @@ export class TelemetryMapService {
   
   /**
    * Convert React Flow nodes and edges to TelemetryMap format
+   * Handles both legacy string types and new NodeTypeDefinition structure
    */
   static convertToTelemetryMapFormat(
     nodes: ReactFlowNode[], 
@@ -125,16 +130,35 @@ export class TelemetryMapService {
     nodes: CreateTelemetryMapRequest['nodes'];
     connections: CreateTelemetryMapRequest['connections'];
   } {
-    const telemetryNodes = nodes.map(node => ({
-      nodeId: node.id,
-      nodeType: node.type || node.data.type || 'default',
-      label: node.data.label || 'Untitled Node',
-      status: node.data.status || 'active' as const,
-      description: node.data.description,
-      positionX: node.position.x,
-      positionY: node.position.y,
-      config: node.data.config || {},
-    }));
+    const telemetryNodes = nodes.map(node => {
+      // Extract nodeType - support both legacy and new structure
+      let nodeType: string | NodeTypeDefinition;
+      let legacyType: string | undefined;
+      
+      // Check if node.data.type is already a NodeTypeDefinition
+      if (node.data.type && typeof node.data.type === 'object' && 'type' in node.data.type) {
+        nodeType = node.data.type as NodeTypeDefinition;
+        // Store legacy type if available
+        legacyType = node.data._legacyType || NodeTypeHelper.toLegacyType(nodeType);
+      } else {
+        // Legacy string type - convert to NodeTypeDefinition
+        const legacyTypeStr = (node.type || node.data.type || 'default') as string;
+        legacyType = legacyTypeStr;
+        nodeType = NodeTypeHelper.fromLegacyType(legacyTypeStr);
+      }
+      
+      return {
+        nodeId: node.id,
+        nodeType,
+        _legacyType: legacyType,
+        label: node.data.label || 'Untitled Node',
+        status: node.data.status || 'active' as const,
+        description: node.data.description,
+        positionX: node.position.x,
+        positionY: node.position.y,
+        config: node.data.config || {},
+      };
+    });
     
     const telemetryConnections = edges.map(edge => ({
       sourceNodeId: edge.source,
@@ -150,23 +174,41 @@ export class TelemetryMapService {
   
   /**
    * Convert TelemetryMap format to React Flow nodes and edges
+   * Automatically handles both legacy string types and new NodeTypeDefinition structure
    */
   static convertFromTelemetryMapFormat(map: TelemetryMap): {
     nodes: ReactFlowNode[];
     edges: ReactFlowEdge[];
   } {
-    const reactFlowNodes: ReactFlowNode[] = map.nodes.map(node => ({
-      id: node.nodeId,
-      type: node.nodeType,
-      position: { x: node.positionX, y: node.positionY },
-      data: {
-        label: node.label,
-        status: node.status,
-        description: node.description,
-        config: node.config,
-        type: node.nodeType,
-      },
-    }));
+    const reactFlowNodes: ReactFlowNode[] = map.nodes.map(node => {
+      // Handle both legacy string types and new NodeTypeDefinition
+      let nodeTypeData: NodeTypeDefinition;
+      let legacyType: string;
+      
+      if (typeof node.nodeType === 'string') {
+        // Legacy format - convert to NodeTypeDefinition
+        legacyType = node.nodeType;
+        nodeTypeData = NodeTypeHelper.fromLegacyType(node.nodeType);
+      } else {
+        // New format - already a NodeTypeDefinition
+        nodeTypeData = node.nodeType;
+        legacyType = node._legacyType || NodeTypeHelper.toLegacyType(node.nodeType);
+      }
+      
+      return {
+        id: node.nodeId,
+        type: legacyType, // React Flow still uses string type at top level
+        position: { x: node.positionX, y: node.positionY },
+        data: {
+          label: node.label,
+          status: node.status,
+          description: node.description,
+          config: node.config,
+          type: nodeTypeData, // Store NodeTypeDefinition in data
+          _legacyType: legacyType, // Store legacy type for compatibility
+        },
+      };
+    });
     
     const reactFlowEdges: ReactFlowEdge[] = map.connections.map(connection => ({
       id: `${connection.sourceNodeId}-${connection.targetNodeId}`,

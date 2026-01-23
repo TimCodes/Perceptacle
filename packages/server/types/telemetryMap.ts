@@ -1,3 +1,5 @@
+import type { NodeTypeDefinition } from './nodeTypes';
+
 // Telemetry Map Types for Server
 export interface TelemetryMap {
   id: string;
@@ -17,7 +19,8 @@ export interface TelemetryMapNode {
   id: string;
   mapId: string;
   nodeId: string; // The node's ID from the diagram
-  nodeType: string;
+  nodeType: string | NodeTypeDefinition; // Support both legacy string and new structure
+  _legacyType?: string; // Store legacy type for rollback capability
   label: string;
   status: 'active' | 'warning' | 'error' | 'inactive';
   description?: string;
