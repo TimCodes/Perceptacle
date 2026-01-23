@@ -11,7 +11,7 @@ import { getCloudComponents } from "@/utils/cloudComponents";
 import { cn } from "@/utils/cn";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
-import { NodeTypeDefinition } from "@/types/nodeTypes";
+import { NodeTypeDefinition, NodeTypes } from "@/types/nodeTypes";
 import { NODE_TYPE_REGISTRY } from "@/types/nodeTypeRegistry";
 
 // Helper for log icons
@@ -83,13 +83,13 @@ const CustomNode = ({ data }: { data: any }) => {
     // Get category-specific background color based on node type
     const getCategoryColor = () => {
         switch (nodeType.type) {
-            case 'azure':
+            case NodeTypes.AZURE:
                 return 'bg-blue-900/50';
-            case 'kubernetes':
+            case NodeTypes.KUBERNETES:
                 return 'bg-green-900/50';
-            case 'kafka':
+            case NodeTypes.KAFKA:
                 return 'bg-orange-900/50';
-            case 'gcp':
+            case NodeTypes.GCP:
                 return 'bg-purple-900/50';
             default:
                 return 'bg-sky-900';
