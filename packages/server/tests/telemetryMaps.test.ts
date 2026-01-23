@@ -5,7 +5,7 @@
  * Ensures backward compatibility and proper validation.
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect } from '@jest/globals';
 import { NodeTypes, AzureSubtypes, KubernetesSubtypes } from '../types/nodeTypes';
 import type { NodeTypeDefinition } from '../types/nodeTypes';
 import type { TelemetryMap, TelemetryMapNode } from '../types/telemetryMap';
