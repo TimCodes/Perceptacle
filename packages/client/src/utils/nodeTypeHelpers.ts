@@ -411,7 +411,7 @@ export class NodeTypeHelper {
     
     // Fallback to generic type
     console.warn(`Unknown legacy type: ${legacyType}, using generic type`);
-    return { type: NodeTypes.GENERIC, subtype: legacyType };
+    return { type: NodeTypes.GENERIC, subtype: 'custom', variant: legacyType };
   }
   
   /**
