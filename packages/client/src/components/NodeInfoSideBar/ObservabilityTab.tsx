@@ -37,8 +37,8 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
   const resourceName = editedNode.data.resourceName || editedNode.data.label;
 
   // Use NodeTypeHelper for type detection
-  const isServiceBusNode = NodeTypeHelper.isAzure(nodeType) && 
-    (nodeType.subtype === 'service-bus' || nodeType.subtype === 'service-bus-queue' || nodeType.subtype === 'service-bus-topic');
+  const isServiceBusNode = NodeTypeHelper.isAzure(nodeType) &&
+    nodeType.subtype === 'service-bus';
 
   const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeType);
   const isKubernetesService = isKubernetesNode && nodeType.subtype === 'service';
