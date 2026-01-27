@@ -104,33 +104,11 @@ export const KUBERNETES_FIELDS: ConfigField[] = [
     description: 'The Kubernetes namespace where this resource is deployed'
   },
   {
-    name: 'resourceName',
-    label: 'Resource Name',
-    type: 'text',
-    required: true,
-    placeholder: 'Kubernetes resource name',
-    description: 'The actual name of the Kubernetes resource (pod, service, etc.)'
-  },
-  {
-    name: 'clusterName',
-    label: 'Cluster Name',
-    type: 'text',
-    placeholder: 'Kubernetes cluster name',
-    description: 'The name of the Kubernetes cluster (optional, for multi-cluster setups)'
-  },
-  {
-    name: 'clusterEndpoint',
-    label: 'Cluster Endpoint',
+    name: 'endpoint',
+    label: 'Endpoint',
     type: 'url',
     placeholder: 'https://k8s-cluster.example.com',
     description: 'The Kubernetes API server endpoint (if different from default kubeconfig)'
-  },
-  {
-    name: 'serviceAccount',
-    label: 'Service Account',
-    type: 'text',
-    placeholder: 'Service account name',
-    description: 'The service account used for authentication (optional)'
   },
   {
     name: 'containerName',
@@ -293,10 +271,7 @@ export function getAzureDefaultValues(): Record<string, string> {
 export function getKubernetesDefaultValues(): Record<string, string> {
   return {
     namespace: 'default',
-    resourceName: '',
-    clusterName: '',
-    clusterEndpoint: '',
-    serviceAccount: '',
+    endpoint: '',
     containerName: ''
   };
 }
@@ -359,9 +334,9 @@ export function buildAzureResourceId(data: any, nodeTypeOrLegacy: string | NodeT
  * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
  */
 export function buildKubernetesResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
-  const { namespace, resourceName, clusterName } = data;
+  const { namespace, label } = data;
 
-  if (!namespace || !resourceName) {
+  if (!namespace || !label) {
     return '';
   }
 
@@ -373,8 +348,7 @@ export function buildKubernetesResourceId(data: any, nodeTypeOrLegacy: string | 
   // Use NodeTypeHelper to build the resource ID
   const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
     namespace,
-    resourceName,
-    clusterName
+    resourceName: label
   });
 
   return resourceId || '';

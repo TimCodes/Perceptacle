@@ -380,10 +380,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       } : {};
 
       const kubernetesFields = isKubernetesNode ? {
-        resourceName: '',
-        clusterName: '',
-        clusterEndpoint: '',
-        serviceAccount: '',
+        endpoint: '',
       } : {};
 
       const kafkaFields = isKafkaNode ? {
@@ -410,7 +407,6 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         data: {
           label: componentDefinition?.label || type,
           type: nodeTypeDefinition, // Store the new type structure
-          _legacyType: type, // Keep legacy type for backward compatibility
           status: initialStatus,
           description:
             componentDefinition?.description || "Example component description",

@@ -69,14 +69,13 @@ describe('TelemetryMap API Integration', () => {
   });
 
   describe('Backward Compatibility', () => {
-    it('should store legacy type for rollback', () => {
+    it('should store NodeTypeDefinition structure', () => {
       const node: Partial<TelemetryMapNode> = {
         nodeId: 'test-4',
         nodeType: { 
           type: NodeTypes.KUBERNETES, 
           subtype: KubernetesSubtypes.POD 
         },
-        _legacyType: 'k8s-pod',
         label: 'API Pod',
         status: 'active',
         positionX: 100,
@@ -84,8 +83,8 @@ describe('TelemetryMap API Integration', () => {
         config: {}
       };
 
-      expect(node._legacyType).toBe('k8s-pod');
       expect(typeof node.nodeType).toBe('object');
+      expect((node.nodeType as any).type).toBe(NodeTypes.KUBERNETES);
     });
 
     it('should allow reading maps created with old format', () => {
@@ -163,7 +162,6 @@ describe('TelemetryMap API Integration', () => {
           type: NodeTypes.KUBERNETES,
           subtype: KubernetesSubtypes.DEPLOYMENT
         },
-        _legacyType: 'k8s-deployment',
         label: 'API Deployment',
         status: 'active',
         positionX: 200,

@@ -23,7 +23,6 @@ export const telemetryMapNodes = pgTable('telemetry_map_nodes', {
   mapId: uuid('map_id').notNull().references(() => telemetryMaps.id, { onDelete: 'cascade' }),
   nodeId: varchar('node_id', { length: 255 }).notNull(), // The node's ID from the diagram
   nodeType: jsonb('node_type').notNull(), // Support both string and NodeTypeDefinition structure
-  _legacyType: varchar('_legacy_type', { length: 255 }), // Store legacy type for backward compatibility
   label: varchar('label', { length: 255 }).notNull(),
   status: varchar('status', { length: 50 }).default('active').notNull(),
   description: text('description'),

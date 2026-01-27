@@ -23,7 +23,6 @@ const mockMaps: TelemetryMap[] = [
         mapId: "map-1",
         nodeId: "azure-function-app-1",
         nodeType: { type: "azure", subtype: "function-app" },
-        _legacyType: "azure-function-app",
         label: "Order Processing Function",
         status: "active",
         description: "Processes customer orders",
@@ -42,7 +41,6 @@ const mockMaps: TelemetryMap[] = [
         mapId: "map-1",
         nodeId: "azure-service-bus-1",
         nodeType: { type: "azure", subtype: "service-bus", variant: "queue" },
-        _legacyType: "ServiceBusQueue",
         label: "Order Queue",
         status: "active",
         description: "Queues order messages",
@@ -84,7 +82,6 @@ const mockMaps: TelemetryMap[] = [
         mapId: "map-2",
         nodeId: "k8s-pod-1",
         nodeType: { type: "kubernetes", subtype: "pod" },
-        _legacyType: "k8s-pod",
         label: "API Gateway",
         status: "warning",
         description: "Main API gateway pod",
@@ -92,8 +89,7 @@ const mockMaps: TelemetryMap[] = [
         positionY: 200,
         config: {
           namespace: "production",
-          resourceName: "api-gateway",
-          clusterName: "prod-cluster",
+          endpoint: "",
         },
         createdAt: new Date().toISOString(),
       },
@@ -183,16 +179,11 @@ router.post("/", async (req: Request, res: Response) => {
           throw new Error(`Invalid node type for node ${node.nodeId}: ${validation.error}`);
         }
         
-        // Store legacy type for backward compatibility
-        const legacyType = node._legacyType || 
-          (typeof node.nodeType === 'string' ? node.nodeType : NodeTypeHelper.toLegacyType(normalizedType));
-        
         return {
           id: `node-${Date.now()}-${index}`,
           mapId: `map-${Date.now()}`,
           nodeId: node.nodeId,
           nodeType: normalizedType,
-          _legacyType: legacyType,
           label: node.label,
           status: node.status || 'active',
           description: node.description,
@@ -261,16 +252,11 @@ router.put("/:id", async (req: Request, res: Response) => {
           throw new Error(`Invalid node type for node ${node.nodeId}: ${validation.error}`);
         }
         
-        // Store legacy type for backward compatibility
-        const legacyType = node._legacyType || 
-          (typeof node.nodeType === 'string' ? node.nodeType : NodeTypeHelper.toLegacyType(normalizedType));
-        
         return {
           id: `node-${Date.now()}-${index}`,
           mapId: id,
           nodeId: node.nodeId,
           nodeType: normalizedType,
-          _legacyType: legacyType,
           label: node.label,
           status: node.status || 'active',
           description: node.description,

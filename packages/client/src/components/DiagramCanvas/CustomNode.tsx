@@ -65,7 +65,7 @@ const CustomNode = ({ data }: { data: any }) => {
 
     // Fallback to legacy component lookup if not found in registry
     const components = getCloudComponents();
-    const legacyType = data._legacyType || NodeTypeHelper.toLegacyType(nodeType);
+    const legacyType = NodeTypeHelper.toLegacyType(nodeType);
     const componentDef = components.find((comp) => comp.type === legacyType);
     
     // Use registry icon if available, otherwise fall back to legacy component icon

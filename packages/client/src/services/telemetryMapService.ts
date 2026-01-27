@@ -138,8 +138,7 @@ export class TelemetryMapService {
       // Check if node.data.type is already a NodeTypeDefinition
       if (node.data.type && typeof node.data.type === 'object' && 'type' in node.data.type) {
         nodeType = node.data.type as NodeTypeDefinition;
-        // Store legacy type if available
-        legacyType = node.data._legacyType || NodeTypeHelper.toLegacyType(nodeType);
+        legacyType = NodeTypeHelper.toLegacyType(nodeType);
       } else {
         // Legacy string type - convert to NodeTypeDefinition
         const legacyTypeStr = (node.type || node.data.type || 'default') as string;
@@ -150,7 +149,6 @@ export class TelemetryMapService {
       return {
         nodeId: node.id,
         nodeType,
-        _legacyType: legacyType,
         label: node.data.label || 'Untitled Node',
         status: node.data.status || 'active' as const,
         description: node.data.description,
@@ -192,7 +190,7 @@ export class TelemetryMapService {
       } else {
         // New format - already a NodeTypeDefinition
         nodeTypeData = node.nodeType;
-        legacyType = node._legacyType || NodeTypeHelper.toLegacyType(node.nodeType);
+        legacyType = NodeTypeHelper.toLegacyType(node.nodeType);
       }
       
       return {
@@ -205,7 +203,6 @@ export class TelemetryMapService {
           description: node.description,
           config: node.config,
           type: nodeTypeData, // Store NodeTypeDefinition in data
-          _legacyType: legacyType, // Store legacy type for compatibility
         },
       };
     });

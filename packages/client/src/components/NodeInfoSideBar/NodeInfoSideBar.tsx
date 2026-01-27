@@ -37,7 +37,7 @@ export default function NodeInfoSideBar({
   const { selectedNode, updateSelectedNode } = useDiagramStore();
   const [editedNode, setEditedNode] = useState(selectedNode);
   const [hasChanges, setHasChanges] = useState(false);
-  const [currentTab, setCurrentTab] = useState<TabName>("configuration");
+  const [currentTab, setCurrentTab] = useState<TabName>("observability");
   const { toast } = useToast();
   const prevSelectedNodeIdRef = useRef<string | null>(null);
 
@@ -171,7 +171,7 @@ export default function NodeInfoSideBar({
   return (
     <div className="w-full border-l bg-background overflow-hidden flex flex-col h-full">
       <Tabs
-        defaultValue="configuration"
+        value={currentTab}
         className="flex flex-col h-full"
         onValueChange={(value) => setCurrentTab(value as TabName)}
       >
@@ -192,7 +192,7 @@ export default function NodeInfoSideBar({
               </Button>
             )}
             <h2 className="text-lg font-semibold">
-              Application Node {tabNames[currentTab]}
+              {editedNode.data.label} {tabNames[currentTab]}
             </h2>
           </div>
           <TabNavigation />
