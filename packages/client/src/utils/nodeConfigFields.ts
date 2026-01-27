@@ -5,11 +5,13 @@ import { NodeTypeDefinition } from '../types/nodeTypes';
 export interface ConfigField {
   name: string;
   label: string;
-  type: 'text' | 'select' | 'textarea' | 'url';
+  type: 'text' | 'select' | 'textarea' | 'url' | 'k8s-select';
   required?: boolean;
   placeholder?: string;
   options?: string[];
   description?: string;
+  source?: 'namespaces' | 'pods' | 'services' | 'deployments';
+  dependsOn?: string;
 }
 
 // Default fields that all application nodes have
@@ -98,9 +100,10 @@ export const KUBERNETES_FIELDS: ConfigField[] = [
   {
     name: 'namespace',
     label: 'Namespace',
-    type: 'text',
+    type: 'k8s-select',
+    source: 'namespaces',
     required: true,
-    placeholder: 'Kubernetes namespace (e.g., default)',
+    placeholder: 'Select or enter namespace',
     description: 'The Kubernetes namespace where this resource is deployed'
   },
   {

@@ -21,6 +21,8 @@ import CustomFieldsSection from "@/components/CustomFieldsSection";
 import { getConfigFieldsForNodeType, ConfigField } from "@/utils/nodeConfigFields";
 import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
 import { NodeTypeDefinition } from "@/types/nodeTypes";
+import { useKubernetesOptions } from "@/hooks/useKubernetesOptions";
+import { K8sCombobox } from "@/components/K8sCombobox";
 
 interface ConfigurationTabProps {
   editedNode: any;
@@ -45,6 +47,31 @@ export const ConfigurationTab = ({
   const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeType);
   const isKafkaNode = NodeTypeHelper.isKafka(nodeType);
   const isGCPNode = NodeTypeHelper.isGCP(nodeType);
+
+  // Get current namespace for K8s options fetching (for dependent fields)
+  const currentNamespace = editedNode.data.namespace;
+
+  // Fetch Kubernetes options if this is a Kubernetes node
+  const { options: k8sOptions, loading: k8sLoading } = useKubernetesOptions(
+    isKubernetesNode ? currentNamespace : undefined
+  );
+
+  // Helper to get options for k8s-select fields
+  const getOptionsForSource = (source?: string): string[] => {
+    if (!source) return [];
+    switch (source) {
+      case 'namespaces':
+        return k8sOptions.namespaces;
+      case 'pods':
+        return k8sOptions.pods.map(p => p.name);
+      case 'services':
+        return k8sOptions.services.map(s => s.name);
+      case 'deployments':
+        return k8sOptions.deployments.map(d => d.name);
+      default:
+        return [];
+    }
+  };
 
   const renderField = (field: ConfigField) => {
     const value = editedNode.data[field.name] || "";
@@ -86,6 +113,14 @@ export const ConfigurationTab = ({
               ))}
             </SelectContent>
           </Select>
+        ) : field.type === 'k8s-select' ? (
+          <K8sCombobox
+            value={value}
+            onChange={(newValue) => handleChange(field.name, newValue)}
+            options={getOptionsForSource(field.source)}
+            placeholder={field.placeholder || `Select ${field.label.toLowerCase()}`}
+            loading={k8sLoading}
+          />
         ) : field.type === 'textarea' ? (
           <Textarea
             value={value}
@@ -159,6 +194,7 @@ export const ConfigurationTab = ({
           <CustomFieldsSection
             customFields={editedNode.data.customFields}
             handleCustomFieldChange={handleCustomFieldChange}
+            namespace={currentNamespace}
           />
         )}
 
