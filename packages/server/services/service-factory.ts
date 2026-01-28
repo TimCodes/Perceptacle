@@ -280,7 +280,9 @@ export function createServiceFactoryFromEnv(): ServiceFactory {
       context: process.env.KUBE_CONTEXT
     },
     github: {
-      token: process.env.GITHUB_TOKEN || 'mock-github-token'
+      token: useMocks 
+        ? (process.env.GITHUB_TOKEN || 'mock-github-token')
+        : (process.env.GITHUB_TOKEN || '')
     },
     oracle: {
       credentials: process.env.ORACLE_TENANCY && process.env.ORACLE_USER && process.env.ORACLE_FINGERPRINT && process.env.ORACLE_PRIVATE_KEY && process.env.ORACLE_REGION ? {
