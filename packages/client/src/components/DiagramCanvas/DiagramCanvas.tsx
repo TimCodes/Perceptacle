@@ -344,8 +344,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       });
 
       const initialStatus = "active";
-      // Try exact match first, then fallback to replacing hyphens with underscores
-      // This supports both k8s-service (hyphenated) and older types that might expect underscores
+      // Get component definition which now includes nodeTypeDefinition
       const components = getCloudComponents();
       let componentDefinition = components.find((comp) => comp.type === type);
 
@@ -354,14 +353,8 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         componentDefinition = components.find((comp) => comp.type === componentType);
       }
 
-      const customFields =
-        componentDefinition?.fields?.map((field: any) => ({
-          ...field,
-          value: field.defaultValue || "",
-        })) || [];
-
-      // Convert legacy type to new NodeTypeDefinition structure
-      const nodeTypeDefinition: NodeTypeDefinition = NodeTypeHelper.fromLegacyType(type);
+      // Use the nodeTypeDefinition from component configuration
+      const nodeTypeDefinition: NodeTypeDefinition = componentDefinition?.nodeTypeDefinition || { type: 'generic', subtype: type };
       
       // Use NodeTypeHelper for type detection
       const isAzureNode = NodeTypeHelper.isAzure(nodeTypeDefinition);
@@ -369,7 +362,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       const isKafkaNode = NodeTypeHelper.isKafka(nodeTypeDefinition);
       const isGCPNode = NodeTypeHelper.isGCP(nodeTypeDefinition);
 
-      // Initialize provider-specific fields based on type
+      // Initialize provider-specific fields based on type with default values
       const azureFields = isAzureNode ? {
         subscriptionId: '',
         resourceGroup: '',
@@ -380,7 +373,14 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       } : {};
 
       const kubernetesFields = isKubernetesNode ? {
-        endpoint: '',
+        namespace: 'default',
+        podName: '',
+        serviceName: '',
+        deploymentName: '',
+        containerName: '',
+        port: '',
+        schedule: '',
+        endpoint: ''
       } : {};
 
       const kafkaFields = isKafkaNode ? {
@@ -417,7 +417,6 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
           consoleUrl:
             componentDefinition?.consoleUrl ||
             "https://console.cloud.google.com/home/dashboard",
-          customFields,
           ...azureFields, // Spread Azure fields for Azure nodes
           ...kubernetesFields, // Spread Kubernetes fields for Kubernetes nodes  
           ...kafkaFields, // Spread Kafka fields for Kafka nodes

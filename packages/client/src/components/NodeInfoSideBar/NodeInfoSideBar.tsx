@@ -50,7 +50,6 @@ export default function NodeInfoSideBar({
         ...selectedNode,
         data: {
           ...selectedNode.data,
-          customFields: selectedNode.data.customFields || [],
           metrics: selectedNode.data.metrics || {
             cpu: 45,
             memory: 60,
@@ -120,7 +119,7 @@ export default function NodeInfoSideBar({
     return <EmptyPanel />;
   }
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: string, value: any) => {
     setEditedNode((prev) => {
       if (!prev) return prev;
       return {
@@ -141,21 +140,7 @@ export default function NodeInfoSideBar({
     setHasChanges(true);
   };
 
-  const handleCustomFieldChange = (fieldName, value) => {
-    setEditedNode((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        data: {
-          ...prev.data,
-          customFields: prev.data.customFields.map((field) =>
-            field.name === fieldName ? { ...field, value } : field,
-          ),
-        },
-      };
-    });
-    setHasChanges(true);
-  };
+
 
   const handleSave = () => {
     if (editedNode) {
@@ -204,7 +189,6 @@ export default function NodeInfoSideBar({
                 <ConfigurationTab
                   editedNode={editedNode}
                   handleChange={handleChange}
-                  handleCustomFieldChange={handleCustomFieldChange}
                 />
               </TabsContent>
 

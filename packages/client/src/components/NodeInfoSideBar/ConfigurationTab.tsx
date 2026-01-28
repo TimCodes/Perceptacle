@@ -17,7 +17,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import CustomFieldsSection from "@/components/CustomFieldsSection";
 import { getConfigFieldsForNodeType, ConfigField } from "@/utils/nodeConfigFields";
 import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
 import { NodeTypeDefinition } from "@/types/nodeTypes";
@@ -27,18 +26,14 @@ import { K8sCombobox } from "@/components/K8sCombobox";
 interface ConfigurationTabProps {
   editedNode: any;
   handleChange: (field: string, value: any) => void;
-  handleCustomFieldChange: (fieldName: string, value: string) => void;
 }
 
 export const ConfigurationTab = ({
   editedNode,
   handleChange,
-  handleCustomFieldChange,
 }: ConfigurationTabProps) => {
-  // Get the node type - support both legacy string format and new NodeTypeDefinition
-  const nodeType: NodeTypeDefinition = typeof editedNode.data.type === 'string'
-    ? NodeTypeHelper.fromLegacyType(editedNode.data.type)
-    : editedNode.data.type || { type: 'generic', subtype: 'application' };
+  // Get the node type - always expect NodeTypeDefinition structure
+  const nodeType: NodeTypeDefinition = editedNode.data.type || { type: 'generic', subtype: 'application' };
 
   const configFields = getConfigFieldsForNodeType(nodeType);
   
@@ -188,15 +183,6 @@ export const ConfigurationTab = ({
       )}
 
       {configFields.map(renderField)}
-
-      {editedNode.data.customFields &&
-        editedNode.data.customFields.length > 0 && (
-          <CustomFieldsSection
-            customFields={editedNode.data.customFields}
-            handleCustomFieldChange={handleCustomFieldChange}
-            namespace={currentNamespace}
-          />
-        )}
 
       {/* Custom Actions Section */}
       <div className="pt-4 border-t">

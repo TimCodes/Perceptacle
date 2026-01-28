@@ -107,18 +107,59 @@ export const KUBERNETES_FIELDS: ConfigField[] = [
     description: 'The Kubernetes namespace where this resource is deployed'
   },
   {
-    name: 'endpoint',
-    label: 'Endpoint',
-    type: 'url',
-    placeholder: 'https://k8s-cluster.example.com',
-    description: 'The Kubernetes API server endpoint (if different from default kubeconfig)'
+    name: 'podName',
+    label: 'Pod Name',
+    type: 'k8s-select',
+    source: 'pods',
+    dependsOn: 'namespace',
+    placeholder: 'Select pod',
+    description: 'The name of the pod (for pod resources)'
+  },
+  {
+    name: 'serviceName',
+    label: 'Service Name',
+    type: 'k8s-select',
+    source: 'services',
+    dependsOn: 'namespace',
+    placeholder: 'Select service',
+    description: 'The name of the service (for service resources)'
+  },
+  {
+    name: 'deploymentName',
+    label: 'Deployment Name',
+    type: 'k8s-select',
+    source: 'deployments',
+    dependsOn: 'namespace',
+    placeholder: 'Select deployment',
+    description: 'The name of the deployment (for deployment resources)'
   },
   {
     name: 'containerName',
     label: 'Container Name',
     type: 'text',
-    placeholder: 'Container name (for pods)',
+    placeholder: 'Container name',
     description: 'Specific container name within the pod (for log collection)'
+  },
+  {
+    name: 'port',
+    label: 'Port',
+    type: 'text',
+    placeholder: 'Service port',
+    description: 'Service port number (for service resources)'
+  },
+  {
+    name: 'schedule',
+    label: 'Schedule',
+    type: 'text',
+    placeholder: '*/5 * * * *',
+    description: 'Cron schedule expression (for CronJob resources)'
+  },
+  {
+    name: 'endpoint',
+    label: 'Endpoint',
+    type: 'url',
+    placeholder: 'https://k8s-cluster.example.com',
+    description: 'The Kubernetes API server endpoint (if different from default kubeconfig)'
   }
 ];
 
@@ -212,38 +253,45 @@ export const GCP_FIELDS: ConfigField[] = [
   }
 ];
 
-// List of GCP component types for identification (DEPRECATED - use NodeTypeHelper instead)
-const GCP_COMPONENT_TYPES = [
-  'compute-engine',
-  'cloud-storage',
-  'cloud-sql',
-  'kubernetes-engine',
-  'cloud-functions',
-  'cloud-run',
-  'load-balancer',
-  'cloud-armor',
-  'app-engine',
-  'vpc-network'
-];
-
 /**
  * Get configuration fields for a specific node type
  * Now uses the type registry for accurate type detection
- * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ * @param nodeType - NodeTypeDefinition object
  */
-export function getConfigFieldsForNodeType(nodeTypeOrLegacy: string | NodeTypeDefinition): ConfigField[] {
-  // Convert legacy string to NodeTypeDefinition if needed
-  const nodeType = typeof nodeTypeOrLegacy === 'string' 
-    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
-    : nodeTypeOrLegacy;
-
+export function getConfigFieldsForNodeType(nodeType: NodeTypeDefinition): ConfigField[] {
   // Use NodeTypeHelper for type detection
   if (NodeTypeHelper.isAzure(nodeType)) {
     return [...DEFAULT_FIELDS, ...AZURE_FIELDS];
   }
 
   if (NodeTypeHelper.isKubernetes(nodeType)) {
-    return [...DEFAULT_FIELDS, ...KUBERNETES_FIELDS];
+    // Get all K8s fields, then filter based on subtype
+    const allK8sFields = [...DEFAULT_FIELDS, ...KUBERNETES_FIELDS];
+    
+    // Filter fields based on K8s resource type
+    const subtype = nodeType.subtype?.toLowerCase(); // Normalize to lowercase for comparison
+    const relevantFields = allK8sFields.filter(field => {
+      // Always include default fields, namespace, and endpoint
+      if (DEFAULT_FIELDS.some(f => f.name === field.name) || field.name === 'namespace' || field.name === 'endpoint') {
+        return true;
+      }
+      
+      // Resource-specific fields
+      if (subtype === 'pod') {
+        return ['podName', 'containerName'].includes(field.name);
+      } else if (subtype === 'service' || subtype === 'svc') {
+        return ['serviceName', 'port'].includes(field.name);
+      } else if (['deployment', 'statefulset', 'daemonset'].includes(subtype)) {
+        return ['deploymentName', 'containerName'].includes(field.name);
+      } else if (subtype === 'cronjob') {
+        return ['schedule', 'containerName'].includes(field.name);
+      }
+      
+      // For unknown types, only include containerName as a safe common field
+      return field.name === 'containerName';
+    });
+    
+    return relevantFields;
   }
 
   if (NodeTypeHelper.isKafka(nodeType)) {
@@ -274,8 +322,13 @@ export function getAzureDefaultValues(): Record<string, string> {
 export function getKubernetesDefaultValues(): Record<string, string> {
   return {
     namespace: 'default',
-    endpoint: '',
-    containerName: ''
+    podName: '',
+    serviceName: '',
+    deploymentName: '',
+    containerName: '',
+    port: '',
+    schedule: '',
+    endpoint: ''
   };
 }
 
@@ -306,19 +359,14 @@ export function getGCPDefaultValues(): Record<string, string> {
  * Build Azure resource ID from component fields
  * Now uses NodeTypeHelper for resource type mapping
  * @param data - Node data containing Azure configuration
- * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ * @param nodeType - NodeTypeDefinition object
  */
-export function buildAzureResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
+export function buildAzureResourceId(data: any, nodeType: NodeTypeDefinition): string {
   const { subscriptionId, resourceGroup, resourceName } = data;
 
   if (!subscriptionId || !resourceGroup || !resourceName) {
     return '';
   }
-
-  // Convert to NodeTypeDefinition if needed
-  const nodeType = typeof nodeTypeOrLegacy === 'string' 
-    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
-    : nodeTypeOrLegacy;
 
   // Use NodeTypeHelper to build the resource ID
   const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
@@ -334,19 +382,14 @@ export function buildAzureResourceId(data: any, nodeTypeOrLegacy: string | NodeT
  * Build Kubernetes resource identifier from component fields
  * Now uses NodeTypeHelper for resource type mapping
  * @param data - Node data containing Kubernetes configuration
- * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ * @param nodeType - NodeTypeDefinition object
  */
-export function buildKubernetesResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
+export function buildKubernetesResourceId(data: any, nodeType: NodeTypeDefinition): string {
   const { namespace, label } = data;
 
   if (!namespace || !label) {
     return '';
   }
-
-  // Convert to NodeTypeDefinition if needed
-  const nodeType = typeof nodeTypeOrLegacy === 'string' 
-    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
-    : nodeTypeOrLegacy;
 
   // Use NodeTypeHelper to build the resource ID
   const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
@@ -361,19 +404,14 @@ export function buildKubernetesResourceId(data: any, nodeTypeOrLegacy: string | 
  * Build Kafka resource identifier from component fields
  * Now uses NodeTypeHelper for resource type mapping
  * @param data - Node data containing Kafka configuration
- * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ * @param nodeType - NodeTypeDefinition object
  */
-export function buildKafkaResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
+export function buildKafkaResourceId(data: any, nodeType: NodeTypeDefinition): string {
   const { brokerList, topicName } = data;
 
   if (!brokerList) {
     return '';
   }
-
-  // Convert to NodeTypeDefinition if needed
-  const nodeType = typeof nodeTypeOrLegacy === 'string' 
-    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
-    : nodeTypeOrLegacy;
 
   // Use NodeTypeHelper to build the resource ID
   const resourceId = NodeTypeHelper.buildResourceId(nodeType, {
@@ -388,19 +426,14 @@ export function buildKafkaResourceId(data: any, nodeTypeOrLegacy: string | NodeT
  * Build GCP resource identifier from component fields
  * Now uses NodeTypeHelper for resource type mapping
  * @param data - Node data containing GCP configuration
- * @param nodeTypeOrLegacy - Either a NodeTypeDefinition object or legacy string
+ * @param nodeType - NodeTypeDefinition object
  */
-export function buildGCPResourceId(data: any, nodeTypeOrLegacy: string | NodeTypeDefinition): string {
+export function buildGCPResourceId(data: any, nodeType: NodeTypeDefinition): string {
   const { projectId, resourceName, zone, region } = data;
 
   if (!projectId || !resourceName) {
     return '';
   }
-
-  // Convert to NodeTypeDefinition if needed
-  const nodeType = typeof nodeTypeOrLegacy === 'string' 
-    ? NodeTypeHelper.fromLegacyType(nodeTypeOrLegacy)
-    : nodeTypeOrLegacy;
 
   // Use NodeTypeHelper to build the resource ID
   const resourceId = NodeTypeHelper.buildResourceId(nodeType, {

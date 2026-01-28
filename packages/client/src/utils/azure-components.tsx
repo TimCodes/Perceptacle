@@ -1,3 +1,5 @@
+import { NodeTypes, AzureSubtypes, type NodeTypeDefinition } from '@/types/nodeTypes';
+
 // Azure SVG Icon Component
 interface AzureIconProps {
   size?: number;
@@ -109,55 +111,64 @@ export const CosmosDBIcon = ({ size = 24, className = "" }: AzureIconProps) => (
 // Azure Components Configuration
 export const AzureComponents = [
   {
-    type: 'azure-function-app',
+    type: 'azure-function-app', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.FUNCTION_APP } as NodeTypeDefinition,
     name: 'Function App',
     icon: FunctionAppsIcon,
     category: 'Serverless'
   },
   {
-    type: 'ServiceBusQueue',
+    type: 'ServiceBusQueue', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.SERVICE_BUS, variant: 'queue' } as NodeTypeDefinition,
     name: 'Service Bus',
     icon: ServiceBusIcon,
     category: 'Integration'
   },
   {
-    type: 'azure-application-insights',
+    type: 'azure-application-insights', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.APPLICATION_INSIGHTS } as NodeTypeDefinition,
     name: 'Application Insights',
     icon: ApplicationInsightsIcon,
     category: 'Monitoring'
   },
   {
-    type: 'azure-virtual-network',
+    type: 'azure-virtual-network', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.VIRTUAL_NETWORK } as NodeTypeDefinition,
     name: 'Virtual Network',
     icon: VirtualNetworksIcon,
     category: 'Networking'
   },
   {
-    type: 'azure-app-service',
+    type: 'azure-app-service', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.APP_SERVICE } as NodeTypeDefinition,
     name: 'App Service',
     icon: AppServicesIcon,
     category: 'Compute'
   },
   {
-    type: 'azure-firewall',
+    type: 'azure-firewall', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.FIREWALL } as NodeTypeDefinition,
     name: 'Firewall',
     icon: FirewallsIcon,
     category: 'Security'
   },
   {
-    type: 'azure-application-gateway',
+    type: 'azure-application-gateway', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.APPLICATION_GATEWAY } as NodeTypeDefinition,
     name: 'Application Gateway',
     icon: ApplicationGatewaysIcon,
     category: 'Networking'
   },
   {
-    type: 'azure-key-vault',
+    type: 'azure-key-vault', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.KEY_VAULT } as NodeTypeDefinition,
     name: 'Key Vault',
     icon: KeyVaultsIcon,
     category: 'Security'
   },
   {
-    type: 'azure-cosmos-db',
+    type: 'azure-cosmos-db', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.AZURE, subtype: AzureSubtypes.COSMOS_DB } as NodeTypeDefinition,
     name: 'Cosmos DB',
     icon: CosmosDBIcon,
     category: 'Database'

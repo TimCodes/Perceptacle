@@ -1,3 +1,5 @@
+import { NodeTypes, KubernetesSubtypes, KafkaSubtypes, type NodeTypeDefinition } from '@/types/nodeTypes';
+
 // Kubernetes SVG Icon Component
 interface KubernetesIconProps {
   size?: number;
@@ -65,7 +67,8 @@ export const KafkaTopicIcon = ({ size = 24, className = "" }: KubernetesIconProp
 // Kubernetes Components Configuration
 export const KubernetesComponents = [
   {
-    type: 'k8s-pod',
+    type: 'k8s-pod', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.POD } as NodeTypeDefinition,
     name: 'Pod',
     icon: PodIcon,
     category: 'Kubernetes',
@@ -76,7 +79,8 @@ export const KubernetesComponents = [
     ]
   },
   {
-    type: 'k8s-service',
+    type: 'k8s-service', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.SERVICE } as NodeTypeDefinition,
     name: 'Service',
     icon: ServiceIcon,
     category: 'Kubernetes',
@@ -87,7 +91,8 @@ export const KubernetesComponents = [
     ]
   },
   {
-    type: 'k8s-cronjob',
+    type: 'k8s-cronjob', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.CRONJOB } as NodeTypeDefinition,
     name: 'CronJob',
     icon: CronJobIcon,
     category: 'Kubernetes',
@@ -98,13 +103,15 @@ export const KubernetesComponents = [
   },
 
   {
-    type: 'kafka-cluster',
+    type: 'kafka-cluster', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.CLUSTER } as NodeTypeDefinition,
     name: 'Kafka Cluster',
     icon: KafkaClusterIcon,
     category: 'Kafka'
   },
   {
-    type: 'kafka-topic',
+    type: 'kafka-topic', // Legacy - kept for drag-drop compatibility
+    nodeTypeDefinition: { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.TOPIC } as NodeTypeDefinition,
     name: 'Kafka Topic',
     icon: KafkaTopicIcon,
     category: 'Kafka'

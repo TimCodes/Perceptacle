@@ -137,17 +137,30 @@ const CustomNode = ({ data }: { data: any }) => {
                                 <span className="text-sm font-medium">{data.label}</span>
                             </div>
 
-                            {/* Only show field preview if no alerts, or compacted */}
-                            {data.customFields && data.customFields.length > 0 && (
-                                <div className="border-t pt-2 mt-1 space-y-1">
-                                    {data.customFields.slice(0, 2).map((field: any, index: number) => (
-                                        <div key={index} className="flex items-center gap-2 text-xs">
-                                            <span className="text-muted-foreground">{field.name}:</span>
-                                            <span className="font-medium truncate max-w-[100px]">{field.value || "-"}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Show key resource-specific fields based on node type */}
+                            {(() => {
+                                const fieldsToShow: Array<{key: string, label: string}> = [];
+                                
+                                // Determine which fields to show based on node type
+                                if (data.namespace) fieldsToShow.push({key: 'namespace', label: 'NS'});
+                                if (data.podName) fieldsToShow.push({key: 'podName', label: 'Pod'});
+                                if (data.serviceName) fieldsToShow.push({key: 'serviceName', label: 'Service'});
+                                if (data.resourceGroup) fieldsToShow.push({key: 'resourceGroup', label: 'RG'});
+                                if (data.projectId) fieldsToShow.push({key: 'projectId', label: 'Project'});
+                                
+                                return fieldsToShow.length > 0 && (
+                                    <div className="border-t pt-2 mt-1 space-y-1">
+                                        {fieldsToShow.slice(0, 2).map((field, index) => (
+                                            <div key={index} className="flex items-center gap-2 text-xs">
+                                                <span className="text-muted-foreground">{field.label}:</span>
+                                                <span className="font-medium truncate max-w-[100px]">
+                                                    {data[field.key] || "-"}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Recent Logs Panel - Animates from bottom on hover */}
