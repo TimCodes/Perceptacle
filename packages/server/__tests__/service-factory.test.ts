@@ -342,27 +342,27 @@ describe('ServiceFactory', () => {
       expect(config.aichat?.deepseekApiKey).toBe('test-deepseek-key');
     });
 
-    it('should use fallback GitHub token only when using mocks', () => {
-      // When using mocks and no GITHUB_TOKEN is set, should use fallback
+    it('should use fallback GitHub token when using mocks and GITHUB_TOKEN not set', () => {
       process.env.USE_MOCK_SERVICES = 'true';
       delete process.env.GITHUB_TOKEN;
 
-      const mockFactory = createServiceFactoryFromEnv();
-      const mockConfig = mockFactory.getConfig();
+      const factory = createServiceFactoryFromEnv();
+      const config = factory.getConfig();
 
-      expect(mockConfig.github?.token).toBe('mock-github-token');
+      expect(config.github?.token).toBe('mock-github-token');
+    });
 
-      // When not using mocks and no GITHUB_TOKEN is set, should be empty
+    it('should use empty string when not using mocks and GITHUB_TOKEN not set', () => {
       process.env.USE_MOCK_SERVICES = 'false';
       delete process.env.GITHUB_TOKEN;
 
-      const realFactory = createServiceFactoryFromEnv();
-      const realConfig = realFactory.getConfig();
+      const factory = createServiceFactoryFromEnv();
+      const config = factory.getConfig();
 
-      expect(realConfig.github?.token).toBe('');
+      expect(config.github?.token).toBe('');
     });
 
-    it('should use GITHUB_TOKEN environment variable when set', () => {
+    it('should use GITHUB_TOKEN environment variable when set in real mode', () => {
       process.env.GITHUB_TOKEN = 'my-real-token';
       process.env.USE_MOCK_SERVICES = 'false';
 
@@ -370,6 +370,16 @@ describe('ServiceFactory', () => {
       const config = factory.getConfig();
 
       expect(config.github?.token).toBe('my-real-token');
+    });
+
+    it('should use GITHUB_TOKEN environment variable when set in mock mode', () => {
+      process.env.GITHUB_TOKEN = 'my-mock-token';
+      process.env.USE_MOCK_SERVICES = 'true';
+
+      const factory = createServiceFactoryFromEnv();
+      const config = factory.getConfig();
+
+      expect(config.github?.token).toBe('my-mock-token');
     });
   });
 
