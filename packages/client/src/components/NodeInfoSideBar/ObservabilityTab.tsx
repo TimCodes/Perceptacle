@@ -18,22 +18,16 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
 
   console.log('[ObservabilityTab] editedNode.data:', editedNode.data);
 
-  // Get the node type - support both legacy string format and new NodeTypeDefinition
-  const nodeType: NodeTypeDefinition = typeof editedNode.data.type === 'string'
-    ? NodeTypeHelper.fromLegacyType(editedNode.data.type)
-    : editedNode.data.type || { type: 'generic', subtype: 'application' };
+  // Get the node type - always expect NodeTypeDefinition structure
+  const nodeType: NodeTypeDefinition = editedNode.data.type || { type: 'generic', subtype: 'application' };
 
   // Get capabilities from the type registry
   const capabilities = NodeTypeHelper.getCapabilities(nodeType);
 
-  // Extract namespace and serviceName from customFields if they exist there
-  const namespaceField = editedNode.data.customFields?.find((f: any) => f.name === 'namespace');
-  const serviceNameField = editedNode.data.customFields?.find((f: any) => f.name === 'serviceName');
-  const podNameField = editedNode.data.customFields?.find((f: any) => f.name === 'podName');
-  
-  const namespace = editedNode.data.namespace || namespaceField?.value;
-  const serviceName = editedNode.data.serviceName || serviceNameField?.value;
-  const podName = editedNode.data.podName || podNameField?.value;
+  // Use direct properties from node data
+  const namespace = editedNode.data.namespace;
+  const serviceName = editedNode.data.serviceName;
+  const podName = editedNode.data.podName;
   const resourceName = editedNode.data.resourceName || editedNode.data.label;
 
   // Use NodeTypeHelper for type detection

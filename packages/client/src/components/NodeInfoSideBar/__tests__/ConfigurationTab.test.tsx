@@ -55,14 +55,6 @@ jest.mock('@/components/ui/tooltip', () => ({
   ),
 }));
 
-jest.mock('@/components/CustomFieldsSection', () => ({
-  __esModule: true,
-  default: ({ customFields, onFieldChange }: any) => (
-    <div data-testid="custom-fields-section">
-      Custom Fields: {customFields?.length || 0}
-    </div>
-  ),
-}));
 
 jest.mock('@/utils/nodeConfigFields', () => ({
   getConfigFieldsForNodeType: (type: string) => {
@@ -97,7 +89,6 @@ jest.mock('@/utils/nodeConfigFields', () => ({
 
 describe('ConfigurationTab', () => {
   const mockHandleChange = jest.fn();
-  const mockHandleCustomFieldChange = jest.fn();
 
   const mockNode = {
     id: 'node-1',
@@ -109,7 +100,6 @@ describe('ConfigurationTab', () => {
       name: 'Test Name',
       description: 'Test Description',
       status: 'active',
-      customFields: [],
     },
   };
 
@@ -122,7 +112,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={mockNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -134,7 +124,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={mockNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -148,7 +138,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={mockNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -162,7 +152,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={mockNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -176,7 +166,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={mockNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -190,7 +180,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={mockNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -205,7 +195,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={mockNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -230,7 +220,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={nodeWithCustomFields}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -251,7 +241,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={nodeWithEmptyData}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -272,7 +262,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={azureNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+
       />
     );
 
@@ -295,7 +285,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={k8sNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -318,7 +308,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={kafkaNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 
@@ -341,7 +331,7 @@ describe('ConfigurationTab', () => {
       <ConfigurationTab
         editedNode={gcpNode}
         handleChange={mockHandleChange}
-        handleCustomFieldChange={mockHandleCustomFieldChange}
+        
       />
     );
 

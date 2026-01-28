@@ -132,19 +132,8 @@ export class TelemetryMapService {
   } {
     const telemetryNodes = nodes.map(node => {
       // Extract nodeType - support both legacy and new structure
-      let nodeType: string | NodeTypeDefinition;
-      let legacyType: string | undefined;
-      
-      // Check if node.data.type is already a NodeTypeDefinition
-      if (node.data.type && typeof node.data.type === 'object' && 'type' in node.data.type) {
-        nodeType = node.data.type as NodeTypeDefinition;
-        legacyType = NodeTypeHelper.toLegacyType(nodeType);
-      } else {
-        // Legacy string type - convert to NodeTypeDefinition
-        const legacyTypeStr = (node.type || node.data.type || 'default') as string;
-        legacyType = legacyTypeStr;
-        nodeType = NodeTypeHelper.fromLegacyType(legacyTypeStr);
-      }
+      // Node data.type should always be NodeTypeDefinition
+      const nodeType: NodeTypeDefinition = (typeof node.data.type === 'object' ? node.data.type : null) || { type: 'generic', subtype: 'application' };
       
       return {
         nodeId: node.id,
@@ -179,19 +168,9 @@ export class TelemetryMapService {
     edges: ReactFlowEdge[];
   } {
     const reactFlowNodes: ReactFlowNode[] = map.nodes.map(node => {
-      // Handle both legacy string types and new NodeTypeDefinition
-      let nodeTypeData: NodeTypeDefinition;
-      let legacyType: string;
-      
-      if (typeof node.nodeType === 'string') {
-        // Legacy format - convert to NodeTypeDefinition
-        legacyType = node.nodeType;
-        nodeTypeData = NodeTypeHelper.fromLegacyType(node.nodeType);
-      } else {
-        // New format - already a NodeTypeDefinition
-        nodeTypeData = node.nodeType;
-        legacyType = NodeTypeHelper.toLegacyType(node.nodeType);
-      }
+      // Node should always have NodeTypeDefinition
+      const nodeTypeData: NodeTypeDefinition = node.nodeType as NodeTypeDefinition || { type: 'generic', subtype: 'application' };
+      const legacyType = NodeTypeHelper.toLegacyType(nodeTypeData);
       
       return {
         id: node.nodeId,

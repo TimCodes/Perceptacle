@@ -137,27 +137,40 @@ const CustomNode = ({ data }: { data: any }) => {
                                 <span className="text-sm font-medium">{data.label}</span>
                             </div>
 
-                            {/* Only show field preview if no alerts, or compacted */}
-                            {data.customFields && data.customFields.length > 0 && (
-                                <div className="border-t pt-2 mt-1 space-y-1">
-                                    {data.customFields.slice(0, 2).map((field: any, index: number) => (
-                                        <div key={index} className="flex items-center gap-2 text-xs">
-                                            <span className="text-muted-foreground">{field.name}:</span>
-                                            <span className="font-medium truncate max-w-[100px]">{field.value || "-"}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            {/* Show key resource-specific fields based on node type */}
+                            {(() => {
+                                const fieldsToShow: Array<{key: string, label: string}> = [];
+                                
+                                // Determine which fields to show based on node type
+                                if (data.namespace) fieldsToShow.push({key: 'namespace', label: 'NS'});
+                                if (data.podName) fieldsToShow.push({key: 'podName', label: 'Pod'});
+                                if (data.serviceName) fieldsToShow.push({key: 'serviceName', label: 'Service'});
+                                if (data.resourceGroup) fieldsToShow.push({key: 'resourceGroup', label: 'RG'});
+                                if (data.projectId) fieldsToShow.push({key: 'projectId', label: 'Project'});
+                                
+                                return fieldsToShow.length > 0 && (
+                                    <div className="border-t pt-2 mt-1 space-y-1">
+                                        {fieldsToShow.slice(0, 2).map((field, index) => (
+                                            <div key={index} className="flex items-center gap-2 text-xs">
+                                                <span className="text-muted-foreground">{field.label}:</span>
+                                                <span className="font-medium truncate max-w-[100px]">
+                                                    {data[field.key] || "-"}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Recent Logs Panel - Animates from bottom on hover */}
-                        {logs.length > 0 && (
+                        {/* {logs.length > 0 && (
                             <div 
                                 className={cn(
-                                    "absolute left-0 right-0 bg-background border-t border-x border-b rounded-b-md shadow-lg transition-all duration-300 ease-in-out z-30",
+                                    "absolute left-0 right-0 bg-background border-t border-x border-b rounded-b-md shadow-lg transition-all duration-300 ease-in-out z-30 pointer-events-none",
                                     isHovered 
                                         ? "top-full opacity-100 translate-y-0" 
-                                        : "top-full opacity-0 translate-y-[-10px] pointer-events-none"
+                                        : "top-full opacity-0 translate-y-[-10px]"
                                 )}
                                 style={{ 
                                     borderColor: 'inherit',
@@ -194,7 +207,7 @@ const CustomNode = ({ data }: { data: any }) => {
                                     </ScrollArea>
                                 </div>
                             </div>
-                        )}
+                        )} */}
 
                         <Handle
                             type="source"

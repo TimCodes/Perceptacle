@@ -72,7 +72,12 @@ export const AIChatTab = ({ editedNode }: AIChatTabProps) => {
         description: editedNode.data.description,
         logs: editedNode.data.logs?.slice(-10) || [], // Last 10 logs
         metrics: editedNode.data.metrics,
-        customFields: editedNode.data.customFields,
+        // Include provider-specific fields directly
+        namespace: editedNode.data.namespace,
+        podName: editedNode.data.podName,
+        serviceName: editedNode.data.serviceName,
+        resourceGroup: editedNode.data.resourceGroup,
+        projectId: editedNode.data.projectId,
       };
 
       await ChatService.streamMessage(

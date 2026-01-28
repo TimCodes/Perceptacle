@@ -30,41 +30,29 @@ export function NodeConfigDialog({
 }: NodeConfigDialogProps) {
     const [label, setLabel] = useState('');
     const [description, setDescription] = useState('');
-    const [customFields, setCustomFields] = useState<any[]>([]);
     // Store other specific fields dynamically
     const [dynamicFields, setDynamicFields] = useState<Record<string, any>>({});
 
     // Get current namespace for K8s options fetching
-    const namespaceField = customFields.find((f: any) => f.name === 'namespace');
-    const currentNamespace = namespaceField?.value;
+    const currentNamespace = dynamicFields.namespace;
 
-    // Fetch Kubernetes options - only if we have k8s fields
-    const hasK8sFields = customFields.some((f: any) => f.type === 'k8s-select');
+    // Check if this is a Kubernetes node
+    const nodeType = initialNode?.data?.type;
+    const isK8sNode = typeof nodeType === 'object' ? nodeType.type === 'kubernetes' : nodeType?.startsWith('k8s-');
     const { options: k8sOptions, loading: k8sLoading } = useKubernetesOptions(
-        // Only pass namespace if we are looking for dependent resources
-        // But we always want to fetch namespaces list, so effectively we always fetch if it's a k8s node
-        hasK8sFields ? currentNamespace : undefined
+        isK8sNode ? currentNamespace : undefined
     );
 
     useEffect(() => {
         if (initialNode) {
             setLabel(initialNode.data.label || '');
             setDescription(initialNode.data.description || '');
-            setCustomFields(initialNode.data.customFields || []);
 
             // Extract other fields that are not standard
-            const { label, description, customFields, type, status, instanceType, githubUrl, consoleUrl, metrics, logs, ...others } = initialNode.data;
+            const { label, description, type, status, instanceType, githubUrl, consoleUrl, metrics, logs, ...others } = initialNode.data;
             setDynamicFields(others);
         }
     }, [initialNode]);
-
-    const handleCustomFieldChange = (index: number, value: string) => {
-        const newFields = [...customFields];
-        newFields[index] = { ...newFields[index], value };
-        setCustomFields(newFields);
-
-        // If namespace changed, it will trigger re-fetch via the currentNamespace variable dependency in the hook
-    };
 
     const handleDynamicFieldChange = (key: string, value: string) => {
         setDynamicFields(prev => ({
@@ -80,7 +68,6 @@ export function NodeConfigDialog({
             ...initialNode.data,
             label,
             description,
-            customFields,
             ...dynamicFields
         };
 
@@ -137,57 +124,68 @@ export function NodeConfigDialog({
                         />
                     </div>
 
-                    {/* Custom Fields from Component Definition */}
-                    {customFields.length > 0 && (
-                        <div className="space-y-3 border-t pt-3">
-                            <h4 className="text-sm font-semibold text-muted-foreground">Configuration</h4>
-                            {customFields.map((field: any, index: number) => (
-                                <div key={index} className="space-y-2">
-                                    <label className="text-sm font-medium">{field.name}</label>
-                                    {field.type === 'select' ? (
-                                        <select
-                                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                                            value={field.value}
-                                            onChange={(e) => handleCustomFieldChange(index, e.target.value)}
-                                        >
-                                            {field.options?.map((opt: string) => (
-                                                <option key={opt} value={opt}>{opt}</option>
-                                            ))}
-                                        </select>
-                                    ) : field.type === 'k8s-select' ? (
-                                        <K8sCombobox
-                                            value={field.value}
-                                            onChange={(value) => handleCustomFieldChange(index, value)}
-                                            options={getOptionsForSource(field.source)}
-                                            placeholder={field.placeholder || `Select ${field.name}`}
-                                            loading={k8sLoading}
-                                        />
-                                    ) : (
-                                        <Input
-                                            type={field.type || 'text'}
-                                            value={field.value}
-                                            onChange={(e) => handleCustomFieldChange(index, e.target.value)}
-                                            placeholder={field.placeholder || ''}
-                                        />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Dynamic Fields (Cloud provider specific) */}
+                    {/* Dynamic Fields (Provider-specific configuration) */}
                     {Object.keys(dynamicFields).length > 0 && (
                         <div className="space-y-3 border-t pt-3">
-                            <h4 className="text-sm font-semibold text-muted-foreground">Provider Settings</h4>
-                            {Object.entries(dynamicFields).map(([key, value]) => (
-                                <div key={key} className="space-y-2">
-                                    <label className="text-sm font-medium capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</label>
-                                    <Input
-                                        value={value as string}
-                                        onChange={(e) => handleDynamicFieldChange(key, e.target.value)}
-                                    />
-                                </div>
-                            ))}
+                            <h4 className="text-sm font-semibold text-muted-foreground">Configuration</h4>
+                            {Object.entries(dynamicFields).map(([key, value]) => {
+                                // Check if this is a namespace field for K8s nodes
+                                if (key === 'namespace' && isK8sNode) {
+                                    return (
+                                        <div key={key} className="space-y-2">
+                                            <label className="text-sm font-medium">Namespace</label>
+                                            <K8sCombobox
+                                                value={value as string}
+                                                onChange={(newValue) => handleDynamicFieldChange(key, newValue)}
+                                                options={getOptionsForSource('namespaces')}
+                                                placeholder="Select namespace"
+                                                loading={k8sLoading}
+                                            />
+                                        </div>
+                                    );
+                                }
+                                // Check for other K8s select fields
+                                if (key === 'podName' && isK8sNode) {
+                                    return (
+                                        <div key={key} className="space-y-2">
+                                            <label className="text-sm font-medium">Pod Name</label>
+                                            <K8sCombobox
+                                                value={value as string}
+                                                onChange={(newValue) => handleDynamicFieldChange(key, newValue)}
+                                                options={getOptionsForSource('pods')}
+                                                placeholder="Select pod"
+                                                loading={k8sLoading}
+                                            />
+                                        </div>
+                                    );
+                                }
+                                if (key === 'serviceName' && isK8sNode) {
+                                    return (
+                                        <div key={key} className="space-y-2">
+                                            <label className="text-sm font-medium">Service Name</label>
+                                            <K8sCombobox
+                                                value={value as string}
+                                                onChange={(newValue) => handleDynamicFieldChange(key, newValue)}
+                                                options={getOptionsForSource('services')}
+                                                placeholder="Select service"
+                                                loading={k8sLoading}
+                                            />
+                                        </div>
+                                    );
+                                }
+                                // Regular text input for other fields
+                                return (
+                                    <div key={key} className="space-y-2">
+                                        <label className="text-sm font-medium capitalize">
+                                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                                        </label>
+                                        <Input
+                                            value={value as string}
+                                            onChange={(e) => handleDynamicFieldChange(key, e.target.value)}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
