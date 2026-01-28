@@ -319,15 +319,57 @@ export function getAzureDefaultValues(): Record<string, string> {
 }
 
 // Function to get the default values for Kubernetes fields
-export function getKubernetesDefaultValues(): Record<string, string> {
+export function getKubernetesDefaultValues(nodeType?: NodeTypeDefinition): Record<string, string> {
+  // If no nodeType provided, return all fields (backward compatibility)
+  if (!nodeType || !nodeType.subtype) {
+    return {
+      namespace: 'default',
+      podName: '',
+      serviceName: '',
+      deploymentName: '',
+      containerName: '',
+      port: '',
+      schedule: '',
+      endpoint: ''
+    };
+  }
+
+  // Add subtype-specific fields with namespace first, endpoint last
+  const subtype = nodeType.subtype.toLowerCase();
+  
+  if (subtype === 'pod') {
+    return {
+      namespace: 'default',
+      podName: '',
+      containerName: '',
+      endpoint: ''
+    };
+  } else if (subtype === 'service' || subtype === 'svc') {
+    return {
+      namespace: 'default',
+      serviceName: '',
+      port: '',
+      endpoint: ''
+    };
+  } else if (['deployment', 'statefulset', 'daemonset'].includes(subtype)) {
+    return {
+      namespace: 'default',
+      deploymentName: '',
+      containerName: '',
+      endpoint: ''
+    };
+  } else if (subtype === 'cronjob') {
+    return {
+      namespace: 'default',
+      schedule: '',
+      containerName: '',
+      endpoint: ''
+    };
+  }
+
+  // Default: return base fields only
   return {
     namespace: 'default',
-    podName: '',
-    serviceName: '',
-    deploymentName: '',
-    containerName: '',
-    port: '',
-    schedule: '',
     endpoint: ''
   };
 }

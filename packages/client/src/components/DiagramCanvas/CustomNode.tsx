@@ -164,13 +164,13 @@ const CustomNode = ({ data }: { data: any }) => {
                         </div>
 
                         {/* Recent Logs Panel - Animates from bottom on hover */}
-                        {logs.length > 0 && (
+                        {/* {logs.length > 0 && (
                             <div 
                                 className={cn(
-                                    "absolute left-0 right-0 bg-background border-t border-x border-b rounded-b-md shadow-lg transition-all duration-300 ease-in-out z-30",
+                                    "absolute left-0 right-0 bg-background border-t border-x border-b rounded-b-md shadow-lg transition-all duration-300 ease-in-out z-30 pointer-events-none",
                                     isHovered 
                                         ? "top-full opacity-100 translate-y-0" 
-                                        : "top-full opacity-0 translate-y-[-10px] pointer-events-none"
+                                        : "top-full opacity-0 translate-y-[-10px]"
                                 )}
                                 style={{ 
                                     borderColor: 'inherit',
@@ -207,7 +207,7 @@ const CustomNode = ({ data }: { data: any }) => {
                                     </ScrollArea>
                                 </div>
                             </div>
-                        )}
+                        )} */}
 
                         <Handle
                             type="source"

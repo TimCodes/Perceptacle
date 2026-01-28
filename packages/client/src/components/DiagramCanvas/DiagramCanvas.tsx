@@ -25,6 +25,7 @@ import { NodeConfigDialog } from "../NodeConfigDialog";
 import { NewMapDialog, NewMapData } from "../NewMapDialog";
 import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
 import { NodeTypeDefinition } from "@/types/nodeTypes";
+import { getKubernetesDefaultValues } from "@/utils/nodeConfigFields";
 
 // Extended metadata to include isPublic for map updates
 interface MapMetadata extends NewMapData {
@@ -372,16 +373,7 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
         instrumentationKey: ''
       } : {};
 
-      const kubernetesFields = isKubernetesNode ? {
-        namespace: 'default',
-        podName: '',
-        serviceName: '',
-        deploymentName: '',
-        containerName: '',
-        port: '',
-        schedule: '',
-        endpoint: ''
-      } : {};
+      const kubernetesFields = isKubernetesNode ? getKubernetesDefaultValues(nodeTypeDefinition) : {};
 
       const kafkaFields = isKafkaNode ? {
         brokerList: '',
