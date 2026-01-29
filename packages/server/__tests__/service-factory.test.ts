@@ -341,6 +341,46 @@ describe('ServiceFactory', () => {
       expect(config.aichat?.geminiApiKey).toBe('test-gemini-key');
       expect(config.aichat?.deepseekApiKey).toBe('test-deepseek-key');
     });
+
+    it('should use fallback GitHub token when using mocks and GITHUB_TOKEN not set', () => {
+      process.env.USE_MOCK_SERVICES = 'true';
+      delete process.env.GITHUB_TOKEN;
+
+      const factory = createServiceFactoryFromEnv();
+      const config = factory.getConfig();
+
+      expect(config.github?.token).toBe('mock-github-token');
+    });
+
+    it('should use empty string when not using mocks and GITHUB_TOKEN not set', () => {
+      process.env.USE_MOCK_SERVICES = 'false';
+      delete process.env.GITHUB_TOKEN;
+
+      const factory = createServiceFactoryFromEnv();
+      const config = factory.getConfig();
+
+      expect(config.github?.token).toBe('');
+    });
+
+    it('should use GITHUB_TOKEN environment variable when set in real mode', () => {
+      process.env.GITHUB_TOKEN = 'my-real-token';
+      process.env.USE_MOCK_SERVICES = 'false';
+
+      const factory = createServiceFactoryFromEnv();
+      const config = factory.getConfig();
+
+      expect(config.github?.token).toBe('my-real-token');
+    });
+
+    it('should use GITHUB_TOKEN environment variable when set in mock mode', () => {
+      process.env.GITHUB_TOKEN = 'my-mock-token';
+      process.env.USE_MOCK_SERVICES = 'true';
+
+      const factory = createServiceFactoryFromEnv();
+      const config = factory.getConfig();
+
+      expect(config.github?.token).toBe('my-mock-token');
+    });
   });
 
   describe('Type Guards', () => {
