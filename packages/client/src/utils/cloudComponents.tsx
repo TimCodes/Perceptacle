@@ -1,100 +1,27 @@
 /**
  * Cloud component registry for diagram builder.
- * Defines available infrastructure components (GCP, Azure, Kubernetes, generic).
+ * Defines available infrastructure components (Azure, Kubernetes).
+ * 
+ * MOCK SERVER MODE: Only Azure and Kubernetes components
  * 
  * NOTE: This module is being gradually migrated to the new type system.
  * See @/types/nodeTypeRegistry for the centralized type registry.
  * Components defined here are used for legacy compatibility and will
  * eventually be consolidated with NODE_TYPE_REGISTRY.
  */
-import {
-  Server,
-  Database,
-  HardDrive,
-  Network,
-  Cloud,
-  Box,
-  Cpu,
-  Globe,
-  Shield,
-  LayoutGrid
-} from 'lucide-react';
+import { Box } from 'lucide-react';
 import { AzureComponents, azureIconMap } from './azure-components';
 import { KubernetesComponents, kubernetesIconMap } from './kubernetes-components';
 
 /** Icon map combining all cloud provider icons */
 export const iconMap = {
-  Server,
-  Database,
-  HardDrive,
-  Network,
-  Cloud,
   Box,
-  Cpu,
-  Globe,
-  Shield,
-  LayoutGrid,
   ...azureIconMap,
   ...kubernetesIconMap
 };
 
 /** Predefined cloud infrastructure components */
 const predefinedComponents = [
-  // GCP Components
-  {
-    type: 'compute-engine',
-    label: 'Compute Engine',
-    icon: Server,
-    category: 'Compute',
-  },
-  {
-    type: 'cloud-storage',
-    label: 'Cloud Storage',
-    icon: HardDrive,
-    category: 'Storage',
-  },
-  {
-    type: 'cloud-sql',
-    label: 'Cloud SQL',
-    icon: Database,
-    category: 'Database',
-  },
-  {
-    type: 'kubernetes-engine',
-    label: 'Kubernetes Engine',
-    icon: Box,
-    category: 'Compute',
-  },
-  {
-    type: 'cloud-functions',
-    label: 'Cloud Functions',
-    icon: Cloud,
-    category: 'Serverless',
-  },
-  {
-    type: 'cloud-run',
-    label: 'Cloud Run',
-    icon: Cpu,
-    category: 'Serverless',
-  },
-  {
-    type: 'load-balancer',
-    label: 'Load Balancer',
-    icon: Globe,
-    category: 'Networking',
-  },
-  {
-    type: 'cloud-armor',
-    label: 'Cloud Armor',
-    icon: Shield,
-    category: 'Security',
-  },
-  {
-    type: 'app-engine',
-    label: 'App Engine',
-    icon: LayoutGrid,
-    category: 'Compute',
-  },
   // Azure Components
   ...AzureComponents.map(comp => ({
     ...comp,
