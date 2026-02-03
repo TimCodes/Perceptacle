@@ -572,20 +572,6 @@ export const isKubernetes = (node: NodeTypeDefinition | null | undefined) =>
   NodeTypeHelper.isKubernetes(node);
 
 /**
- * Quick check if a node is Kafka.
- * @param node - Node type definition
- */
-export const isKafka = (node: NodeTypeDefinition | null | undefined) => 
-  NodeTypeHelper.isKafka(node);
-
-/**
- * Quick check if a node is GCP.
- * @param node - Node type definition
- */
-export const isGCP = (node: NodeTypeDefinition | null | undefined) => 
-  NodeTypeHelper.isGCP(node);
-
-/**
  * Quick conversion from legacy type.
  * @param legacyType - Legacy type string
  */

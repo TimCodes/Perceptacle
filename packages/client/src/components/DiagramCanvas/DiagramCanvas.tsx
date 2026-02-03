@@ -373,23 +373,6 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
 
       const kubernetesFields = isKubernetesNode ? getKubernetesDefaultValues(nodeTypeDefinition) : {};
 
-      const kafkaFields = isKafkaNode ? {
-        brokerList: '',
-        topicName: '',
-        consumerGroup: '',
-        securityProtocol: 'PLAINTEXT'
-      } : {};
-
-      const gcpFields = isGCPNode ? {
-        projectId: '',
-        resourceName: '',
-        zone: '',
-        region: '',
-        serviceAccount: '',
-        monitoringLabels: '',
-        logType: 'system-event'
-      } : {};
-
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
         type: "default",
@@ -403,14 +386,12 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
           instanceType: "",
           githubUrl:
             componentDefinition?.githubUrl ||
-            "https://github.com/example/gcp-component",
+            "https://github.com/example/component",
           consoleUrl:
             componentDefinition?.consoleUrl ||
-            "https://console.cloud.google.com/home/dashboard",
+            "https://console.azure.com",
           ...azureFields, // Spread Azure fields for Azure nodes
           ...kubernetesFields, // Spread Kubernetes fields for Kubernetes nodes  
-          ...kafkaFields, // Spread Kafka fields for Kafka nodes
-          ...gcpFields, // Spread GCP fields for GCP nodes
           metrics: {
             cpu: Math.floor(Math.random() * 100),
             memory: Math.floor(Math.random() * 100),

@@ -148,20 +148,6 @@ export const ConfigurationTab = ({
         description: 'Additional fields for Kubernetes metrics and logs'
       };
     }
-    if (isKafkaNode) {
-      return {
-        text: 'Kafka Resource',
-        className: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-        description: 'Additional fields for Kafka monitoring'
-      };
-    }
-    if (isGCPNode) {
-      return {
-        text: 'Google Cloud Resource',
-        className: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-        description: 'Additional fields for GCP monitoring and logging'
-      };
-    }
     return null;
   };
 

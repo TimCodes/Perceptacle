@@ -52,8 +52,6 @@ export {
   NodeTypeHelper,
   isAzure,
   isKubernetes,
-  isKafka,
-  isGCP,
   fromLegacyType,
   toLegacyType
 } from '../utils/nodeTypeHelpers';

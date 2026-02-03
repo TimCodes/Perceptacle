@@ -53,12 +53,6 @@ export function MessagesTab() {
                     />
                 )}
 
-                {isKafkaNode && (
-                    <KafkaMessageForm
-                        topicName={selectedNode.data.topicName || nodeLabel}
-                    />
-                )}
-
                 {isServiceBusNode && (
                     <ServiceBusMessageForm
                         queueOrTopicName={selectedNode.data.queueName || selectedNode.data.topicName || nodeLabel}
@@ -66,7 +60,7 @@ export function MessagesTab() {
                     />
                 )}
 
-                {!isHttpNode && !isKafkaNode && !isServiceBusNode && (
+                {!isHttpNode && !isServiceBusNode && (
                     <div className="rounded-md border p-4 bg-muted/20 text-center text-sm text-muted-foreground">
                         <p className="mb-2">Messaging interface for <strong>{NodeTypeHelper.getDisplayName(nodeType)}</strong></p>
                         {!capabilities.hasMessages ? (

@@ -294,14 +294,6 @@ export function getConfigFieldsForNodeType(nodeType: NodeTypeDefinition): Config
     return relevantFields;
   }
 
-  if (NodeTypeHelper.isKafka(nodeType)) {
-    return [...DEFAULT_FIELDS, ...KAFKA_FIELDS];
-  }
-
-  if (NodeTypeHelper.isGCP(nodeType)) {
-    return [...DEFAULT_FIELDS, ...GCP_FIELDS];
-  }
-
   // Return only default fields for other node types
   return DEFAULT_FIELDS;
 }

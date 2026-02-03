@@ -85,9 +85,6 @@ export const KubernetesComponents = [
 export const kubernetesIconMap = {
   PodIcon,
   ServiceIcon,
-  CronJobIcon,
-  KafkaClusterIcon,
-  KafkaTopicIcon
+  CronJobIcon
 };
-
 
