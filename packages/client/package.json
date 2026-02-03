@@ -73,8 +73,6 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
-    "@replit/vite-plugin-shadcn-theme-json": "^0.0.4",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",

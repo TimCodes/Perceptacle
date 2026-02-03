@@ -33,6 +33,3 @@
     * [Mocked Services](MOCKED_SERVICES_SUMMARY.md)
     * [GitHub Completion](GITHUB_COMPLETION_CHECKLIST.md)
     * [Completion Summary](COMPLETION_SUMMARY.md)
-
-* **Development**
-  * [Replit Setup](replit.md)
