@@ -38,6 +38,8 @@ export interface NodeTypeDefinition {
  * Primary node type categories.
  * Use these constants instead of magic strings.
  * 
+ * MOCK SERVER MODE: Only Azure and Kubernetes types supported
+ * 
  * @example
  * if (node.type === NodeTypes.AZURE) { ... }
  */
@@ -46,16 +48,7 @@ export const NodeTypes = {
   AZURE: 'azure',
   
   /** Kubernetes orchestration resources */
-  KUBERNETES: 'kubernetes',
-  
-  /** Apache Kafka streaming platform */
-  KAFKA: 'kafka',
-  
-  /** Google Cloud Platform services */
-  GCP: 'gcp',
-  
-  /** Generic/custom node types */
-  GENERIC: 'generic'
+  KUBERNETES: 'kubernetes'
 } as const;
 
 /**
@@ -117,51 +110,6 @@ export const KubernetesSubtypes = {
  * Type for Kubernetes subtypes
  */
 export type KubernetesSubtype = typeof KubernetesSubtypes[keyof typeof KubernetesSubtypes];
-
-/**
- * Kafka-specific subtypes.
- * All Kafka component types available in the system.
- */
-export const KafkaSubtypes = {
-  CLUSTER: 'cluster',
-  TOPIC: 'topic',
-  PRODUCER: 'producer',
-  CONSUMER: 'consumer',
-  CONNECT: 'connect',
-  STREAMS: 'streams'
-} as const;
-
-/**
- * Type for Kafka subtypes
- */
-export type KafkaSubtype = typeof KafkaSubtypes[keyof typeof KafkaSubtypes];
-
-/**
- * GCP-specific subtypes.
- * All Google Cloud Platform service types available in the system.
- */
-export const GCPSubtypes = {
-  COMPUTE_ENGINE: 'compute-engine',
-  CLOUD_STORAGE: 'cloud-storage',
-  CLOUD_SQL: 'cloud-sql',
-  KUBERNETES_ENGINE: 'kubernetes-engine',
-  CLOUD_FUNCTIONS: 'cloud-functions',
-  CLOUD_RUN: 'cloud-run',
-  LOAD_BALANCER: 'load-balancer',
-  CLOUD_ARMOR: 'cloud-armor',
-  APP_ENGINE: 'app-engine',
-  VPC_NETWORK: 'vpc-network',
-  CLOUD_PUBSUB: 'cloud-pubsub',
-  CLOUD_SPANNER: 'cloud-spanner',
-  BIGTABLE: 'bigtable',
-  DATASTORE: 'datastore',
-  FIRESTORE: 'firestore'
-} as const;
-
-/**
- * Type for GCP subtypes
- */
-export type GCPSubtype = typeof GCPSubtypes[keyof typeof GCPSubtypes];
 
 /**
  * Service Bus variants (Queue vs Topic)
@@ -276,6 +224,7 @@ export type NodeTypeRegistry = RegisteredNodeType[];
 
 /**
  * Legacy type conversion map
+ * MOCK SERVER MODE: Only Azure and Kubernetes types
  */
 export const LEGACY_TYPE_MAP: Record<string, NodeTypeDefinition> = {
   // Azure legacy types
@@ -304,23 +253,5 @@ export const LEGACY_TYPE_MAP: Record<string, NodeTypeDefinition> = {
   'k8s-deployment': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.DEPLOYMENT },
   'k8s-statefulset': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.STATEFULSET },
   'k8s-daemonset': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.DAEMONSET },
-  'k8s-cronjob': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.CRONJOB },
-  
-  // Kafka legacy types
-  'kafka-cluster': { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.CLUSTER },
-  'kafka-topic': { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.TOPIC },
-  'KafkaTopic': { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.TOPIC },
-  
-  // GCP legacy types
-  'compute-engine': { type: NodeTypes.GCP, subtype: GCPSubtypes.COMPUTE_ENGINE },
-  'cloud-storage': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_STORAGE },
-  'cloud-sql': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_SQL },
-  'kubernetes-engine': { type: NodeTypes.GCP, subtype: GCPSubtypes.KUBERNETES_ENGINE },
-  'cloud-functions': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_FUNCTIONS },
-  'GoogleCloudFunction': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_FUNCTIONS },
-  'cloud-run': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_RUN },
-  'load-balancer': { type: NodeTypes.GCP, subtype: GCPSubtypes.LOAD_BALANCER },
-  'cloud-armor': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_ARMOR },
-  'app-engine': { type: NodeTypes.GCP, subtype: GCPSubtypes.APP_ENGINE },
-  'vpc-network': { type: NodeTypes.GCP, subtype: GCPSubtypes.VPC_NETWORK }
+  'k8s-cronjob': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.CRONJOB }
 };
