@@ -27,11 +27,9 @@
     * **Utils**
       * [Log Formatter](files/server/utils/log-formatter.md)
     * **Types**
+      * [Type Definitions](TYPE_DEFINITIONS.md)
       * [Telemetry Map](files/server/types/telemetryMap.md)
   * **Summaries**
     * [Mocked Services](MOCKED_SERVICES_SUMMARY.md)
     * [GitHub Completion](GITHUB_COMPLETION_CHECKLIST.md)
     * [Completion Summary](COMPLETION_SUMMARY.md)
-
-* **Development**
-  * [Replit Setup](replit.md)

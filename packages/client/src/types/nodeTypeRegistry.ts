@@ -4,6 +4,8 @@
  * This module contains the complete registry of all supported node types
  * with their metadata, capabilities, and configuration.
  * 
+ * MOCK SERVER MODE: Only Azure and Kubernetes node types
+ * 
  * @module nodeTypeRegistry
  */
 
@@ -11,8 +13,6 @@ import {
   NodeTypes,
   AzureSubtypes,
   KubernetesSubtypes,
-  KafkaSubtypes,
-  GCPSubtypes,
   type RegisteredNodeType,
   type NodeTypeRegistry
 } from './nodeTypes';
@@ -381,191 +381,6 @@ export const NODE_TYPE_REGISTRY: NodeTypeRegistry = [
       hasNetworkConfig: true
     },
     tags: ['kubernetes', 'k8s', 'ingress', 'network', 'routing']
-  },
-  
-  // ============================================================================
-  // KAFKA NODE TYPES
-  // ============================================================================
-  
-  {
-    type: NodeTypes.KAFKA,
-    subtype: KafkaSubtypes.CLUSTER,
-    displayName: 'Kafka Cluster',
-    category: 'Messaging',
-    description: 'Distributed streaming platform cluster',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasHealthCheck: true
-    },
-    tags: ['kafka', 'streaming', 'cluster', 'messaging']
-  },
-  
-  {
-    type: NodeTypes.KAFKA,
-    subtype: KafkaSubtypes.TOPIC,
-    displayName: 'Kafka Topic',
-    category: 'Messaging',
-    description: 'Message topic for publish/subscribe',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasMessages: true,
-      messageProtocol: 'kafka'
-    },
-    tags: ['kafka', 'streaming', 'topic', 'messaging']
-  },
-  
-  {
-    type: NodeTypes.KAFKA,
-    subtype: KafkaSubtypes.PRODUCER,
-    displayName: 'Kafka Producer',
-    category: 'Messaging',
-    description: 'Application producing messages to Kafka',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasMessages: true,
-      messageProtocol: 'kafka'
-    },
-    tags: ['kafka', 'producer', 'messaging']
-  },
-  
-  {
-    type: NodeTypes.KAFKA,
-    subtype: KafkaSubtypes.CONSUMER,
-    displayName: 'Kafka Consumer',
-    category: 'Messaging',
-    description: 'Application consuming messages from Kafka',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasMessages: true,
-      messageProtocol: 'kafka'
-    },
-    tags: ['kafka', 'consumer', 'messaging']
-  },
-  
-  // ============================================================================
-  // GCP NODE TYPES
-  // ============================================================================
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.COMPUTE_ENGINE,
-    displayName: 'Compute Engine',
-    category: 'Compute',
-    description: 'Virtual machine instances on Google Cloud',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasHealthCheck: true
-    },
-    tags: ['gcp', 'compute', 'vm', 'instance']
-  },
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.CLOUD_STORAGE,
-    displayName: 'Cloud Storage',
-    category: 'Storage',
-    description: 'Object storage for any amount of data',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true
-    },
-    tags: ['gcp', 'storage', 'object-storage', 'bucket']
-  },
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.CLOUD_SQL,
-    displayName: 'Cloud SQL',
-    category: 'Database',
-    description: 'Fully managed relational database service',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasHealthCheck: true
-    },
-    tags: ['gcp', 'database', 'sql', 'managed']
-  },
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.KUBERNETES_ENGINE,
-    displayName: 'Google Kubernetes Engine',
-    category: 'Compute',
-    description: 'Managed Kubernetes service',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasAutoScaling: true,
-      hasHealthCheck: true
-    },
-    tags: ['gcp', 'kubernetes', 'gke', 'container', 'orchestration']
-  },
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.CLOUD_FUNCTIONS,
-    displayName: 'Cloud Functions',
-    category: 'Serverless',
-    description: 'Event-driven serverless compute',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasMessages: true,
-      messageProtocol: 'https',
-      hasAutoScaling: true
-    },
-    tags: ['gcp', 'serverless', 'function', 'compute']
-  },
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.CLOUD_RUN,
-    displayName: 'Cloud Run',
-    category: 'Serverless',
-    description: 'Fully managed serverless container platform',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasMessages: true,
-      messageProtocol: 'https',
-      hasAutoScaling: true,
-      hasHealthCheck: true
-    },
-    tags: ['gcp', 'serverless', 'container', 'compute']
-  },
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.LOAD_BALANCER,
-    displayName: 'Cloud Load Balancer',
-    category: 'Network',
-    description: 'Scalable load balancing for applications',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasHealthCheck: true,
-      hasNetworkConfig: true
-    },
-    tags: ['gcp', 'load-balancer', 'network', 'traffic']
-  },
-  
-  {
-    type: NodeTypes.GCP,
-    subtype: GCPSubtypes.VPC_NETWORK,
-    displayName: 'VPC Network',
-    category: 'Network',
-    description: 'Virtual private cloud networking',
-    capabilities: {
-      hasMetrics: true,
-      hasLogs: true,
-      hasNetworkConfig: true
-    },
-    tags: ['gcp', 'network', 'vpc', 'infrastructure']
   }
 ];
 

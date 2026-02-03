@@ -59,36 +59,6 @@ export class NodeTypeHelper {
   }
   
   /**
-   * Check if a node is a Kafka node.
-   * 
-   * @param node - Node type definition
-   * @returns True if Kafka node
-   */
-  static isKafka(node: NodeTypeDefinition | null | undefined): boolean {
-    return node?.type === NodeTypes.KAFKA;
-  }
-  
-  /**
-   * Check if a node is a GCP node.
-   * 
-   * @param node - Node type definition
-   * @returns True if GCP node
-   */
-  static isGCP(node: NodeTypeDefinition | null | undefined): boolean {
-    return node?.type === NodeTypes.GCP;
-  }
-  
-  /**
-   * Check if a node is a generic/custom node.
-   * 
-   * @param node - Node type definition
-   * @returns True if generic node
-   */
-  static isGeneric(node: NodeTypeDefinition | null | undefined): boolean {
-    return node?.type === NodeTypes.GENERIC;
-  }
-  
-  /**
    * Check if a node is a specific subtype.
    * 
    * @param node - Node type definition
@@ -386,7 +356,7 @@ export class NodeTypeHelper {
    */
   static fromLegacyType(legacyType: string | null | undefined): NodeTypeDefinition {
     if (!legacyType) {
-      return { type: NodeTypes.GENERIC, subtype: 'unknown' };
+      return { type: NodeTypes.AZURE, subtype: 'unknown' };
     }
     
     // Check direct mapping first
@@ -409,9 +379,9 @@ export class NodeTypeHelper {
       }
     }
     
-    // Fallback to generic type
-    console.warn(`Unknown legacy type: ${legacyType}, using generic type`);
-    return { type: NodeTypes.GENERIC, subtype: 'custom', variant: legacyType };
+    // Fallback to azure type (default in mock mode)
+    console.warn(`Unknown legacy type: ${legacyType}, using azure type`);
+    return { type: NodeTypes.AZURE, subtype: 'custom', variant: legacyType };
   }
   
   /**
@@ -515,7 +485,7 @@ export class NodeTypeHelper {
   static fromCompositeKey(key: string): NodeTypeDefinition {
     const parts = key.split(':');
     return {
-      type: parts[0] || NodeTypes.GENERIC,
+      type: parts[0] || NodeTypes.AZURE,
       subtype: parts[1] || 'unknown',
       variant: parts[2]
     };
@@ -600,20 +570,6 @@ export const isAzure = (node: NodeTypeDefinition | null | undefined) =>
  */
 export const isKubernetes = (node: NodeTypeDefinition | null | undefined) => 
   NodeTypeHelper.isKubernetes(node);
-
-/**
- * Quick check if a node is Kafka.
- * @param node - Node type definition
- */
-export const isKafka = (node: NodeTypeDefinition | null | undefined) => 
-  NodeTypeHelper.isKafka(node);
-
-/**
- * Quick check if a node is GCP.
- * @param node - Node type definition
- */
-export const isGCP = (node: NodeTypeDefinition | null | undefined) => 
-  NodeTypeHelper.isGCP(node);
 
 /**
  * Quick conversion from legacy type.

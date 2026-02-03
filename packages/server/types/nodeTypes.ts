@@ -37,22 +37,15 @@ export interface NodeTypeDefinition {
 /**
  * Primary node type categories.
  * Use these constants instead of magic strings.
+ * 
+ * MOCK SERVER MODE: Only Azure and Kubernetes types supported
  */
 export const NodeTypes = {
   /** Microsoft Azure cloud services */
   AZURE: 'azure',
   
   /** Kubernetes orchestration resources */
-  KUBERNETES: 'kubernetes',
-  
-  /** Apache Kafka streaming platform */
-  KAFKA: 'kafka',
-  
-  /** Google Cloud Platform services */
-  GCP: 'gcp',
-  
-  /** Generic/custom node types */
-  GENERIC: 'generic'
+  KUBERNETES: 'kubernetes'
 } as const;
 
 /**
@@ -104,37 +97,9 @@ export const KubernetesSubtypes = {
 } as const;
 
 /**
- * Kafka-specific subtypes.
- */
-export const KafkaSubtypes = {
-  TOPIC: 'topic',
-  PRODUCER: 'producer',
-  CONSUMER: 'consumer',
-  BROKER: 'broker',
-  CONNECTOR: 'connector',
-  STREAM: 'stream'
-} as const;
-
-/**
- * GCP-specific subtypes.
- */
-export const GCPSubtypes = {
-  COMPUTE_ENGINE: 'compute-engine',
-  CLOUD_FUNCTION: 'cloud-function',
-  CLOUD_RUN: 'cloud-run',
-  APP_ENGINE: 'app-engine',
-  KUBERNETES_ENGINE: 'kubernetes-engine',
-  CLOUD_STORAGE: 'cloud-storage',
-  FIRESTORE: 'firestore',
-  CLOUD_SQL: 'cloud-sql',
-  PUB_SUB: 'pub-sub',
-  CLOUD_TASKS: 'cloud-tasks',
-  LOAD_BALANCER: 'load-balancer'
-} as const;
-
-/**
  * Legacy type mapping for backward compatibility.
  * Maps old string-based types to new NodeTypeDefinition structure.
+ * MOCK SERVER MODE: Only Azure and Kubernetes types
  */
 export const LEGACY_TYPE_MAP: Record<string, NodeTypeDefinition> = {
   // Azure types
@@ -153,24 +118,7 @@ export const LEGACY_TYPE_MAP: Record<string, NodeTypeDefinition> = {
   'k8s-deployment': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.DEPLOYMENT },
   'deployment': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.DEPLOYMENT },
   'k8s-service': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.SERVICE },
-  'service': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.SERVICE },
-  
-  // Kafka types
-  'kafka-topic': { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.TOPIC },
-  'kafka-producer': { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.PRODUCER },
-  'kafka-consumer': { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.CONSUMER },
-  'kafka-broker': { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.BROKER },
-  
-  // GCP types
-  'gcp-compute-engine': { type: NodeTypes.GCP, subtype: GCPSubtypes.COMPUTE_ENGINE },
-  'gcp-cloud-function': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_FUNCTION },
-  'gcp-cloud-run': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_RUN },
-  'gcp-cloud-storage': { type: NodeTypes.GCP, subtype: GCPSubtypes.CLOUD_STORAGE },
-  
-  // Generic/default
-  'default': { type: NodeTypes.GENERIC, subtype: 'custom' },
-  'generic': { type: NodeTypes.GENERIC, subtype: 'custom' },
-  'custom': { type: NodeTypes.GENERIC, subtype: 'custom' }
+  'service': { type: NodeTypes.KUBERNETES, subtype: KubernetesSubtypes.SERVICE }
 };
 
 /**

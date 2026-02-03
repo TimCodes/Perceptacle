@@ -18,11 +18,6 @@ jest.mock('@/pages/settings', () => ({
   default: () => <div data-testid="settings-page">Settings Page</div>,
 }));
 
-jest.mock('@/pages/node-types', () => ({
-  __esModule: true,
-  default: () => <div data-testid="node-types-page">Node Types Page</div>,
-}));
-
 jest.mock('@/pages/not-found', () => ({
   __esModule: true,
   default: () => <div data-testid="not-found-page">404 Not Found</div>,

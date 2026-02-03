@@ -1,4 +1,4 @@
-import { NodeTypes, KubernetesSubtypes, KafkaSubtypes, type NodeTypeDefinition } from '@/types/nodeTypes';
+import { NodeTypes, KubernetesSubtypes, type NodeTypeDefinition } from '@/types/nodeTypes';
 
 // Kubernetes SVG Icon Component
 interface KubernetesIconProps {
@@ -10,8 +10,6 @@ interface KubernetesIconProps {
 import PodIconSvg from '@/assets/kubernetes-icons/pod.svg';
 import ServiceIconSvg from '@/assets/kubernetes-icons/svc.svg';
 import CronJobIconSvg from '@/assets/kubernetes-icons/cronjob.svg';
-import KafkaClusterIconSvg from '@/assets/kubernetes-icons/kafka-cluster.svg';
-import KafkaTopicIconSvg from '@/assets/kubernetes-icons/kafka-topic.svg';
 
 // Create React components for Kubernetes SVG icons
 export const PodIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
@@ -38,26 +36,6 @@ export const CronJobIcon = ({ size = 24, className = "" }: KubernetesIconProps) 
   <img
     src={CronJobIconSvg}
     alt="Kubernetes CronJob"
-    width={size}
-    height={size}
-    className={className}
-  />
-);
-
-export const KafkaClusterIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
-  <img
-    src={KafkaClusterIconSvg}
-    alt="Kafka Cluster"
-    width={size}
-    height={size}
-    className={className}
-  />
-);
-
-export const KafkaTopicIcon = ({ size = 24, className = "" }: KubernetesIconProps) => (
-  <img
-    src={KafkaTopicIconSvg}
-    alt="Kafka Topic"
     width={size}
     height={size}
     className={className}
@@ -100,21 +78,6 @@ export const KubernetesComponents = [
       { name: 'namespace', type: 'k8s-select', source: 'namespaces', placeholder: 'Select namespace', defaultValue: 'default' },
       { name: 'schedule', type: 'text', placeholder: '*/5 * * * *' }
     ]
-  },
-
-  {
-    type: 'kafka-cluster', // Legacy - kept for drag-drop compatibility
-    nodeTypeDefinition: { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.CLUSTER } as NodeTypeDefinition,
-    name: 'Kafka Cluster',
-    icon: KafkaClusterIcon,
-    category: 'Kafka'
-  },
-  {
-    type: 'kafka-topic', // Legacy - kept for drag-drop compatibility
-    nodeTypeDefinition: { type: NodeTypes.KAFKA, subtype: KafkaSubtypes.TOPIC } as NodeTypeDefinition,
-    name: 'Kafka Topic',
-    icon: KafkaTopicIcon,
-    category: 'Kafka'
   }
 ];
 
@@ -122,9 +85,6 @@ export const KubernetesComponents = [
 export const kubernetesIconMap = {
   PodIcon,
   ServiceIcon,
-  CronJobIcon,
-  KafkaClusterIcon,
-  KafkaTopicIcon
+  CronJobIcon
 };
-
 

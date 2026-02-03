@@ -33,15 +33,13 @@ export const ConfigurationTab = ({
   handleChange,
 }: ConfigurationTabProps) => {
   // Get the node type - always expect NodeTypeDefinition structure
-  const nodeType: NodeTypeDefinition = editedNode.data.type || { type: 'generic', subtype: 'application' };
+  const nodeType: NodeTypeDefinition = editedNode.data.type || { type: 'azure', subtype: 'application' };
 
   const configFields = getConfigFieldsForNodeType(nodeType);
   
   // Use NodeTypeHelper for type detection instead of string matching
   const isAzureNode = NodeTypeHelper.isAzure(nodeType);
   const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeType);
-  const isKafkaNode = NodeTypeHelper.isKafka(nodeType);
-  const isGCPNode = NodeTypeHelper.isGCP(nodeType);
 
   // Get current namespace for K8s options fetching (for dependent fields)
   const currentNamespace = editedNode.data.namespace;
@@ -148,20 +146,6 @@ export const ConfigurationTab = ({
         text: 'Kubernetes Resource',
         className: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
         description: 'Additional fields for Kubernetes metrics and logs'
-      };
-    }
-    if (isKafkaNode) {
-      return {
-        text: 'Kafka Resource',
-        className: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-        description: 'Additional fields for Kafka monitoring'
-      };
-    }
-    if (isGCPNode) {
-      return {
-        text: 'Google Cloud Resource',
-        className: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-        description: 'Additional fields for GCP monitoring and logging'
       };
     }
     return null;
