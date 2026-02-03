@@ -28,13 +28,9 @@ export {
   type NodeType,
   type AzureSubtype,
   type KubernetesSubtype,
-  type KafkaSubtype,
-  type GCPSubtype,
   NodeTypes,
   AzureSubtypes,
   KubernetesSubtypes,
-  KafkaSubtypes,
-  GCPSubtypes,
   ServiceBusVariants,
   LEGACY_TYPE_MAP
 } from './nodeTypes';

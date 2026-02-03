@@ -33,15 +33,13 @@ export const ConfigurationTab = ({
   handleChange,
 }: ConfigurationTabProps) => {
   // Get the node type - always expect NodeTypeDefinition structure
-  const nodeType: NodeTypeDefinition = editedNode.data.type || { type: 'generic', subtype: 'application' };
+  const nodeType: NodeTypeDefinition = editedNode.data.type || { type: 'azure', subtype: 'application' };
 
   const configFields = getConfigFieldsForNodeType(nodeType);
   
   // Use NodeTypeHelper for type detection instead of string matching
   const isAzureNode = NodeTypeHelper.isAzure(nodeType);
   const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeType);
-  const isKafkaNode = NodeTypeHelper.isKafka(nodeType);
-  const isGCPNode = NodeTypeHelper.isGCP(nodeType);
 
   // Get current namespace for K8s options fetching (for dependent fields)
   const currentNamespace = editedNode.data.namespace;

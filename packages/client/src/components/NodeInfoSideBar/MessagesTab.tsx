@@ -25,17 +25,16 @@ export function MessagesTab() {
     // Convert to NodeTypeDefinition if needed
     const nodeType: NodeTypeDefinition = typeof nodeTypeValue === 'string'
         ? NodeTypeHelper.fromLegacyType(nodeTypeValue)
-        : nodeTypeValue || { type: 'generic', subtype: 'application' };
+        : nodeTypeValue || { type: 'azure', subtype: 'application' };
 
     // Use NodeTypeHelper to determine message protocol
     const messageProtocol = NodeTypeHelper.getMessageProtocol(nodeType);
     const capabilities = NodeTypeHelper.getCapabilities(nodeType);
 
-    const isKafkaNode = messageProtocol === 'kafka' || NodeTypeHelper.isKafka(nodeType);
     const isServiceBusNode = messageProtocol === 'service-bus' ||
         (NodeTypeHelper.isAzure(nodeType) && nodeType.subtype === 'service-bus');
     const isTopic = (nodeType.subtype === 'service-bus' && nodeType.variant === 'topic') || nodeType.subtype === 'topic';
-    const isHttpNode = messageProtocol === 'http' && !isKafkaNode && !isServiceBusNode;
+    const isHttpNode = messageProtocol === 'http' && !isServiceBusNode;
 
     return (
         <ScrollArea className="h-full">

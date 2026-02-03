@@ -355,13 +355,11 @@ export default function DiagramCanvas({ onNodeSelected, saveTriggered, onSaveCom
       }
 
       // Use the nodeTypeDefinition from component configuration
-      const nodeTypeDefinition: NodeTypeDefinition = componentDefinition?.nodeTypeDefinition || { type: 'generic', subtype: type };
+      const nodeTypeDefinition: NodeTypeDefinition = componentDefinition?.nodeTypeDefinition || { type: 'azure', subtype: type };
       
       // Use NodeTypeHelper for type detection
       const isAzureNode = NodeTypeHelper.isAzure(nodeTypeDefinition);
       const isKubernetesNode = NodeTypeHelper.isKubernetes(nodeTypeDefinition);
-      const isKafkaNode = NodeTypeHelper.isKafka(nodeTypeDefinition);
-      const isGCPNode = NodeTypeHelper.isGCP(nodeTypeDefinition);
 
       // Initialize provider-specific fields based on type with default values
       const azureFields = isAzureNode ? {
