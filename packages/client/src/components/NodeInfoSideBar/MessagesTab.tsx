@@ -2,7 +2,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDiagramStore } from "@/utils/diagram-store";
 import { MessageSquare } from "lucide-react";
 import { RestMessageForm } from "./MessagesTab/RestMessageForm";
-import { KafkaMessageForm } from "./MessagesTab/KafkaMessageForm";
 import { ServiceBusMessageForm } from "./MessagesTab/ServiceBusMessageForm";
 import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
 import { NodeTypeDefinition } from "@/types/nodeTypes";

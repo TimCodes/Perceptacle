@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 
-import { Settings as SettingsIcon, Library } from "lucide-react";
+import { Settings as SettingsIcon } from "lucide-react";
 import { useLocation } from "wouter";
 import SynapseLogo from "@/assets/SynapseLogo.png";
 
@@ -26,13 +26,6 @@ export default function NavBar() {
 
 
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setLocation("/node-types")}
-            >
-              <Library className="h-[1.2rem] w-[1.2rem]" />
-            </Button>
             <Button
               variant="outline"
               size="icon"
