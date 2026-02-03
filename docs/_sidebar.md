@@ -27,6 +27,7 @@
     * **Utils**
       * [Log Formatter](files/server/utils/log-formatter.md)
     * **Types**
+      * [Type Definitions](TYPE_DEFINITIONS.md)
       * [Telemetry Map](files/server/types/telemetryMap.md)
   * **Summaries**
     * [Mocked Services](MOCKED_SERVICES_SUMMARY.md)
