@@ -58,16 +58,16 @@ describe('helpers utilities', () => {
       expect(getStatusBadgeVariant('Open')).toBe('destructive');
     });
 
-    it('should return warning variant for in-progress status', () => {
-      expect(getStatusBadgeVariant('in-progress')).toBe('warning');
-      expect(getStatusBadgeVariant('IN-PROGRESS')).toBe('warning');
-      expect(getStatusBadgeVariant('In-Progress')).toBe('warning');
+    it('should return outline variant for in-progress status', () => {
+      expect(getStatusBadgeVariant('in-progress')).toBe('outline');
+      expect(getStatusBadgeVariant('IN-PROGRESS')).toBe('outline');
+      expect(getStatusBadgeVariant('In-Progress')).toBe('outline');
     });
 
-    it('should return success variant for closed status', () => {
-      expect(getStatusBadgeVariant('closed')).toBe('success');
-      expect(getStatusBadgeVariant('CLOSED')).toBe('success');
-      expect(getStatusBadgeVariant('Closed')).toBe('success');
+    it('should return secondary variant for closed status', () => {
+      expect(getStatusBadgeVariant('closed')).toBe('secondary');
+      expect(getStatusBadgeVariant('CLOSED')).toBe('secondary');
+      expect(getStatusBadgeVariant('Closed')).toBe('secondary');
     });
 
     it('should return secondary variant for unknown status', () => {

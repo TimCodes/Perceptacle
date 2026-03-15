@@ -1,9 +1,8 @@
-import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import GitHubIssues from "@/components/NodeInfoSideBar/GitHubIssues";
 
-export const CICDTab = ({ editedNode, handleChange }) => (
+export const CICDTab = ({ editedNode, handleChange }: { editedNode: any; handleChange: (field: string, value: string) => void }) => (
   <div className="space-y-4">
     <div className="space-y-2">
       <Label>Repository URL</Label>

@@ -116,8 +116,8 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
       
       // Handle pod-specific logs (direct string response)
       if (typeof data.logs === 'string') {
-        const lines = data.logs.split('\n').filter(line => line.trim());
-        lines.forEach(line => {
+        const lines = data.logs.split('\n').filter((line: string) => line.trim());
+        lines.forEach((line: string) => {
           // Try to parse timestamp and level from log line
           const match = line.match(/^(\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2}[^\s]*)\s+(INFO|WARN|ERROR|DEBUG)?\s*(.*)$/i);
           
@@ -141,8 +141,8 @@ export const ObservabilityTab = ({ editedNode }: ObservabilityTabProps) => {
         Object.entries(data.logs).forEach(([podName, logContent]: [string, any]) => {
           if (typeof logContent === 'string' && !podName.startsWith('_')) {
             // Parse log lines
-            const lines = logContent.split('\n').filter(line => line.trim());
-            lines.forEach(line => {
+            const lines = logContent.split('\n').filter((line: string) => line.trim());
+            lines.forEach((line: string) => {
               // Try to parse timestamp and level from log line
               const match = line.match(/^(\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2}[^\s]*)\s+(INFO|WARN|ERROR|DEBUG)?\s*(.*)$/i);
               

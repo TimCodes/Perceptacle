@@ -353,19 +353,19 @@ start_port_forward() {
     echo "" > "$PF_PIDS_FILE"
 
     print_step "Forwarding client (port 5173)..."
-    kubectl port-forward -n "$NAMESPACE" svc/perceptacle-client-client 5173:80 &
+    kubectl port-forward -n "$NAMESPACE" svc/${RELEASE_NAME}-client 5173:80 &
     echo $! >> "$PF_PIDS_FILE"
 
     print_step "Forwarding server (port 3000)..."
-    kubectl port-forward -n "$NAMESPACE" svc/perceptacle-server-server 3000:3000 &
+    kubectl port-forward -n "$NAMESPACE" svc/${RELEASE_NAME}-server 3000:3000 &
     echo $! >> "$PF_PIDS_FILE"
 
     print_step "Forwarding agents (port 8000)..."
-    kubectl port-forward -n "$NAMESPACE" svc/perceptacle-agents-agents 8000:8000 &
+    kubectl port-forward -n "$NAMESPACE" svc/${RELEASE_NAME}-agents 8000:8000 &
     echo $! >> "$PF_PIDS_FILE"
 
     print_step "Forwarding database (port 5432)..."
-    kubectl port-forward -n "$NAMESPACE" svc/perceptacle-postgresql-postgresql 5432:5432 &
+    kubectl port-forward -n "$NAMESPACE" svc/${RELEASE_NAME}-postgresql 5432:5432 &
     echo $! >> "$PF_PIDS_FILE"
 
     sleep 2

@@ -1,11 +1,10 @@
-import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Bug } from "lucide-react";
 import { cn } from "@/utils/cn";
 
-export const GitHubIssues = ({ issues }) => (
+export const GitHubIssues = ({ issues }: { issues: any[] }) => (
   <div className="mt-8 space-y-4">
     <div className="flex items-center justify-between mb-2">
       <h3 className="text-sm font-medium">GitHub Issues</h3>
@@ -14,7 +13,7 @@ export const GitHubIssues = ({ issues }) => (
 
     <ScrollArea className="h-[300px] w-full rounded-md border p-4">
       <div className="space-y-2">
-        {issues.map((issue, index) => (
+        {issues.map((issue: any, index: number) => (
           <div
             key={index}
             className={cn(

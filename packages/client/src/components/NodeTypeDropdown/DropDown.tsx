@@ -27,9 +27,9 @@ interface DropDownProps {
   onComponentSelect: (component: CloudComponent) => void;
 }
 
-function DropDown({ onComponentSelect }: DropDownProps) {
+function DropDown({ onComponentSelect: _onComponentSelect }: DropDownProps) {
   const [open, setOpen] = useState(false);
-  const [selectedComponent, setSelectedComponent] =
+  const [selectedComponent, _setSelectedComponent] =
     useState<CloudComponent | null>(null);
 
   const cloudComponents = getCloudComponents();
