@@ -30,7 +30,7 @@ interface BatchRequestItem {
     body?: any;
 }
 
-export function RestMessageForm({ defaultEndpoint = "", nodeLabel }: RestMessageFormProps) {
+export function RestMessageForm({ defaultEndpoint = "", nodeLabel: _nodeLabel }: RestMessageFormProps) {
     const { toast } = useToast();
     const [method, setMethod] = useState("GET");
     const [endpoint, setEndpoint] = useState(defaultEndpoint);

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Sparkles } from "lucide-react";
-import { useCallback, useState, useEffect } from "react";
+import { Search, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useDiagramStore } from "@/utils/diagram-store";
 import { useToast } from "@/hooks/use-toast";
 import Fuse from "fuse.js";
@@ -24,7 +24,7 @@ import {
 
 export default function DiagramToolbar() {
   const { toast } = useToast();
-  const { clearDiagram, nodes, setSelectedNode } = useDiagramStore();
+  const { nodes, setSelectedNode } = useDiagramStore();
   const [open, setOpen] = useState(false);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<
@@ -84,16 +84,6 @@ export default function DiagramToolbar() {
       setLoading(false);
     }
   };
-
-  const handleNew = useCallback(() => {
-    if (
-      window.confirm(
-        "Are you sure you want to create a new diagram? All unsaved changes will be lost.",
-      )
-    ) {
-      clearDiagram();
-    }
-  }, [clearDiagram]);
 
   return (
     <>

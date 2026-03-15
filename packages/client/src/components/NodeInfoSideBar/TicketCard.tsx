@@ -1,9 +1,8 @@
-import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/utils/cn";
 import { getStatusBadgeVariant, getPriorityColor } from "@/utils/helpers";
 
-export const TicketCard = ({ ticket }) => (
+export const TicketCard = ({ ticket }: { ticket: any }) => (
   <div className="p-4 border rounded-lg bg-card">
     <div className="flex items-start justify-between mb-2">
       <div className="space-y-1">

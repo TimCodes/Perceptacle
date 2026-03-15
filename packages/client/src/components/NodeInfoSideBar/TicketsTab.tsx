@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import TicketList from "@/components/NodeInfoSideBar/TicketList";
 
-export const TicketsTab = ({ editedNode }) => {
+export const TicketsTab = ({ editedNode }: { editedNode: any }) => {
   const tickets = editedNode.data.tickets || [];
 
   return (

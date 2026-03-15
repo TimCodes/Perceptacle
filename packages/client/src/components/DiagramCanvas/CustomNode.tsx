@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import {
     Tooltip,
@@ -6,25 +6,12 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AlertCircle, Bell, AlertTriangle, Info } from "lucide-react";
+import { AlertCircle, Bell } from "lucide-react";
 import { getCloudComponents } from "@/utils/cloudComponents";
 import { cn } from "@/utils/cn";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { NodeTypeHelper } from "@/utils/nodeTypeHelpers";
 import { NodeTypeDefinition } from "@/types/nodeTypes";
 import { NODE_TYPE_REGISTRY } from "@/types/nodeTypeRegistry";
-
-// Helper for log icons
-const getLogIcon = (level: string) => {
-    switch (level) {
-        case "error":
-            return <AlertCircle className="h-3 w-3 text-destructive" />;
-        case "warning":
-            return <AlertTriangle className="h-3 w-3 text-yellow-500" />;
-        default:
-            return <Info className="h-3 w-3 text-blue-500" />;
-    }
-};
 
 // Helper for status colors
 const getStatusClasses = (status: string, activeAlerts: number, alertSeverity: string) => {
@@ -51,8 +38,6 @@ const getStatusClasses = (status: string, activeAlerts: number, alertSeverity: s
 };
 
 const CustomNode = ({ data }: { data: any }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    
     // Get node type - support both legacy string format and new NodeTypeDefinition
     const nodeType: NodeTypeDefinition = typeof data.type === 'string'
         ? NodeTypeHelper.fromLegacyType(data.type)
@@ -78,9 +63,6 @@ const CustomNode = ({ data }: { data: any }) => {
     const activeAlerts = data.metrics?.activeAlerts || 0;
     const alertSeverity = data.metrics?.alertSeverity || 'warning';
     const status = data.status || 'active';
-    const logs = data.logs || [];
-    const recentLogs = logs.slice(-5).reverse(); // Get last 5 logs, most recent first
-
     const borderClasses = getStatusClasses(status, activeAlerts, alertSeverity);
 
     // Get category-specific background color
@@ -109,8 +91,6 @@ const CustomNode = ({ data }: { data: any }) => {
                             getCategoryColor(),
                             borderClasses
                         )}
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => setIsHovered(false)}
                     >
 
                         {/* Alert Badge */}

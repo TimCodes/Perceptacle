@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "@/utils/cn";
 import { Activity, AlertCircle } from "lucide-react";
 
@@ -11,7 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-export const ObservabilityMetricsDisplay = ({ metrics }) => (
+export const ObservabilityMetricsDisplay = ({ metrics }: { metrics: any }) => (
   <div className="space-y-6">
     <div className="grid grid-cols-1 gap-4">
       <Carousel className="m-7">

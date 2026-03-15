@@ -130,7 +130,15 @@ wait_for_service() {
     print_info "Waiting for $service to be ready..."
 
     while [[ $attempt -le $max_attempts ]]; do
-        if curl -s "$url" > /dev/null 2>&1; then
+        # Use nc for TCP-only endpoints (host:port without http/https scheme)
+        if [[ "$url" =~ ^[^:]+:[0-9]+$ ]]; then
+            local host="${url%%:*}"
+            local port="${url##*:}"
+            if nc -z "$host" "$port" > /dev/null 2>&1; then
+                print_success "$service is ready!"
+                return 0
+            fi
+        elif curl -s "$url" > /dev/null 2>&1; then
             print_success "$service is ready!"
             return 0
         fi
