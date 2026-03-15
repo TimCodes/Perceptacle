@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Synapse Agents Service
 
 # Development stage
-FROM python:3.11-slim as development
+FROM python:3.11-slim AS development
 
 WORKDIR /app
 
@@ -28,7 +28,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # Production stage
-FROM python:3.11-slim as production
+FROM python:3.11-slim AS production
 
 WORKDIR /app
 

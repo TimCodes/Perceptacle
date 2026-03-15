@@ -1,0 +1,15 @@
+dependencies:
+- name: client
+  repository: ""
+  version: 0.1.0
+- name: server
+  repository: ""
+  version: 0.1.0
+- name: agents
+  repository: ""
+  version: 0.1.0
+- name: postgresql
+  repository: ""
+  version: 0.1.0
+digest: sha256:8fc5b9b2f5c9e1795cf21d3735cd08d0b56d0d9975b42e725a7b085ef71a9eac
+generated: "2026-03-15T11:30:25.6877565-07:00"

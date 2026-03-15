@@ -5,12 +5,12 @@ pydantic-settings==2.6.0
 python-dotenv==1.0.1
 
 # LangChain and LangGraph (for future agent implementation)
-langchain==0.3.0
-langchain-core==0.3.0
-langchain-community==0.3.0
-langchain-openai==0.2.0
-langchain-anthropic==0.2.0
-langgraph==0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+langchain-openai>=0.2.0
+langchain-anthropic>=0.2.0
+langgraph>=0.2.34
 
 # Testing
 pytest==8.3.3

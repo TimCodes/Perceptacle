@@ -1,0 +1,99 @@
+# Production environment values
+# Usage: helm upgrade --install perceptacle . -f values.yaml -f values-production.yaml
+
+global:
+  environment: production
+  domain: perceptacle.example.com
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: perceptacle.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: server
+          port: 3000
+        - path: /agents
+          pathType: Prefix
+          service: agents
+          port: 8000
+        - path: /
+          pathType: Prefix
+          service: client
+          port: 80
+  tls:
+    - secretName: perceptacle-production-tls
+      hosts:
+        - perceptacle.example.com
+
+# Production client configuration with HPA
+client:
+  replicaCount: 2
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+
+# Production server configuration with HPA
+server:
+  replicaCount: 2
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+  config:
+    nodeEnv: production
+    useMockServices: "false"
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# Production agents configuration with HPA
+agents:
+  replicaCount: 2
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+  config:
+    environment: production
+    logLevel: INFO
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+# Disable in-cluster PostgreSQL for production
+postgresql:
+  enabled: false
+
+# Use DigitalOcean Managed PostgreSQL
+externalDatabase:
+  enabled: true
+  host: ""  # Set via Terraform output or secrets
+  port: 25060  # Default DO managed DB port with SSL
+  database: synapse

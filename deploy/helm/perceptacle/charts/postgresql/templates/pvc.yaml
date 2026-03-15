@@ -1,0 +1,7 @@
+{{- /*
+  Note: PVC is created via volumeClaimTemplates in StatefulSet for dynamic provisioning.
+  This file is kept for reference and manual PVC creation if needed.
+*/ -}}
+{{- if and .Values.enabled (not .Values.persistence.enabled) }}
+{{- /* Only create standalone PVC if persistence is enabled but we're not using volumeClaimTemplates */ -}}
+{{- end }}

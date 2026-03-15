@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for React Client
 
 # Development stage - using Vite dev server
-FROM node:18-alpine as development
+FROM node:18-alpine AS development
 WORKDIR /app
 
 # Install dependencies for development
@@ -21,19 +21,22 @@ EXPOSE 5173
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 # Build stage - create production build
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package files and install ALL dependencies (including devDependencies for build)
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci
 
 # Copy source code and build the application
 COPY . .
 RUN npm run build
 
+# Clean up devDependencies after build
+RUN npm prune --production && npm cache clean --force
+
 # Production stage - serve with Nginx
-FROM nginx:alpine as production
+FROM nginx:alpine AS production
 
 # Install curl for health checks
 RUN apk add --no-cache curl

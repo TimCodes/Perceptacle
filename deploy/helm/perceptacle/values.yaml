@@ -1,0 +1,221 @@
+# Default values for perceptacle
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  # Environment name (staging, production)
+  environment: staging
+
+  # Image pull secrets for private registries
+  imagePullSecrets: []
+
+  # Container registry
+  imageRegistry: registry.digitalocean.com/perceptacle
+
+  # Domain configuration
+  domain: perceptacle.example.com
+
+  # TLS configuration
+  tls:
+    enabled: true
+    issuer: letsencrypt-prod
+
+  # PostgreSQL configuration (shared with subcharts)
+  postgresql:
+    enabled: true
+    auth:
+      database: synapse
+      username: synapse
+      password: ""
+    service:
+      port: 5432
+
+# Ingress configuration (shared across services)
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  hosts:
+    - host: perceptacle.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: server
+          port: 3000
+        - path: /agents
+          pathType: Prefix
+          service: agents
+          port: 8000
+        - path: /
+          pathType: Prefix
+          service: client
+          port: 80
+  tls:
+    - secretName: perceptacle-tls
+      hosts:
+        - perceptacle.example.com
+
+# Client (React frontend) subchart values
+client:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: client
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+  config:
+    apiUrl: ""  # Will be set via ConfigMap
+
+# Server (Express backend) subchart values
+server:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: server
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+  config:
+    nodeEnv: production
+    useMockServices: "false"
+    agentsServiceUrl: "http://perceptacle-agents:8000"
+    ragServiceUrl: ""
+    ragServiceTimeout: "30000"
+
+  # Secrets (should be overridden or use external secrets)
+  secrets:
+    databaseUrl: ""
+    sessionSecret: ""
+    openaiApiKey: ""
+    anthropicApiKey: ""
+    geminiApiKey: ""
+    githubToken: ""
+    # Azure credentials
+    azureSubscriptionId: ""
+    azureClientId: ""
+    azureClientSecret: ""
+    azureTenantId: ""
+
+# Agents (Python FastAPI) subchart values
+agents:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: agents
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+  config:
+    environment: production
+    logLevel: INFO
+    corsOrigins: ""
+    ragServiceUrl: ""
+    ragServiceApiKey: ""
+
+  secrets:
+    openaiApiKey: ""
+    anthropicApiKey: ""
+    geminiApiKey: ""
+
+# PostgreSQL subchart values (for staging/dev only)
+postgresql:
+  enabled: true  # Set to false in production to use managed DB
+
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+
+  auth:
+    database: synapse
+    username: synapse
+    password: ""  # Set via secrets
+    postgresPassword: ""  # Set via secrets
+
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: do-block-storage
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# External database configuration (for production)
+externalDatabase:
+  enabled: false
+  host: ""
+  port: 5432
+  database: synapse
+  # Connection string set via secrets

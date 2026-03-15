@@ -1,0 +1,83 @@
+# Default values for server subchart
+replicaCount: 1
+
+image:
+  repository: server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+config:
+  nodeEnv: production
+  useMockServices: "false"
+  agentsServiceUrl: ""
+  ragServiceUrl: ""
+  ragServiceTimeout: "30000"
+
+secrets:
+  databaseUrl: ""
+  sessionSecret: ""
+  openaiApiKey: ""
+  anthropicApiKey: ""
+  geminiApiKey: ""
+  githubToken: ""
+  azureSubscriptionId: ""
+  azureClientId: ""
+  azureClientSecret: ""
+  azureTenantId: ""
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1001
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3

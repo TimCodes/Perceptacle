@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(export PATH=\"$PATH:/c/Users/i3ere/AppData/Local/Microsoft/WinGet/Packages/Helm.Helm_Microsoft.Winget.Source_8wekyb3d8bbwe/windows-amd64:/c/Users/i3ere/AppData/Local/Microsoft/WinGet/Packages/Kubernetes.kind_Microsoft.Winget.Source_8wekyb3d8bbwe\" echo \"=== Server Pod Image ===\" kubectl get pods -n perceptacle-local -o jsonpath='{.items[?\\(@.metadata.name contains \"\"server\"\"\\)].spec.containers[0].image}')",
+      "Bash(kubectl describe:*)"
+    ]
+  }
+}

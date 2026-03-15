@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "perceptacle.fullname" . }}-server-config
+  labels:
+    {{- include "perceptacle.labels" . | nindent 4 }}
+    app.kubernetes.io/component: server
+data:
+  NODE_ENV: {{ .Values.config.nodeEnv | quote }}
+  PORT: "3000"
+  USE_MOCK_SERVICES: {{ .Values.config.useMockServices | quote }}
+  AGENTS_SERVICE_URL: {{ .Values.config.agentsServiceUrl | default (printf "http://%s-agents:8000" (include "perceptacle.fullname" .)) | quote }}
+  {{- if .Values.config.ragServiceUrl }}
+  RAG_SERVICE_URL: {{ .Values.config.ragServiceUrl | quote }}
+  {{- end }}
+  RAG_SERVICE_TIMEOUT: {{ .Values.config.ragServiceTimeout | quote }}
+  # CORS configuration - use HTTPS if TLS enabled, HTTP otherwise
+  CLIENT_URL: "{{ if .Values.global.tls.enabled }}https{{ else }}http{{ end }}://{{ .Values.global.domain }}"

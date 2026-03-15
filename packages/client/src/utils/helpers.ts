@@ -26,14 +26,14 @@ export const getPriorityColor = (priority: string): string => {
   }
 };
 
-export const getStatusBadgeVariant = (status: string): string => {
+export const getStatusBadgeVariant = (status: string): "default" | "destructive" | "outline" | "secondary" => {
   switch (status.toLowerCase()) {
     case "open":
       return "destructive";
     case "in-progress":
-      return "warning";
+      return "outline";
     case "closed":
-      return "success";
+      return "secondary";
     default:
       return "secondary";
   }
