@@ -1,7 +1,4 @@
-import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/utils/cn";
-import { getStatusBadgeVariant, getPriorityColor } from "./utils";
 import TicketList from "@/components/NodeInfoSideBar/TicketList";
 
 export const TicketsTab = ({ editedNode }) => {

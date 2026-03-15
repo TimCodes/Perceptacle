@@ -37,7 +37,7 @@ export const GitHubIssues = ({ issues }) => (
                 {issue.title}
               </Button>
               <Badge
-                variant={issue.state === "open" ? "destructive" : "success"}
+                variant={issue.state === "open" ? "destructive" : "secondary"}
                 className="w-fit"
               >
                 {issue.state}

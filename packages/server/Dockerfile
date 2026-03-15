@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Express Server
 
 # Development stage
-FROM node:18-alpine as development
+FROM node:18-alpine AS development
 WORKDIR /app
 
 # Install tsx globally for development
@@ -9,7 +9,7 @@ RUN npm install -g tsx
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -25,19 +25,19 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 CMD ["npm", "run", "dev"]
 
 # Build stage
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy source code and build
 COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18-alpine as production
+FROM node:18-alpine AS production
 WORKDIR /app
 
 # Create non-root user
@@ -46,7 +46,7 @@ RUN addgroup -g 1001 -S nodejs && \
 
 # Copy package files and install production dependencies
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --legacy-peer-deps --omit=dev && npm cache clean --force
 
 # Copy built application
 COPY --from=build --chown=nodejs:nodejs /app/dist ./dist

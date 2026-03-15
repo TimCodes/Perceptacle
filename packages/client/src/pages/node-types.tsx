@@ -269,52 +269,6 @@ export default function NodeTypes() {
                     <Input value={selectedComponent.category} readOnly />
                   </div>
 
-                  {selectedComponent.fields &&
-                    selectedComponent.fields.length > 0 && (
-                      <div className="space-y-4">
-                        <Label className="text-lg">Custom Fields</Label>
-                        <div className="grid gap-4">
-                          {selectedComponent.fields.map(
-                            (field: CustomField) => (
-                              <Card key={field.id}>
-                                <CardContent className="pt-4">
-                                  <div className="grid gap-2">
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-medium">
-                                        {field.name}
-                                      </span>
-                                      <Badge>
-                                        {
-                                          FIELD_TYPES.find(
-                                            (t) => t.value === field.type,
-                                          )?.label
-                                        }
-                                      </Badge>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">
-                                      {field.placeholder &&
-                                        `Placeholder: ${field.placeholder}`}
-                                      {field.defaultValue &&
-                                        ` • Default: ${field.defaultValue}`}
-                                    </p>
-                                    {field.type === "select" &&
-                                      field.options && (
-                                        <div className="flex gap-2 flex-wrap">
-                                          {field.options.map((option, i) => (
-                                            <Badge key={i} variant="outline">
-                                              {option}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ),
-                          )}
-                        </div>
-                      </div>
-                    )}
                 </div>
 
                 <div className="space-y-2">

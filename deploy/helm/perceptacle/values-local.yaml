@@ -1,0 +1,140 @@
+# Local development values for Perceptacle
+# Use with: kind, minikube, k3d, or Docker Desktop Kubernetes
+
+global:
+  environment: local
+  imagePullSecrets: []
+  # Use local images (no registry prefix)
+  imageRegistry: ""
+  domain: localhost
+  tls:
+    enabled: false
+
+# Disable ingress for local - we'll use port-forwarding
+ingress:
+  enabled: false
+
+# Client configuration
+client:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: perceptacle/client
+    tag: local
+    pullPolicy: Never  # Use local images
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  config:
+    apiUrl: "http://localhost:3000"
+
+# Server configuration
+server:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: perceptacle/server
+    tag: local
+    pullPolicy: Never
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  config:
+    nodeEnv: development
+    useMockServices: "true"
+    agentsServiceUrl: "http://perceptacle-agents:8000"
+
+  secrets:
+    databaseUrl: "postgresql://synapse:localdev123@perceptacle-postgresql:5432/synapse"
+    sessionSecret: "local-dev-secret-change-in-production"
+    openaiApiKey: ""
+    anthropicApiKey: ""
+
+# Agents configuration
+agents:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: perceptacle/agents
+    tag: local
+    pullPolicy: Never
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  config:
+    environment: development
+    logLevel: DEBUG
+    corsOrigins: "http://localhost:5173,http://localhost:3000"
+
+  secrets:
+    openaiApiKey: ""
+    anthropicApiKey: ""
+
+# PostgreSQL - enabled for local dev
+postgresql:
+  enabled: true
+
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+
+  auth:
+    database: synapse
+    username: synapse
+    password: "localdev123"
+    postgresPassword: "localdev123"
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    # Use default storage class for local cluster
+    storageClass: ""
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+externalDatabase:
+  enabled: false

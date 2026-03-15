@@ -1,0 +1,121 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named: {{ .Release.Name }}
+Environment: {{ .Values.global.environment }}
+
+=============================================================================
+DEPLOYMENT STATUS
+=============================================================================
+
+To check the status of your deployment, run:
+
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+=============================================================================
+ACCESSING THE APPLICATION
+=============================================================================
+
+{{- if .Values.ingress.enabled }}
+
+The application is accessible via Ingress at:
+
+{{- range .Values.ingress.hosts }}
+  {{- if $.Values.global.tls.enabled }}
+  https://{{ .host }}
+  {{- else }}
+  http://{{ .host }}
+  {{- end }}
+{{- end }}
+
+API Endpoints:
+  - Client:  https://{{ .Values.global.domain }}/
+  - Server:  https://{{ .Values.global.domain }}/api
+  - Agents:  https://{{ .Values.global.domain }}/agents
+
+{{- else }}
+
+To access the application, port-forward the services:
+
+  # Client (React frontend)
+  kubectl port-forward svc/{{ include "perceptacle.fullname" . }}-client 8080:80 -n {{ .Release.Namespace }}
+
+  # Server (Express API)
+  kubectl port-forward svc/{{ include "perceptacle.fullname" . }}-server 3000:3000 -n {{ .Release.Namespace }}
+
+  # Agents (FastAPI)
+  kubectl port-forward svc/{{ include "perceptacle.fullname" . }}-agents 8000:8000 -n {{ .Release.Namespace }}
+
+{{- end }}
+
+=============================================================================
+HEALTH CHECKS
+=============================================================================
+
+Verify the services are healthy:
+
+  # Client
+  curl https://{{ .Values.global.domain }}/
+
+  # Server
+  curl https://{{ .Values.global.domain }}/api/health
+
+  # Agents
+  curl https://{{ .Values.global.domain }}/agents/health
+
+=============================================================================
+DATABASE
+=============================================================================
+
+{{- if .Values.postgresql.enabled }}
+
+PostgreSQL is deployed within the cluster.
+
+To connect to the database:
+
+  kubectl run postgresql-client --rm --tty -i --restart='Never' \
+    --namespace {{ .Release.Namespace }} \
+    --image postgres:15-alpine \
+    --env="PGPASSWORD=$POSTGRES_PASSWORD" \
+    --command -- psql -h {{ include "perceptacle.fullname" . }}-postgresql -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }}
+
+{{- else if .Values.externalDatabase.enabled }}
+
+Using external managed database at: {{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}
+
+{{- end }}
+
+=============================================================================
+TROUBLESHOOTING
+=============================================================================
+
+View logs for a specific service:
+
+  kubectl logs -f deployment/{{ include "perceptacle.fullname" . }}-server -n {{ .Release.Namespace }}
+  kubectl logs -f deployment/{{ include "perceptacle.fullname" . }}-client -n {{ .Release.Namespace }}
+  kubectl logs -f deployment/{{ include "perceptacle.fullname" . }}-agents -n {{ .Release.Namespace }}
+
+Check events:
+
+  kubectl get events -n {{ .Release.Namespace }} --sort-by='.lastTimestamp'
+
+=============================================================================
+SCALING
+=============================================================================
+
+{{- if or .Values.client.autoscaling.enabled .Values.server.autoscaling.enabled .Values.agents.autoscaling.enabled }}
+
+Horizontal Pod Autoscaling is enabled. Check HPA status:
+
+  kubectl get hpa -n {{ .Release.Namespace }}
+
+{{- else }}
+
+To manually scale a service:
+
+  kubectl scale deployment {{ include "perceptacle.fullname" . }}-server --replicas=3 -n {{ .Release.Namespace }}
+
+{{- end }}
+
+=============================================================================
+
+For more information, visit: https://github.com/TimCodes/perceptacle

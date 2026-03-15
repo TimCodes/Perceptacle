@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/command";
 
 export default function DiagramToolbar() {
-  const toast = useToast();
+  const { toast } = useToast();
   const { clearDiagram, nodes, setSelectedNode } = useDiagramStore();
   const [open, setOpen] = useState(false);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
