@@ -31,6 +31,14 @@ fi
 echo -e "${YELLOW}Checking required tools...${NC}"
 command -v kubectl >/dev/null 2>&1 || { echo -e "${RED}kubectl is required but not installed.${NC}"; exit 1; }
 command -v helm >/dev/null 2>&1 || { echo -e "${RED}helm is required but not installed.${NC}"; exit 1; }
+command -v doctl >/dev/null 2>&1 || { echo -e "${RED}doctl (DigitalOcean CLI) is required but not installed. Install from: https://docs.digitalocean.com/reference/doctl/how-to/install/${NC}"; exit 1; }
+
+# Verify doctl is authenticated
+if ! doctl account get >/dev/null 2>&1; then
+    echo -e "${RED}doctl is not authenticated. Run 'doctl auth init' first.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}All required tools are available.${NC}"
 
 # Set namespace
 NAMESPACE="perceptacle-$ENVIRONMENT"

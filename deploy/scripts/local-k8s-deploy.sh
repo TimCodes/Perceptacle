@@ -298,10 +298,10 @@ load_images() {
             k3d image import perceptacle/agents:local -c "$CLUSTER_NAME"
             ;;
         minikube)
-            # For minikube, we use the docker-env or image load
-            eval $(minikube -p "$CLUSTER_NAME" docker-env)
-            docker images | grep perceptacle || true
-            print_info "Images available in minikube docker daemon"
+            # For minikube, use 'minikube image load' to transfer images from host
+            minikube -p "$CLUSTER_NAME" image load perceptacle/client:local
+            minikube -p "$CLUSTER_NAME" image load perceptacle/server:local
+            minikube -p "$CLUSTER_NAME" image load perceptacle/agents:local
             ;;
         docker-desktop)
             # Docker Desktop shares the daemon, images are already available
@@ -607,28 +607,41 @@ cmd_db() {
     switch_context
 
     local subcmd=${1:-help}
-    local server_pod
 
-    server_pod=$(kubectl get pods -n "$NAMESPACE" -l "app.kubernetes.io/name=server" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+    # Helper function to get pod name with validation
+    get_pod() {
+        local label=$1
+        local pod
+        pod=$(kubectl get pods -n "$NAMESPACE" -l "$label" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+        if [[ -z "$pod" ]]; then
+            print_error "No pod found with label: $label"
+            print_info "Make sure the deployment is running: $0 status"
+            return 1
+        fi
+        echo "$pod"
+    }
 
     case "$subcmd" in
         migrate|push)
+            local server_pod
+            server_pod=$(get_pod "app.kubernetes.io/name=server") || exit 1
             print_info "Running database migrations..."
             kubectl exec -n "$NAMESPACE" "$server_pod" -- npm run db:push
             print_success "Migrations complete"
             ;;
         psql|shell)
-            print_info "Connecting to PostgreSQL..."
             local pg_pod
-            pg_pod=$(kubectl get pods -n "$NAMESPACE" -l "app.kubernetes.io/name=postgresql" -o jsonpath='{.items[0].metadata.name}')
+            pg_pod=$(get_pod "app.kubernetes.io/name=postgresql") || exit 1
+            print_info "Connecting to PostgreSQL..."
             kubectl exec -it -n "$NAMESPACE" "$pg_pod" -- psql -U synapse -d synapse
             ;;
         reset)
             print_warning "This will delete all data in the database!"
             read -p "Are you sure? (yes/no): " confirm
             if [[ "$confirm" == "yes" ]]; then
-                local pg_pod
-                pg_pod=$(kubectl get pods -n "$NAMESPACE" -l "app.kubernetes.io/name=postgresql" -o jsonpath='{.items[0].metadata.name}')
+                local pg_pod server_pod
+                pg_pod=$(get_pod "app.kubernetes.io/name=postgresql") || exit 1
+                server_pod=$(get_pod "app.kubernetes.io/name=server") || exit 1
                 kubectl exec -n "$NAMESPACE" "$pg_pod" -- psql -U synapse -d synapse -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
                 print_info "Running migrations..."
                 kubectl exec -n "$NAMESPACE" "$server_pod" -- npm run db:push

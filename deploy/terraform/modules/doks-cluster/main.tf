@@ -14,11 +14,16 @@ resource "digitalocean_kubernetes_cluster" "perceptacle" {
   region  = var.region
   version = var.kubernetes_version
 
+  # Use custom VPC if created
+  vpc_uuid = var.create_vpc ? digitalocean_vpc.perceptacle[0].id : null
+
   # Enable auto-upgrade for patch versions
   auto_upgrade = var.auto_upgrade
 
   # Enable HA control plane for production
   ha = var.ha_control_plane
+
+  depends_on = [digitalocean_vpc.perceptacle]
 
   # Maintenance window
   maintenance_policy {

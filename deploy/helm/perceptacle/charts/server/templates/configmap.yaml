@@ -14,5 +14,5 @@ data:
   RAG_SERVICE_URL: {{ .Values.config.ragServiceUrl | quote }}
   {{- end }}
   RAG_SERVICE_TIMEOUT: {{ .Values.config.ragServiceTimeout | quote }}
-  # CORS configuration
-  CLIENT_URL: "https://{{ .Values.global.domain }}"
+  # CORS configuration - use HTTPS if TLS enabled, HTTP otherwise
+  CLIENT_URL: "{{ if .Values.global.tls.enabled }}https{{ else }}http{{ end }}://{{ .Values.global.domain }}"

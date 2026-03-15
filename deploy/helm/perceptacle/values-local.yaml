@@ -9,6 +9,15 @@ global:
   domain: localhost
   tls:
     enabled: false
+  # PostgreSQL configuration (shared with subcharts)
+  postgresql:
+    enabled: true
+    auth:
+      database: synapse
+      username: synapse
+      password: "localdev123"
+    service:
+      port: 5432
 
 # Disable ingress for local - we'll use port-forwarding
 ingress:

@@ -28,9 +28,10 @@ The application is accessible via Ingress at:
 {{- end }}
 
 API Endpoints:
-  - Client:  https://{{ .Values.global.domain }}/
-  - Server:  https://{{ .Values.global.domain }}/api
-  - Agents:  https://{{ .Values.global.domain }}/agents
+{{- $scheme := ternary "https" "http" .Values.global.tls.enabled }}
+  - Client:  {{ $scheme }}://{{ .Values.global.domain }}/
+  - Server:  {{ $scheme }}://{{ .Values.global.domain }}/api
+  - Agents:  {{ $scheme }}://{{ .Values.global.domain }}/agents
 
 {{- else }}
 
@@ -52,15 +53,16 @@ HEALTH CHECKS
 =============================================================================
 
 Verify the services are healthy:
+{{- $healthScheme := ternary "https" "http" .Values.global.tls.enabled }}
 
   # Client
-  curl https://{{ .Values.global.domain }}/
+  curl {{ $healthScheme }}://{{ .Values.global.domain }}/
 
   # Server
-  curl https://{{ .Values.global.domain }}/api/health
+  curl {{ $healthScheme }}://{{ .Values.global.domain }}/api/health
 
   # Agents
-  curl https://{{ .Values.global.domain }}/agents/health
+  curl {{ $healthScheme }}://{{ .Values.global.domain }}/agents/health
 
 =============================================================================
 DATABASE

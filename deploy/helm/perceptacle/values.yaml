@@ -20,6 +20,16 @@ global:
     enabled: true
     issuer: letsencrypt-prod
 
+  # PostgreSQL configuration (shared with subcharts)
+  postgresql:
+    enabled: true
+    auth:
+      database: synapse
+      username: synapse
+      password: ""
+    service:
+      port: 5432
+
 # Ingress configuration (shared across services)
 ingress:
   enabled: true
